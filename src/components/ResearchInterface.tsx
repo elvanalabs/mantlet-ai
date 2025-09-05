@@ -57,7 +57,7 @@ export const ResearchInterface = () => {
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'assistant',
-        content: response.answer,
+        content: response.contextData,
         timestamp: new Date(),
         sources: response.sources,
       };

@@ -2,7 +2,7 @@ import axios from 'axios';
 import { MoralisService } from './MoralisService';
 
 export interface ResearchResponse {
-  answer: string;
+  contextData: string;
   sources: string[];
 }
 
@@ -10,68 +10,69 @@ interface CoinGeckoPrice {
   id: string;
   symbol: string;
   name: string;
+  image: string;
   current_price: number;
-  price_change_percentage_24h: number;
-  price_change_percentage_7d_in_currency?: number;
   market_cap: number;
   market_cap_rank: number;
+  fully_diluted_valuation: number;
   total_volume: number;
   high_24h: number;
   low_24h: number;
+  price_change_24h: number;
+  price_change_percentage_24h: number;
+  price_change_percentage_7d_in_currency?: number;
+  price_change_percentage_30d_in_currency?: number;
+  market_cap_change_24h: number;
+  market_cap_change_percentage_24h: number;
   circulating_supply: number;
   total_supply: number;
   max_supply: number;
   ath: number;
+  ath_change_percentage: number;
   ath_date: string;
   atl: number;
+  atl_change_percentage: number;
   atl_date: string;
-}
-
-interface CoinGeckoDetailedCoin {
-  id: string;
-  name: string;
-  symbol: string;
-  description: { en: string };
-  market_cap_rank: number;
-  coingecko_rank: number;
-  developer_score: number;
-  community_score: number;
-  liquidity_score: number;
-  public_interest_score: number;
+  roi?: any;
+  last_updated: string;
 }
 
 interface DeFiLlamaProtocol {
   id: string;
   name: string;
-  address?: string;
-  symbol?: string;
-  url?: string;
-  description?: string;
-  chain?: string;
-  logo?: string;
-  audits?: string;
-  audit_note?: string;
-  gecko_id?: string;
-  cmcId?: string;
-  category?: string;
-  chains?: string[];
-  module?: string;
-  twitter?: string;
-  forkedFrom?: string[];
-  oracles?: string[];
-  listedAt?: number;
-  methodology?: string;
-  slug?: string;
+  address: string;
+  symbol: string;
+  url: string;
+  description: string;
+  chain: string;
+  logo: string;
+  audits: string;
+  audit_note: string;
+  gecko_id: string;
+  cmcId: string;
+  category: string;
+  chains: string[];
+  module: string;
+  twitter: string;
+  audit_links: string[];
+  listedAt: number;
+  methodology: string;
+  slug: string;
   tvl: number;
-  chainTvls?: { [chain: string]: number };
-  change_1h?: number;
-  change_1d?: number;
-  change_7d?: number;
-  tokenBreakdowns?: any;
-  mcap?: number;
+  chainTvls: { [chain: string]: number };
+  change_1h: number;
+  change_1d: number;
+  change_7d: number;
+  tokenBreakdowns: any;
+  mcap: number;
 }
 
-interface GlobalMarketData {
+interface CoinGeckoGlobalData {
+  active_cryptocurrencies: number;
+  upcoming_icos: number;
+  ongoing_icos: number;
+  ended_icos: number;
+  markets: number;
   total_market_cap: { [currency: string]: number };
   total_volume: { [currency: string]: number };
   market_cap_percentage: { [symbol: string]: number };
@@ -89,8 +90,17 @@ export class ResearchService {
       const sources: string[] = [];
       let contextData = '';
 
-      // Always fetch comprehensive data for better analysis
+      // Collect all data promises for concurrent execution
       const dataPromises: Promise<string | null>[] = [];
+      
+      // Handle wallet queries first (highest priority)
+      if (this.isWalletQuery(queryLower)) {
+        const walletResult = await this.processWalletQuery(query);
+        return {
+          contextData: walletResult,
+          sources: ['Moralis API', 'CoinGecko API']
+        };
+      }
 
       // Comprehensive market data
       dataPromises.push(this.fetchCoinGeckoMarketData(query));
@@ -117,65 +127,107 @@ export class ResearchService {
         dataPromises.push(this.fetchChainSpecificData(query));
       }
 
-      if (this.isWalletQuery(queryLower)) {
-        dataPromises.push(this.fetchMoralisWalletData(query));
-      }
-
-      // Fetch all data concurrently
+      // Execute all data fetches concurrently
       const results = await Promise.allSettled(dataPromises);
       
+      // Process results and collect successful data
+      const dataResults: string[] = [];
       results.forEach((result, index) => {
         if (result.status === 'fulfilled' && result.value) {
-          contextData += result.value + '\n\n';
+          dataResults.push(result.value);
           
-          // Add appropriate source labels
-          if (index === 0) sources.push('CoinGecko Market Data');
-          else if (index === 1) sources.push('Global Market Stats');
-          else if (index === 2) sources.push('Trending Cryptocurrencies');
-          else if (index === 3) sources.push('DeFi Protocol Data');
-          else if (index === 4) sources.push('Chain TVL Analytics');
-          else if (index === 5) sources.push('Yield Farming Data');
-          else if (index === 6) sources.push('Detailed Coin Analysis');
-          else if (index === 7) sources.push('Price History');
-          else if (index === 8) sources.push('Protocol Details');
-          else if (index === 9) sources.push('Stablecoin Data');
-          else if (index === 10) sources.push('Chain-Specific Data');
-          else if (index === 11) sources.push('Moralis Wallet Data');
+          // Add appropriate sources based on data type
+          if (index < 3) sources.push('CoinGecko API');
+          else if (index < 6) sources.push('DeFiLlama API');
+          else sources.push('CoinGecko API', 'DeFiLlama API');
         }
       });
 
-      // Generate comprehensive response using Claude AI
-      const answer = await this.generateClaudeResponse(query, contextData);
+      // Combine all successful results
+      contextData = dataResults.join('\n\n');
+
+      // Add fallback data if no results
+      if (!contextData) {
+        contextData = 'No specific market data available for this query. Please try a more specific request about cryptocurrencies, DeFi protocols, or blockchain data.';
+        sources.push('System Message');
+      }
 
       return {
-        answer,
-        sources: sources.length > 0 ? sources : ['Web3 Knowledge Base']
+        contextData,
+        sources: Array.from(new Set(sources))
       };
     } catch (error) {
-      console.error('Research service error:', error);
+      console.error('Research Service error:', error);
       return {
-        answer: 'I apologize, but I encountered an error while processing your query. Please try again with a different question.',
-        sources: []
+        contextData: 'An error occurred while fetching market data. Please try again.',
+        sources: ['Error']
       };
     }
   }
 
+  // === WALLET QUERY PROCESSING ===
+
+  private static async processWalletQuery(query: string): Promise<string> {
+    try {
+      const walletAddress = MoralisService.extractWalletAddress(query);
+      if (!walletAddress) {
+        return 'No valid wallet address found in the query. Please provide a valid Ethereum (0x...) or Solana address.';
+      }
+
+      const chain = MoralisService.detectChainFromAddress(walletAddress);
+      
+      console.log('Using chain:', chain, 'for address:', walletAddress);
+
+      // Fetch wallet data with enhanced pricing
+      const [balances, history] = await Promise.allSettled([
+        MoralisService.getWalletTokenBalancesWithPricing(walletAddress, chain),
+        MoralisService.getWalletHistory(walletAddress, chain, 5)
+      ]);
+
+      let result = `WALLET ANALYSIS: ${walletAddress}
+Blockchain: ${chain.toUpperCase()}
+
+`;
+
+      // Add token balances (which includes native balance for Solana)
+      if (balances.status === 'fulfilled') {
+        const balanceData = MoralisService.formatWalletBalanceData(balances.value, chain);
+        if (balanceData) {
+          result += balanceData + '\n\n';
+        }
+      } else {
+        result += 'Error fetching wallet balances\n\n';
+      }
+
+      // Add transaction history for EVM chains
+      if (history.status === 'fulfilled' && chain !== 'solana') {
+        const historyData = MoralisService.formatWalletHistoryData(history.value);
+        if (historyData) {
+          result += historyData + '\n\n';
+        }
+      }
+
+      return result;
+    } catch (error) {
+      console.error('Wallet query error:', error);
+      return 'Error processing wallet query. Please check the wallet address and try again.';
+    }
+  }
+
+  // === QUERY TYPE DETECTION ===
+
   private static isPriceQuery(query: string): boolean {
     const priceKeywords = [
-      'price', 'cost', 'value', 'worth', 'market cap', 'volume', 'high', 'low', 'ath', 'atl',
-      'bitcoin', 'ethereum', 'btc', 'eth', 'token', 'coin', 'crypto', 'cryptocurrency',
-      'solana', 'ada', 'bnb', 'xrp', 'doge', 'matic', 'avax', 'dot', 'link', 'uni',
-      'near', 'atom', 'icp', 'fil', 'vet', 'algo', 'mana', 'sand', 'axs', 'chr'
+      'price', 'cost', 'value', 'worth', 'usd', 'dollar', 'how much',
+      'current price', 'market price', 'trading at', 'priced at'
     ];
-    return priceKeywords.some(keyword => query.toLowerCase().includes(keyword));
+    return priceKeywords.some(keyword => query.includes(keyword));
   }
 
   private static isDeFiQuery(query: string): boolean {
     const defiKeywords = [
-      'defi', 'protocol', 'tvl', 'yield', 'liquidity', 'staking', 'lending', 'borrowing',
-      'aave', 'uniswap', 'compound', 'makerdao', 'curve', 'convex', 'yearn', 'synthetix',
-      'pancakeswap', 'sushiswap', 'balancer', 'trader joe', 'gmx', 'dydx', 'perpetual',
-      'farm', 'farming', 'pool', 'amm', 'dex', 'exchange', 'swap'
+      'defi', 'tvl', 'yield', 'liquidity', 'protocol', 'apy', 'apr',
+      'lending', 'borrowing', 'staking', 'farming', 'pool', 'vault'
     ];
     return defiKeywords.some(keyword => query.toLowerCase().includes(keyword));
   }
@@ -283,40 +335,99 @@ export class ResearchService {
 
   private static async fetchDetailedCoinData(query: string): Promise<string | null> {
     try {
-      // Extract potential coin ID from query
-      const coinId = this.extractCoinId(query);
-      if (!coinId) return null;
+      // First try to search for the coin to get its correct ID
+      const coinQuery = this.extractCoinFromQuery(query);
+      if (!coinQuery) return null;
+
+      // Search for the coin first
+      const searchResponse = await axios.get(`${this.COINGECKO_API}/search`, {
+        params: { query: coinQuery }
+      });
+
+      let coinId = null;
+      if (searchResponse.data.coins && searchResponse.data.coins.length > 0) {
+        coinId = searchResponse.data.coins[0].id;
+      } else {
+        // Fallback: try using the query directly as coin ID
+        coinId = coinQuery.toLowerCase().replace(/\s+/g, '-');
+      }
 
       const response = await axios.get(`${this.COINGECKO_API}/coins/${coinId}`, {
         params: {
           localization: false,
           tickers: false,
           market_data: true,
-          community_data: true,
-          developer_data: true
+          community_data: false,
+          developer_data: false
         }
       });
 
       const coin = response.data;
       const marketData = coin.market_data;
 
-      return `DETAILED ANALYSIS - ${coin.name} (${coin.symbol.toUpperCase()}):\n` +
-        `Current Price: $${marketData.current_price?.usd?.toLocaleString() || 'N/A'}\n` +
-        `All-Time High: $${marketData.ath?.usd?.toLocaleString() || 'N/A'} (${marketData.ath_date?.usd?.split('T')[0] || 'N/A'})\n` +
-        `All-Time Low: $${marketData.atl?.usd?.toLocaleString() || 'N/A'} (${marketData.atl_date?.usd?.split('T')[0] || 'N/A'})\n` +
-        `Market Cap: $${marketData.market_cap?.usd ? (marketData.market_cap.usd / 1e9).toFixed(2) + 'B' : 'N/A'}\n` +
-        `Fully Diluted Valuation: $${marketData.fully_diluted_valuation?.usd ? (marketData.fully_diluted_valuation.usd / 1e9).toFixed(2) + 'B' : 'N/A'}\n` +
-        `Circulating Supply: ${marketData.circulating_supply?.toLocaleString() || 'N/A'}\n` +
-        `Total Supply: ${marketData.total_supply?.toLocaleString() || 'N/A'}\n` +
-        `Max Supply: ${marketData.max_supply?.toLocaleString() || 'Unlimited'}\n` +
-        `Price Changes: 1h: ${marketData.price_change_percentage_1h_in_currency?.usd?.toFixed(2) || 'N/A'}% | ` +
-        `24h: ${marketData.price_change_percentage_24h?.toFixed(2) || 'N/A'}% | ` +
-        `7d: ${marketData.price_change_percentage_7d?.toFixed(2) || 'N/A'}% | ` +
-        `30d: ${marketData.price_change_percentage_30d?.toFixed(2) || 'N/A'}%`;
+      return `${coin.name.toUpperCase()} (${coin.symbol.toUpperCase()}) PRICE DATA:
+
+Current Price: $${marketData.current_price?.usd?.toLocaleString() || 'N/A'}
+24h Change: ${marketData.price_change_percentage_24h?.toFixed(2) || 'N/A'}%
+Market Cap Rank: ${coin.market_cap_rank || 'N/A'}
+Market Capitalization: $${marketData.market_cap?.usd ? (marketData.market_cap.usd / 1e6).toFixed(2) + ' Million' : 'N/A'}
+24h Trading Volume: $${marketData.total_volume?.usd ? (marketData.total_volume.usd / 1e6).toFixed(2) + ' Million' : 'N/A'}
+7d Change: ${marketData.price_change_percentage_7d?.toFixed(2) || 'N/A'}%
+30d Change: ${marketData.price_change_percentage_30d?.toFixed(2) || 'N/A'}%
+All Time High: $${marketData.ath?.usd?.toLocaleString() || 'N/A'}
+Circulating Supply: ${marketData.circulating_supply ? marketData.circulating_supply.toLocaleString() : 'N/A'} ${coin.symbol.toUpperCase()}`;
     } catch (error) {
       console.error('Detailed coin data error:', error);
+      // Fallback: try markets endpoint for broader search
+      return await this.fetchCoinFromMarkets(query);
+    }
+  }
+
+  private static async fetchCoinFromMarkets(query: string): Promise<string | null> {
+    try {
+      const coinQuery = this.extractCoinFromQuery(query);
+      if (!coinQuery) return null;
+
+      const response = await axios.get(`${this.COINGECKO_API}/coins/markets`, {
+        params: {
+          vs_currency: 'usd',
+          order: 'market_cap_desc',
+          per_page: 250,
+          page: 1,
+          sparkline: false,
+          price_change_percentage: '24h,7d,30d'
+        }
+      });
+
+      const coin = response.data.find((c: any) => 
+        c.symbol.toLowerCase() === coinQuery.toLowerCase() ||
+        c.name.toLowerCase().includes(coinQuery.toLowerCase()) ||
+        c.id.toLowerCase().includes(coinQuery.toLowerCase())
+      );
+
+      if (!coin) return null;
+
+      return `${coin.name.toUpperCase()} (${coin.symbol.toUpperCase()}) PRICE DATA:
+
+Current Price: $${coin.current_price?.toLocaleString() || 'N/A'}
+24h Change: ${coin.price_change_percentage_24h?.toFixed(2) || 'N/A'}%
+Market Cap Rank: ${coin.market_cap_rank || 'N/A'}
+Market Capitalization: $${coin.market_cap ? (coin.market_cap / 1e6).toFixed(2) + ' Million' : 'N/A'}
+24h Trading Volume: $${coin.total_volume ? (coin.total_volume / 1e6).toFixed(2) + ' Million' : 'N/A'}`;
+    } catch (error) {
+      console.error('Coin from markets error:', error);
       return null;
     }
+  }
+
+  private static extractCoinFromQuery(query: string): string | null {
+    // Remove common price-related words and extract the coin name/symbol
+    const cleanQuery = query.toLowerCase()
+      .replace(/\b(price|for|of|token|coin|crypto|cryptocurrency|what|is|the|how|much)\b/g, '')
+      .trim();
+    
+    // Return the cleaned query if it's not empty and reasonable length
+    return cleanQuery && cleanQuery.length >= 2 ? cleanQuery : null;
   }
 
   private static async fetchPriceHistoryData(query: string): Promise<string | null> {
@@ -359,7 +470,7 @@ export class ResearchService {
           `${index + 1}. ${protocol.name}: $${(protocol.tvl / 1e9).toFixed(2)}B TVL ` +
           `| 1d: ${protocol.change_1d ? (protocol.change_1d > 0 ? '+' : '') + protocol.change_1d.toFixed(2) + '%' : 'N/A'} ` +
           `| Category: ${protocol.category || 'N/A'} ` +
-          `| Chain: ${protocol.chain || (protocol.chains ? protocol.chains[0] : 'Multi-chain')}`
+          `| Chain: ${protocol.chain || (protocol.chains?.join(', ') || 'Multi-Chain')}`
         ).join('\n');
     } catch (error) {
       console.error('DeFi protocol data error:', error);
@@ -469,10 +580,11 @@ export class ResearchService {
 
       if (chainProtocols.length === 0) return null;
 
-      return `${chainName.toUpperCase()} ECOSYSTEM PROTOCOLS:\n` +
-        chainProtocols.map((protocol: DeFiLlamaProtocol) => 
-          `${protocol.name}: $${(protocol.tvl / 1e9).toFixed(2)}B TVL ` +
-          `| Category: ${protocol.category || 'N/A'}`
+      return `TOP ${chainName.toUpperCase()} PROTOCOLS:\n` +
+        chainProtocols.map((protocol: DeFiLlamaProtocol, index: number) => 
+          `${index + 1}. ${protocol.name}: $${(protocol.tvl / 1e9).toFixed(2)}B TVL ` +
+          `| Category: ${protocol.category} ` +
+          `| 1d: ${protocol.change_1d?.toFixed(2) || 'N/A'}%`
         ).join('\n');
     } catch (error) {
       console.error('Chain specific data error:', error);
@@ -493,18 +605,38 @@ export class ResearchService {
       'dogecoin': 'dogecoin', 'doge': 'dogecoin',
       'polygon': 'matic-network', 'matic': 'matic-network',
       'avalanche': 'avalanche-2', 'avax': 'avalanche-2',
-      'polkadot': 'polkadot', 'dot': 'polkadot',
       'chainlink': 'chainlink', 'link': 'chainlink',
+      'polkadot': 'polkadot', 'dot': 'polkadot',
       'uniswap': 'uniswap', 'uni': 'uniswap',
-      'near': 'near', 'near protocol': 'near'
+      'litecoin': 'litecoin', 'ltc': 'litecoin',
+      'manta': 'manta-network', 'manta network': 'manta-network',
+      'eigenlayer': 'eigenlayer', 'eigen': 'eigenlayer',
+      'jupiter': 'jupiter-exchange-solana', 'jup': 'jupiter-exchange-solana',
+      'tether': 'tether', 'usdt': 'tether',
+      'usdc': 'usd-coin', 'usd coin': 'usd-coin'
     };
 
     const queryLower = query.toLowerCase();
-    for (const [key, value] of Object.entries(coinMap)) {
+    
+    // First check direct matches
+    for (const [key, coinId] of Object.entries(coinMap)) {
       if (queryLower.includes(key)) {
-        return value;
+        return coinId;
       }
     }
+
+    // Extract potential coin name/symbol from query
+    const matches = queryLower.match(/\b[a-zA-Z]{2,20}\b/g);
+    if (matches) {
+      for (const match of matches) {
+        if (coinMap[match]) {
+          return coinMap[match];
+        }
+      }
+      // Return the first reasonable match if no direct mapping found
+      return matches.find(m => m.length >= 3 && !['price', 'for', 'of', 'the', 'what', 'how', 'much'].includes(m)) || null;
+    }
+
     return null;
   }
 
@@ -515,139 +647,42 @@ export class ResearchService {
       'compound': 'compound',
       'makerdao': 'makerdao',
       'curve': 'curve',
-      'convex': 'convex-finance',
-      'yearn': 'yearn-finance',
-      'synthetix': 'synthetix',
+      'sushiswap': 'sushi',
       'pancakeswap': 'pancakeswap',
-      'sushiswap': 'sushiswap'
+      'balancer': 'balancer'
     };
 
     const queryLower = query.toLowerCase();
-    for (const [key, value] of Object.entries(protocolMap)) {
+    
+    for (const [key, protocolId] of Object.entries(protocolMap)) {
       if (queryLower.includes(key)) {
-        return value;
+        return protocolId;
       }
     }
+
     return null;
-  }
-
-  private static async fetchMoralisWalletData(query: string): Promise<string | null> {
-    try {
-      const walletAddress = MoralisService.extractWalletAddress(query);
-      if (!walletAddress || !MoralisService.isValidAddress(walletAddress)) {
-        return null;
-      }
-
-      console.log('Fetching Moralis data for wallet:', walletAddress);
-
-      // Auto-detect chain from address format, or use query override
-      const detectedChain = MoralisService.detectChainFromAddress(walletAddress);
-      const chain = this.extractChainFromQuery(query) || detectedChain;
-      
-      console.log('Using chain:', chain, 'for address:', walletAddress);
-
-      // Fetch wallet data with enhanced pricing
-      const [balances, history] = await Promise.allSettled([
-        MoralisService.getWalletTokenBalancesWithPricing(walletAddress, chain),
-        MoralisService.getWalletHistory(walletAddress, chain, 5)
-      ]);
-
-      let result = `WALLET ANALYSIS: ${walletAddress}
-Blockchain: ${chain.toUpperCase()}
-
-`;
-
-      // Add token balances (which includes native balance for Solana)
-      if (balances.status === 'fulfilled') {
-        const balanceData = MoralisService.formatWalletBalanceData(balances.value, chain);
-        if (balanceData) {
-          result += balanceData + '\n\n';
-        }
-      } else {
-        console.error('Failed to fetch balances:', balances.reason);
-        result += 'TOKEN BALANCES: Failed to fetch wallet balances\n\n';
-      }
-
-      // Add transaction history
-      if (history.status === 'fulfilled') {
-        const historyData = MoralisService.formatWalletHistoryData(history.value);
-        if (historyData) {
-          result += historyData + '\n\n';
-        }
-      } else {
-        console.error('Failed to fetch history:', history.reason);
-        result += 'TRANSACTION HISTORY: Failed to fetch wallet history\n\n';
-      }
-
-      return result.trim();
-    } catch (error) {
-      console.error('Error fetching Moralis wallet data:', error);
-      return `WALLET ANALYSIS ERROR: Unable to fetch data for the provided wallet address. Please ensure the address is valid and try again.`;
-    }
   }
 
   private static extractChainFromQuery(query: string): string | null {
-    const queryLower = query.toLowerCase();
-    
     const chainMap: { [key: string]: string } = {
       'ethereum': 'eth',
-      'eth': 'eth',
       'polygon': 'polygon',
-      'matic': 'polygon',
       'bsc': 'bsc',
       'binance smart chain': 'bsc',
       'avalanche': 'avalanche',
-      'avax': 'avalanche',
       'fantom': 'fantom',
-      'ftm': 'fantom',
       'arbitrum': 'arbitrum',
-      'optimism': 'optimism',
-      'solana': 'solana',
-      'sol': 'solana'
+      'optimism': 'optimism'
     };
 
-    for (const [keyword, chain] of Object.entries(chainMap)) {
-      if (queryLower.includes(keyword)) {
-        return chain;
-      }
-    }
+    const queryLower = query.toLowerCase();
     
-    return null;
-  }
-
-  private static async generateClaudeResponse(query: string, contextData: string): Promise<string> {
-    try {
-      const response = await fetch('https://djozrzgevluayzcvenby.supabase.co/functions/v1/claude-chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: query,
-          context: contextData
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Claude API error: ${response.status}`);
+    for (const [key, chainId] of Object.entries(chainMap)) {
+      if (queryLower.includes(key)) {
+        return chainId;
       }
-
-      const data = await response.json();
-      
-      if (data.error) {
-        throw new Error(data.error);
-      }
-
-      return data.response;
-    } catch (error) {
-      console.error('Claude response error:', error);
-      
-      // Fallback response
-      if (contextData) {
-        return `Based on the latest data:\n\n${contextData}\n\nRegarding your question "${query}":\n\nThis is a comprehensive analysis based on real-time Web3 data. The market shows current trends and the DeFi ecosystem continues to evolve with new protocols and innovations. For more specific analysis, please provide additional details about what aspects you'd like me to focus on.`;
-      }
-
-      return `I understand you're asking about "${query}". While I don't have specific real-time data for this query right now, I can provide general insights about Web3 and blockchain topics. For more accurate and current information, please try asking about specific tokens, protocols, or include keywords like "price", "DeFi", or "market data".`;
     }
+
+    return null;
   }
 }
