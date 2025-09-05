@@ -2,3 +2,6 @@ project_id = "djozrzgevluayzcvenby"
 
 [functions.claude-chat]
 verify_jwt = false
+
+[functions.moralis-api]
+verify_jwt = false

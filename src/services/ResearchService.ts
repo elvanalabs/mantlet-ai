@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { MoralisService } from './MoralisService';
 
 export interface ResearchResponse {
   answer: string;
@@ -116,6 +117,10 @@ export class ResearchService {
         dataPromises.push(this.fetchChainSpecificData(query));
       }
 
+      if (this.isWalletQuery(queryLower)) {
+        dataPromises.push(this.fetchMoralisWalletData(query));
+      }
+
       // Fetch all data concurrently
       const results = await Promise.allSettled(dataPromises);
       
@@ -135,6 +140,7 @@ export class ResearchService {
           else if (index === 8) sources.push('Protocol Details');
           else if (index === 9) sources.push('Stablecoin Data');
           else if (index === 10) sources.push('Chain-Specific Data');
+          else if (index === 11) sources.push('Moralis Wallet Data');
         }
       });
 
@@ -183,9 +189,13 @@ export class ResearchService {
     return chainKeywords.some(keyword => query.toLowerCase().includes(keyword));
   }
 
-  private static isGeneralQuery(query: string): boolean {
-    const generalKeywords = ['what', 'how', 'why', 'when', 'where', 'explain', 'tell me', 'define'];
-    return generalKeywords.some(keyword => query.toLowerCase().includes(keyword));
+  private static isWalletQuery(query: string): boolean {
+    const walletKeywords = [
+      'wallet', 'address', 'balance', 'transaction', 'tx', 'transfer', 'send', 'receive',
+      'portfolio', 'holdings', 'assets', '0x', 'eth balance', 'token balance', 'history'
+    ];
+    return walletKeywords.some(keyword => query.toLowerCase().includes(keyword)) ||
+           MoralisService.extractWalletAddress(query) !== null;
   }
 
   // === COINGECKO API METHODS ===
@@ -434,13 +444,26 @@ export class ResearchService {
 
   private static async fetchChainSpecificData(query: string): Promise<string | null> {
     try {
-      const chainName = this.extractChainName(query);
-      if (!chainName) return null;
+      const chain = this.extractChainFromQuery(query);
+      if (!chain) return null;
+
+      // Map API chain names to display names
+      const chainDisplayMap: { [key: string]: string } = {
+        'eth': 'Ethereum',
+        'polygon': 'Polygon',
+        'bsc': 'BSC',
+        'avalanche': 'Avalanche',
+        'fantom': 'Fantom',
+        'arbitrum': 'Arbitrum',
+        'optimism': 'Optimism'
+      };
+
+      const chainName = chainDisplayMap[chain] || chain;
 
       const response = await axios.get(`${this.DEFILLAMA_API}/protocols`);
       const chainProtocols = response.data.filter((p: DeFiLlamaProtocol) => 
         p.chain?.toLowerCase() === chainName.toLowerCase() || 
-        p.chains?.some(chain => chain.toLowerCase() === chainName.toLowerCase())
+        p.chains?.some(chainItem => chainItem.toLowerCase() === chainName.toLowerCase())
       ).slice(0, 10);
 
       if (chainProtocols.length === 0) return null;
@@ -507,25 +530,80 @@ export class ResearchService {
     return null;
   }
 
-  private static extractChainName(query: string): string | null {
+  private static async fetchMoralisWalletData(query: string): Promise<string | null> {
+    try {
+      const walletAddress = MoralisService.extractWalletAddress(query);
+      if (!walletAddress || !MoralisService.isValidEthereumAddress(walletAddress)) {
+        return null;
+      }
+
+      console.log('Fetching Moralis data for wallet:', walletAddress);
+
+      // Determine chain from query (default to Ethereum)
+      const chain = this.extractChainFromQuery(query) || 'eth';
+      
+      // Fetch wallet data concurrently
+      const [balances, history, nativeBalance] = await Promise.allSettled([
+        MoralisService.getWalletTokenBalances(walletAddress, chain),
+        MoralisService.getWalletHistory(walletAddress, chain, 5),
+        MoralisService.getWalletNativeBalance(walletAddress, chain)
+      ]);
+
+      let result = `**WALLET ANALYSIS: ${walletAddress}**\n\n`;
+
+      // Add native balance
+      if (nativeBalance.status === 'fulfilled') {
+        const chainName = chain === 'eth' ? 'ETH' : chain.toUpperCase();
+        result += `**Native Balance:** ${nativeBalance.value.balance_formatted} ${chainName}\n\n`;
+      }
+
+      // Add token balances
+      if (balances.status === 'fulfilled') {
+        const balanceData = MoralisService.formatWalletBalanceData(balances.value);
+        if (balanceData) {
+          result += balanceData + '\n\n';
+        }
+      }
+
+      // Add transaction history
+      if (history.status === 'fulfilled') {
+        const historyData = MoralisService.formatWalletHistoryData(history.value);
+        if (historyData) {
+          result += historyData + '\n\n';
+        }
+      }
+
+      return result.trim();
+    } catch (error) {
+      console.error('Error fetching Moralis wallet data:', error);
+      return null;
+    }
+  }
+
+  private static extractChainFromQuery(query: string): string | null {
+    const queryLower = query.toLowerCase();
+    
     const chainMap: { [key: string]: string } = {
-      'ethereum': 'Ethereum',
-      'polygon': 'Polygon',
-      'bsc': 'BSC',
-      'binance smart chain': 'BSC',
-      'avalanche': 'Avalanche',
-      'solana': 'Solana',
-      'fantom': 'Fantom',
-      'arbitrum': 'Arbitrum',
-      'optimism': 'Optimism'
+      'ethereum': 'eth',
+      'eth': 'eth',
+      'polygon': 'polygon',
+      'matic': 'polygon',
+      'bsc': 'bsc',
+      'binance smart chain': 'bsc',
+      'avalanche': 'avalanche',
+      'avax': 'avalanche',
+      'fantom': 'fantom',
+      'ftm': 'fantom',
+      'arbitrum': 'arbitrum',
+      'optimism': 'optimism'
     };
 
-    const queryLower = query.toLowerCase();
-    for (const [key, value] of Object.entries(chainMap)) {
-      if (queryLower.includes(key)) {
-        return value;
+    for (const [keyword, chain] of Object.entries(chainMap)) {
+      if (queryLower.includes(keyword)) {
+        return chain;
       }
     }
+    
     return null;
   }
 
