@@ -385,14 +385,14 @@ export class ResearchService {
 
   private static async fetchYieldData(): Promise<string | null> {
     try {
-      const response = await axios.get(`${this.DEFILLAMA_API}/yields`);
-      const pools = response.data.data?.slice(0, 10) || [];
+      const response = await axios.get(`${this.DEFILLAMA_API}/pools`);
+      const pools = response.data?.data?.slice(0, 10) || response.data?.slice(0, 10) || [];
       
       if (pools.length === 0) return null;
 
       return `TOP YIELD OPPORTUNITIES:\n` +
         pools.map((pool: any) => 
-          `${pool.project || 'Unknown'} - ${pool.symbol || 'N/A'}: ${pool.apy?.toFixed(2) || 'N/A'}% APY ` +
+          `${pool.project || 'Unknown'} - ${pool.symbol || 'N/A'}: ${(pool.apy || pool.apyBase || 0)?.toFixed(2) || 'N/A'}% APY ` +
           `| Chain: ${pool.chain || 'N/A'} ` +
           `| TVL: $${pool.tvlUsd ? (pool.tvlUsd / 1e6).toFixed(1) + 'M' : 'N/A'}`
         ).join('\n');
