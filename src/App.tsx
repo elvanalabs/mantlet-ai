@@ -13,33 +13,21 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 const App = () => {
-  const [appId, setAppId] = useState<string | null>(null);
-  const [showDemo, setShowDemo] = useState(false);
-
-  // Show setup screen if no app ID is configured
-  if (!appId && !showDemo) {
-    return (
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <PrivySetup 
-            onAppIdSet={setAppId}
-            onDemoMode={() => setShowDemo(true)}
-          />
-        </TooltipProvider>
-      </QueryClientProvider>
-    );
-  }
+  const [showDemo, setShowDemo] = useState(() => {
+    return new URLSearchParams(window.location.search).has('demo');
+  });
 
   // Show demo mode if selected
-  if (showDemo && !appId) {
+  if (showDemo) {
     return (
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <DemoInterface onSetupWallet={() => setShowDemo(false)} />
+          <DemoInterface onSetupWallet={() => {
+            setShowDemo(false);
+            window.history.replaceState({}, '', '/');
+          }} />
         </TooltipProvider>
       </QueryClientProvider>
     );
@@ -48,7 +36,7 @@ const App = () => {
   // Show full app with Privy integration
   return (
     <PrivyProvider
-      appId={appId!}
+      appId="cmf76nfq6007pla0c2n4pd4u0"
       config={{
         appearance: {
           theme: 'dark',
