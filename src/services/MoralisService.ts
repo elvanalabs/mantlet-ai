@@ -156,24 +156,57 @@ export class MoralisService {
       return '**WALLET TOKEN BALANCES:** No tokens found or wallet is empty';
     }
 
-    const totalValue = balances.reduce((sum, token) => sum + (token.usd_value || 0), 0);
+    console.log('Raw balance data:', balances);
+
+    // Calculate total value more safely
+    const totalValue = balances.reduce((sum, token) => {
+      const value = parseFloat(token.usd_value?.toString() || '0') || 0;
+      return sum + value;
+    }, 0);
     
+    // More lenient filtering for tokens
     const validTokens = balances
-      .filter(token => !token.possible_spam && parseFloat(token.balance_formatted || '0') > 0)
-      .sort((a, b) => (b.usd_value || 0) - (a.usd_value || 0))
-      .slice(0, 10);
+      .filter(token => {
+        // Don't filter spam for now to see all tokens
+        const hasBalance = parseFloat(token.balance_formatted || token.balance || '0') > 0;
+        const hasValue = parseFloat(token.usd_value?.toString() || '0') > 0;
+        console.log(`Token ${token.name || token.symbol}: balance=${token.balance_formatted || token.balance}, usd_value=${token.usd_value}, hasBalance=${hasBalance}, hasValue=${hasValue}`);
+        return hasBalance || hasValue;
+      })
+      .sort((a, b) => {
+        const aValue = parseFloat(a.usd_value?.toString() || '0') || 0;
+        const bValue = parseFloat(b.usd_value?.toString() || '0') || 0;
+        return bValue - aValue;
+      })
+      .slice(0, 15); // Show more tokens
+
+    console.log('Filtered tokens:', validTokens.length);
 
     if (validTokens.length === 0) {
-      return '**WALLET TOKEN BALANCES:** No significant token balances found';
+      return `**WALLET TOKEN BALANCES:** 
+**Total Tokens Found:** ${balances.length}
+**Filtered Tokens:** 0 (showing raw data for debugging)
+
+**Raw Token Data:**
+${balances.slice(0, 5).map(token => 
+  `• ${token.name || token.symbol || 'Unknown'}: ${token.balance || token.balance_formatted || 'No balance'} (USD: ${token.usd_value || 'N/A'})`
+).join('\n')}`;
     }
     
     return `**WALLET TOKEN BALANCES:**\n` +
-      `**Total Portfolio Value:** $${totalValue.toLocaleString()}\n\n` +
-      validTokens.map(token => 
-        `• **${token.name || 'Unknown'} (${(token.symbol || 'N/A').toUpperCase()})**: ${token.balance_formatted || '0'} ` +
-        `${token.usd_value ? `($${token.usd_value.toLocaleString()})` : ''} ` +
-        `${token.usd_value_24hr_percent_change ? `| 24h: ${token.usd_value_24hr_percent_change > 0 ? '+' : ''}${token.usd_value_24hr_percent_change.toFixed(2)}%` : ''}`
-      ).join('\n');
+      `**Total Portfolio Value:** $${totalValue.toLocaleString()}\n` +
+      `**Tokens Found:** ${balances.length} | **Showing:** ${validTokens.length}\n\n` +
+      validTokens.map(token => {
+        const balance = token.balance_formatted || token.balance || '0';
+        const symbol = (token.symbol || 'N/A').toUpperCase();
+        const name = token.name || 'Unknown Token';
+        const usdValue = token.usd_value ? `($${parseFloat(token.usd_value.toString()).toLocaleString()})` : '';
+        const change24h = token.usd_value_24hr_percent_change 
+          ? `| 24h: ${token.usd_value_24hr_percent_change > 0 ? '+' : ''}${token.usd_value_24hr_percent_change.toFixed(2)}%` 
+          : '';
+        
+        return `• **${name} (${symbol})**: ${balance} ${usdValue} ${change24h}`;
+      }).join('\n');
   }
 
   static formatWalletHistoryData(transactions: WalletTransaction[]): string {
