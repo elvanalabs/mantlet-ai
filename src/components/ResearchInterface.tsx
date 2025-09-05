@@ -80,7 +80,7 @@ export const ResearchInterface = () => {
       case 'user':
         return <div className="w-8 h-8 bg-gradient-primary rounded-full flex items-center justify-center text-primary-foreground font-semibold">U</div>;
       case 'assistant':
-        return <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center"><TrendingUp className="w-4 h-4 text-accent-foreground" /></div>;
+        return <img src="/lovable-uploads/9a5386b5-d005-44f8-9022-6aba34a15e19.png" alt="AI Agent" className="w-8 h-8 object-contain" />;
       case 'system':
         return <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center"><Database className="w-4 h-4 text-muted-foreground" /></div>;
       default:

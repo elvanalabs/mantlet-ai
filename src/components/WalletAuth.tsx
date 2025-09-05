@@ -23,7 +23,11 @@ export const WalletAuth = () => {
       <div className="flex items-center justify-center min-h-screen p-4">
         <Card className="glass p-8 max-w-md w-full text-center">
           <div className="mb-6">
-            <Wallet className="w-16 h-16 mx-auto mb-4 text-primary" />
+            <img 
+              src="/lovable-uploads/33de17b2-37de-44c9-994a-e297e6beede9.png" 
+              alt="Web3 Research Agent" 
+              className="w-16 h-16 mx-auto mb-4 object-contain"
+            />
             <h1 className="text-2xl font-bold mb-2">Web3 Research Agent</h1>
             <p className="text-muted-foreground">
               Connect your wallet to access AI-powered Web3 research tools
@@ -53,9 +57,11 @@ export const WalletAuth = () => {
   return (
     <div className="flex items-center justify-between p-4 glass border-b">
       <div className="flex items-center space-x-3">
-        <div className="w-8 h-8 bg-gradient-primary rounded-full flex items-center justify-center">
-          <Wallet className="w-4 h-4 text-primary-foreground" />
-        </div>
+        <img 
+          src="/lovable-uploads/33de17b2-37de-44c9-994a-e297e6beede9.png" 
+          alt="Logo" 
+          className="w-8 h-8 object-contain"
+        />
         <div>
           <p className="text-sm font-medium">
             {user?.wallet?.address ? 
@@ -63,7 +69,6 @@ export const WalletAuth = () => {
               'Connected'
             }
           </p>
-          <p className="text-xs text-muted-foreground">Web3 Research Agent</p>
         </div>
       </div>
       <Button

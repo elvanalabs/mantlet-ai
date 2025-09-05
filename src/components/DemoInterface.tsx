@@ -84,7 +84,7 @@ export const DemoInterface = ({ onSetupWallet }: DemoInterfaceProps) => {
       case 'user':
         return <div className="w-8 h-8 bg-gradient-primary rounded-full flex items-center justify-center text-primary-foreground font-semibold">U</div>;
       case 'assistant':
-        return <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center"><TrendingUp className="w-4 h-4 text-accent-foreground" /></div>;
+        return <img src="/lovable-uploads/9a5386b5-d005-44f8-9022-6aba34a15e19.png" alt="AI Agent" className="w-8 h-8 object-contain" />;
       case 'system':
         return <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center"><Database className="w-4 h-4 text-muted-foreground" /></div>;
       default:
@@ -97,12 +97,13 @@ export const DemoInterface = ({ onSetupWallet }: DemoInterfaceProps) => {
       {/* Header */}
       <div className="flex items-center justify-between p-4 glass border-b">
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center">
-            <TrendingUp className="w-4 h-4 text-muted-foreground" />
-          </div>
+          <img 
+            src="/lovable-uploads/33de17b2-37de-44c9-994a-e297e6beede9.png" 
+            alt="Logo" 
+            className="w-8 h-8 object-contain"
+          />
           <div>
             <p className="text-sm font-medium">Demo Mode</p>
-            <p className="text-xs text-muted-foreground">Web3 Research Agent</p>
           </div>
         </div>
         <Button

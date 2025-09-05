@@ -263,7 +263,12 @@ Blockchain: ${chain.toUpperCase()}
           page: 1,
           sparkline: false,
           price_change_percentage: '1h,24h,7d,30d'
-        }
+        },
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'Web3ResearchAgent/1.0'
+        },
+        timeout: 10000
       });
 
       const coins: CoinGeckoPrice[] = response.data;
@@ -284,7 +289,13 @@ Blockchain: ${chain.toUpperCase()}
 
   private static async fetchGlobalMarketData(): Promise<string | null> {
     try {
-      const response = await axios.get(`${this.COINGECKO_API}/global`);
+      const response = await axios.get(`${this.COINGECKO_API}/global`, {
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'Web3ResearchAgent/1.0'
+        },
+        timeout: 10000
+      });
       const global = response.data.data;
       
       return `GLOBAL MARKET STATS:\n` +
@@ -304,14 +315,25 @@ Blockchain: ${chain.toUpperCase()}
   private static async fetchTrendingData(): Promise<string | null> {
     try {
       const [trendingResponse, gainersResponse] = await Promise.all([
-        axios.get(`${this.COINGECKO_API}/search/trending`),
+        axios.get(`${this.COINGECKO_API}/search/trending`, {
+          headers: {
+            'Accept': 'application/json',
+            'User-Agent': 'Web3ResearchAgent/1.0'
+          },
+          timeout: 10000
+        }),
         axios.get(`${this.COINGECKO_API}/coins/markets`, {
           params: {
             vs_currency: 'usd',
             order: 'price_change_percentage_24h_desc',
             per_page: 5,
             page: 1
-          }
+          },
+          headers: {
+            'Accept': 'application/json',
+            'User-Agent': 'Web3ResearchAgent/1.0'
+          },
+          timeout: 10000
         })
       ]);
 
@@ -341,7 +363,12 @@ Blockchain: ${chain.toUpperCase()}
 
       // Search for the coin first
       const searchResponse = await axios.get(`${this.COINGECKO_API}/search`, {
-        params: { query: coinQuery }
+        params: { query: coinQuery },
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'Web3ResearchAgent/1.0'
+        },
+        timeout: 10000
       });
 
       let coinId = null;
