@@ -1,12 +1,20 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { usePrivy } from '@privy-io/react-auth';
+import { WalletAuth } from '@/components/WalletAuth';
+import { ResearchInterface } from '@/components/ResearchInterface';
 
 const Index = () => {
+  const { authenticated } = usePrivy();
+
+  if (!authenticated) {
+    return <WalletAuth />;
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="h-screen flex flex-col">
+      <WalletAuth />
+      <main className="flex-1 flex flex-col">
+        <ResearchInterface />
+      </main>
     </div>
   );
 };
