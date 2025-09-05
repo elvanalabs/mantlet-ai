@@ -76,9 +76,8 @@ export class MoralisService {
       let params: any = {};
 
       if (chain === 'solana') {
-        // Use portfolio endpoint for Solana to get USD values
+        // Use portfolio endpoint for Solana to get complete portfolio data
         endpoint = `/account/mainnet/${address}/portfolio`;
-        // No exclude_spam parameter for Solana API
       } else {
         // EVM chains use the standard wallet API
         endpoint = `/wallets/${address}/tokens`;
@@ -110,8 +109,11 @@ export class MoralisService {
       const data = result.data as any;
       
       if (chain === 'solana') {
-        // For Solana portfolio response, extract tokens array
-        return Array.isArray(data) ? data : (data.tokens || []);
+        // For Solana portfolio response, extract tokens array and add pricing
+        const tokens = Array.isArray(data) ? data : (data.tokens || []);
+        
+        // Add estimated USD values for major tokens
+        return this.addSolanaTokenPricing(tokens);
       } else {
         // For EVM response
         return Array.isArray(data) ? data : (data.result || []);
@@ -120,6 +122,36 @@ export class MoralisService {
       console.error('Error fetching wallet balances:', error);
       throw error;
     }
+  }
+
+  private static addSolanaTokenPricing(tokens: any[]): WalletBalance[] {
+    // Simple price estimates for major Solana tokens (this could be enhanced with real-time pricing)
+    const tokenPrices: { [symbol: string]: number } = {
+      'USDC': 1.00,
+      'USDT': 1.00,
+      'SOL': 140.00, // Approximate - could be fetched from external API
+      'JUP': 1.25,   // Approximate
+      'RAY': 5.50,   // Approximate
+      'BONK': 0.000025, // Approximate
+      'WIF': 3.80,   // Approximate
+      'PYTH': 0.42,  // Approximate
+    };
+
+    return tokens.map(token => {
+      const symbol = token.symbol?.toUpperCase();
+      const amount = parseFloat(token.amount || '0');
+      const pricePerToken = tokenPrices[symbol] || 0;
+      const usdValue = amount * pricePerToken;
+
+      return {
+        ...token,
+        usd_value: usdValue > 0 ? usdValue : undefined,
+        usd_price: pricePerToken > 0 ? pricePerToken : undefined,
+        // Map Solana fields to standard format
+        balance_formatted: token.amount,
+        possible_spam: token.possibleSpam
+      };
+    });
   }
 
   static async getWalletHistory(
@@ -171,7 +203,7 @@ export class MoralisService {
     }
   }
 
-  static formatWalletBalanceData(balances: WalletBalance[]): string {
+  static formatWalletBalanceData(balances: WalletBalance[], chain?: string): string {
     if (!balances || !Array.isArray(balances) || balances.length === 0) {
       return 'WALLET TOKEN BALANCES: No tokens found or wallet is empty';
     }

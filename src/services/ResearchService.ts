@@ -546,7 +546,7 @@ export class ResearchService {
       
       console.log('Using chain:', chain, 'for address:', walletAddress);
 
-      // Fetch wallet data concurrently (removed native balance call)
+      // Fetch wallet data concurrently
       const [balances, history] = await Promise.allSettled([
         MoralisService.getWalletTokenBalances(walletAddress, chain),
         MoralisService.getWalletHistory(walletAddress, chain, 5)
@@ -557,9 +557,9 @@ Blockchain: ${chain.toUpperCase()}
 
 `;
 
-      // Add token balances (which includes native token)
+      // Add token balances (which includes native balance for Solana)
       if (balances.status === 'fulfilled') {
-        const balanceData = MoralisService.formatWalletBalanceData(balances.value);
+        const balanceData = MoralisService.formatWalletBalanceData(balances.value, chain);
         if (balanceData) {
           result += balanceData + '\n\n';
         }
