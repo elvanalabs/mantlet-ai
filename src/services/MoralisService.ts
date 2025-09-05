@@ -1,19 +1,27 @@
 export interface WalletBalance {
-  token_address: string;
+  token_address?: string;
   name: string;
   symbol: string;
   logo?: string;
   thumbnail?: string;
   decimals: number;
-  balance: string;
-  possible_spam: boolean;
-  verified_collection: boolean;
-  balance_formatted: string;
+  balance?: string;
+  possible_spam?: boolean;
+  verified_collection?: boolean;
+  balance_formatted?: string;
   usd_price?: number;
   usd_value?: number;
   usd_value_24hr_percent_change?: number;
-  native_token: boolean;
+  native_token?: boolean;
   portfolio_percentage?: number;
+  // Solana-specific fields
+  amount?: string;
+  amountRaw?: string;
+  possibleSpam?: boolean;
+  mint?: string;
+  associatedTokenAddress?: string;
+  tokenStandard?: number;
+  isVerifiedContract?: boolean;
 }
 
 export interface WalletTransaction {
@@ -156,7 +164,7 @@ export class MoralisService {
       return 'WALLET TOKEN BALANCES: No tokens found or wallet is empty';
     }
 
-    console.log('Raw balance data:', balances);
+    console.log('Processing', balances.length, 'tokens for display');
 
     // Calculate total value more safely
     const totalValue = balances.reduce((sum, token) => {
@@ -164,42 +172,48 @@ export class MoralisService {
       return sum + value;
     }, 0);
     
-    // More lenient filtering for tokens
+    // Show all tokens with balances, regardless of USD value
     const validTokens = balances
       .filter(token => {
-        // Don't filter spam for now to see all tokens
-        const hasBalance = parseFloat(token.balance_formatted || token.balance || '0') > 0;
-        const hasValue = parseFloat(token.usd_value?.toString() || '0') > 0;
-        console.log(`Token ${token.name || token.symbol}: balance=${token.balance_formatted || token.balance}, usd_value=${token.usd_value}, hasBalance=${hasBalance}, hasValue=${hasValue}`);
-        return hasBalance || hasValue;
+        const amount = token.amount || token.balance_formatted || token.balance || '0';
+        const hasBalance = parseFloat(amount) > 0;
+        const notSpam = !(token.possible_spam || token.possibleSpam);
+        console.log(`Token ${token.name || token.symbol}: amount=${amount}, hasBalance=${hasBalance}, notSpam=${notSpam}`);
+        return hasBalance && notSpam;
       })
       .sort((a, b) => {
+        // Sort by USD value first, then by amount
         const aValue = parseFloat(a.usd_value?.toString() || '0') || 0;
         const bValue = parseFloat(b.usd_value?.toString() || '0') || 0;
-        return bValue - aValue;
+        if (aValue !== bValue) return bValue - aValue;
+        
+        const aAmount = parseFloat(a.amount || a.balance_formatted || a.balance || '0');
+        const bAmount = parseFloat(b.amount || b.balance_formatted || b.balance || '0');
+        return bAmount - aAmount;
       })
-      .slice(0, 15); // Show more tokens
+      .slice(0, 15);
 
-    console.log('Filtered tokens:', validTokens.length);
+    console.log(`Showing ${validTokens.length} tokens out of ${balances.length} total`);
 
     if (validTokens.length === 0) {
-      return `WALLET TOKEN BALANCES:
-Total Tokens Found: ${balances.length}
-Filtered Tokens: 0 (showing raw data for debugging)
-
-Raw Token Data:
-${balances.slice(0, 5).map(token => 
-  `- ${token.name || token.symbol || 'Unknown'}: ${token.balance || token.balance_formatted || 'No balance'} (USD: ${token.usd_value || 'N/A'})`
-).join('\n')}`;
+      return `WALLET TOKEN BALANCES: No valid tokens found
+Total tokens received: ${balances.length}
+This might be due to filtering or all tokens being marked as spam`;
     }
     
-    return `WALLET TOKEN BALANCES:
-Total Portfolio Value: $${totalValue.toLocaleString()}
-Tokens Found: ${balances.length} | Showing: ${validTokens.length}
+    let result = `WALLET TOKEN BALANCES:
+`;
+    
+    if (totalValue > 0) {
+      result += `Total Portfolio Value: $${totalValue.toLocaleString()}
+`;
+    }
+    
+    result += `Tokens Found: ${balances.length} | Showing: ${validTokens.length}
 
 TOKEN HOLDINGS:
 ${validTokens.map(token => {
-        const balance = token.balance_formatted || token.balance || '0';
+        const amount = token.amount || token.balance_formatted || token.balance || '0';
         const symbol = (token.symbol || 'N/A').toUpperCase();
         const name = token.name || 'Unknown Token';
         const usdValue = token.usd_value ? `($${parseFloat(token.usd_value.toString()).toLocaleString()})` : '';
@@ -207,8 +221,10 @@ ${validTokens.map(token => {
           ? `24h change: ${token.usd_value_24hr_percent_change > 0 ? '+' : ''}${token.usd_value_24hr_percent_change.toFixed(2)}%` 
           : '';
         
-        return `- ${name} (${symbol}): ${balance} ${usdValue} ${change24h}`;
+        return `- ${name} (${symbol}): ${amount} ${usdValue} ${change24h}`.trim();
       }).join('\n')}`;
+
+    return result;
   }
 
   static formatWalletHistoryData(transactions: WalletTransaction[]): string {
