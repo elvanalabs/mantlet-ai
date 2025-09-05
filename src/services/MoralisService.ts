@@ -1,9 +1,9 @@
-export interface WalletBalance {
+interface WalletBalance {
   token_address?: string;
   name: string;
   symbol: string;
   logo?: string;
-  thumbnail?: string;
+  thumbnail?: string;  
   decimals: number;
   balance?: string;
   possible_spam?: boolean;
@@ -22,6 +22,11 @@ export interface WalletBalance {
   associatedTokenAddress?: string;
   tokenStandard?: number;
   isVerifiedContract?: boolean;
+  // Solana portfolio-specific fields (from /portfolio endpoint)
+  usdValue?: number;
+  usdPrice?: number;
+  usdValue24hrPercentChange?: number;
+  portfolioPercentage?: number;
 }
 
 export interface WalletTransaction {
@@ -71,8 +76,8 @@ export class MoralisService {
       let params: any = {};
 
       if (chain === 'solana') {
-        // Solana uses different API structure
-        endpoint = `/account/mainnet/${address}/tokens`;
+        // Use portfolio endpoint for Solana to get USD values
+        endpoint = `/account/mainnet/${address}/portfolio`;
         // No exclude_spam parameter for Solana API
       } else {
         // EVM chains use the standard wallet API
@@ -103,7 +108,14 @@ export class MoralisService {
 
       // Handle the actual Moralis API response structure
       const data = result.data as any;
-      return Array.isArray(data) ? data : (data.result || []);
+      
+      if (chain === 'solana') {
+        // For Solana portfolio response, extract tokens array
+        return Array.isArray(data) ? data : (data.tokens || []);
+      } else {
+        // For EVM response
+        return Array.isArray(data) ? data : (data.result || []);
+      }
     } catch (error) {
       console.error('Error fetching wallet balances:', error);
       throw error;
@@ -168,7 +180,7 @@ export class MoralisService {
 
     // Calculate total portfolio value
     const totalValue = balances.reduce((sum, token) => {
-      const value = parseFloat(token.usd_value?.toString() || '0') || 0;
+      const value = parseFloat(token.usd_value?.toString() || token.usdValue?.toString() || '0') || 0;
       return sum + value;
     }, 0);
     
@@ -183,8 +195,8 @@ export class MoralisService {
       })
       .sort((a, b) => {
         // Sort by USD value first, then by amount
-        const aValue = parseFloat(a.usd_value?.toString() || '0') || 0;
-        const bValue = parseFloat(b.usd_value?.toString() || '0') || 0;
+        const aValue = parseFloat(a.usd_value?.toString() || a.usdValue?.toString() || '0') || 0;
+        const bValue = parseFloat(b.usd_value?.toString() || b.usdValue?.toString() || '0') || 0;
         if (aValue !== bValue) return bValue - aValue;
         
         const aAmount = parseFloat(a.amount || a.balance_formatted || a.balance || '0');
@@ -223,15 +235,17 @@ TOKEN HOLDINGS:
       
       // Calculate and format USD value
       let usdInfo = '';
-      if (token.usd_value && token.usd_value > 0) {
-        const usdValue = parseFloat(token.usd_value.toString());
-        usdInfo = ` | USD VALUE: $${usdValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+      const usdValue = token.usd_value || token.usdValue;
+      const usdChange = token.usd_value_24hr_percent_change || token.usdValue24hrPercentChange;
+      
+      if (usdValue && usdValue > 0) {
+        const formattedUsdValue = parseFloat(usdValue.toString());
+        usdInfo = ` | USD VALUE: $${formattedUsdValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
         
         // Add 24h change if available
-        if (token.usd_value_24hr_percent_change !== undefined) {
-          const change = token.usd_value_24hr_percent_change;
-          const changeSign = change >= 0 ? '+' : '';
-          usdInfo += ` | 24H CHANGE: ${changeSign}${change.toFixed(2)}%`;
+        if (usdChange !== undefined) {
+          const changeSign = usdChange >= 0 ? '+' : '';
+          usdInfo += ` | 24H CHANGE: ${changeSign}${usdChange.toFixed(2)}%`;
         }
       } else {
         usdInfo = ' | USD VALUE: Not available';
@@ -241,7 +255,7 @@ TOKEN HOLDINGS:
     });
 
     // Add summary statistics
-    const tokensWithValue = validTokens.filter(t => t.usd_value && t.usd_value > 0);
+    const tokensWithValue = validTokens.filter(t => (t.usd_value && t.usd_value > 0) || (t.usdValue && t.usdValue > 0));
     result += `\nPORTFOLIO SUMMARY:
 - Tokens with USD values: ${tokensWithValue.length}/${validTokens.length}
 - Tokens without USD values: ${validTokens.length - tokensWithValue.length}/${validTokens.length}`;
