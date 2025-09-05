@@ -34,23 +34,27 @@ serve(async (req) => {
     - If they ask for TVL, give TVL data only
     - Do not provide warnings, disclaimers, or additional context unless specifically requested
 
-    FORMATTING REQUIREMENTS:
-    - Use **bold text** for important numbers, names, and key information
-    - Use bullet points (•) for lists and data points
-    - Use proper line breaks and spacing for readability
-    - Structure data clearly with headers when showing multiple items
-    - Use tables or structured format for comparative data
-    - Highlight percentage changes and important metrics in **bold**
-    - Use clear section breaks with headers like **PRICE DATA:** or **TVL ANALYSIS:**
+    FORMATTING REQUIREMENTS - NO MARKDOWN EVER:
+    - NEVER use **bold text** or any asterisk formatting
+    - NEVER use markdown syntax like **, __, [], (), or #
+    - Use CAPITAL LETTERS for important numbers, names, and key information instead of bold
+    - Use simple bullet points with - (dash) for lists
+    - Use plain text formatting only
+    - Structure data with clear line breaks and spacing
+    - Use headers like "PRICE DATA:" or "TVL ANALYSIS:" in CAPITAL LETTERS
+    - Use natural language emphasis like "IMPORTANT:" or "KEY POINT:"
+    - Format numbers clearly: $1,234.56 not **$1,234.56**
+    - Use simple dashes - for bullet points, not • or *
 
     RESPONSE STYLE:
     - Be direct and concise
-    - Present data in an organized, easy-to-scan format
+    - Present data in an organized, easy-to-scan format using plain text only
     - Use natural language but keep it focused
     - No fluff or unnecessary explanations
     - Answer only what was asked, nothing more
+    - Structure with clear sections using CAPITAL LETTER headers
 
-    Always provide accurate, well-researched responses based on the provided data context.`;
+    Always provide accurate, well-researched responses based on the provided data context. Remember: ABSOLUTELY NO MARKDOWN FORMATTING EVER.`;
 
     // Prepare messages for Claude
     const messages = [
@@ -85,17 +89,33 @@ serve(async (req) => {
       throw new Error(`Claude API error: ${response.status} - ${errorText}`);
     }
 
-    const data = await response.json();
-    console.log('Claude API response received successfully');
-    
-    const assistantMessage = data.content[0].text;
+      const data = await response.json();
+      console.log('Claude API response received successfully');
+      
+      let assistantMessage = data.content[0].text;
+      
+      // Strip all markdown formatting to ensure clean natural language output
+      assistantMessage = assistantMessage
+        .replace(/\*\*(.*?)\*\*/g, '$1')  // Remove bold **text**
+        .replace(/\*(.*?)\*/g, '$1')     // Remove italic *text*
+        .replace(/__(.*?)__/g, '$1')     // Remove bold __text__
+        .replace(/_(.*?)_/g, '$1')       // Remove italic _text_
+        .replace(/#{1,6}\s*/g, '')       // Remove headers # ## ###
+        .replace(/\[(.*?)\]\(.*?\)/g, '$1') // Remove links [text](url)
+        .replace(/`{1,3}(.*?)`{1,3}/g, '$1') // Remove code blocks
+        .replace(/^\s*[\*\-\+]\s+/gm, '- ') // Normalize bullet points
+        .replace(/^\s*\d+\.\s+/gm, (match, offset, string) => {
+          // Keep numbered lists but ensure consistent formatting
+          const num = match.match(/\d+/)[0];
+          return `${num}. `;
+        });
 
-    return new Response(JSON.stringify({ 
-      response: assistantMessage,
-      model: 'claude-opus-4-20250514'
-    }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+      return new Response(JSON.stringify({ 
+        response: assistantMessage,
+        model: 'claude-opus-4-20250514'
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     
   } catch (error) {
     console.error('Error in claude-chat function:', error);
