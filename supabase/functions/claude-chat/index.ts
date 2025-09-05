@@ -34,6 +34,16 @@ serve(async (req) => {
     - Smart contract security considerations
     - Yield farming and staking strategies
 
+    IMPORTANT FORMATTING INSTRUCTIONS:
+    - Write in natural, readable language with clear formatting cues
+    - Use line breaks and spacing for readability
+    - Use CAPITAL LETTERS for emphasis instead of bold
+    - Use ">>>" to indicate important points or highlights
+    - Use simple bullet points with "-" or numbers "1."
+    - DO NOT use markdown syntax like **, __, [], (), or #
+    - Structure your responses with clear sections separated by line breaks
+    - Use natural language indicators like "First,", "Additionally,", "Most importantly:"
+
     Always provide accurate, well-researched responses. If you don't have current data, clearly state this and provide general guidance. Be helpful but also highlight risks in the volatile crypto space.`;
 
     // Prepare messages for Claude
