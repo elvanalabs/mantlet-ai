@@ -542,27 +542,23 @@ export class ResearchService {
       // Determine chain from query (default to Ethereum)
       const chain = this.extractChainFromQuery(query) || 'eth';
       
-      // Fetch wallet data concurrently
-      const [balances, history, nativeBalance] = await Promise.allSettled([
+      // Fetch wallet data concurrently (removed native balance call)
+      const [balances, history] = await Promise.allSettled([
         MoralisService.getWalletTokenBalances(walletAddress, chain),
-        MoralisService.getWalletHistory(walletAddress, chain, 5),
-        MoralisService.getWalletNativeBalance(walletAddress, chain)
+        MoralisService.getWalletHistory(walletAddress, chain, 5)
       ]);
 
       let result = `**WALLET ANALYSIS: ${walletAddress}**\n\n`;
 
-      // Add native balance
-      if (nativeBalance.status === 'fulfilled') {
-        const chainName = chain === 'eth' ? 'ETH' : chain.toUpperCase();
-        result += `**Native Balance:** ${nativeBalance.value.balance_formatted} ${chainName}\n\n`;
-      }
-
-      // Add token balances
+      // Add token balances (which includes native token)
       if (balances.status === 'fulfilled') {
         const balanceData = MoralisService.formatWalletBalanceData(balances.value);
         if (balanceData) {
           result += balanceData + '\n\n';
         }
+      } else {
+        console.error('Failed to fetch balances:', balances.reason);
+        result += '**TOKEN BALANCES:** Failed to fetch wallet balances\n\n';
       }
 
       // Add transaction history
@@ -571,12 +567,15 @@ export class ResearchService {
         if (historyData) {
           result += historyData + '\n\n';
         }
+      } else {
+        console.error('Failed to fetch history:', history.reason);
+        result += '**TRANSACTION HISTORY:** Failed to fetch wallet history\n\n';
       }
 
       return result.trim();
     } catch (error) {
       console.error('Error fetching Moralis wallet data:', error);
-      return null;
+      return `**WALLET ANALYSIS ERROR:** Unable to fetch data for the provided wallet address. Please ensure the address is valid and try again.`;
     }
   }
 

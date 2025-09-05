@@ -81,7 +81,9 @@ export class MoralisService {
         throw new Error(result.error || 'Failed to fetch wallet balances');
       }
 
-      return result.data;
+      // Handle the actual Moralis API response structure
+      const data = result.data as any;
+      return Array.isArray(data) ? data : (data.result || []);
     } catch (error) {
       console.error('Error fetching wallet balances:', error);
       throw error;
@@ -116,84 +118,61 @@ export class MoralisService {
         throw new Error(result.error || 'Failed to fetch wallet history');
       }
 
-      return result.data.result || [];
+      // Handle the actual Moralis API response structure
+      const data = result.data as any;
+      return Array.isArray(data) ? data : (data.result || []);
     } catch (error) {
       console.error('Error fetching wallet history:', error);
       throw error;
     }
   }
 
-  static async getWalletNativeBalance(
-    address: string,
-    chain: string = 'eth'
-  ): Promise<{ balance: string; balance_formatted: string }> {
-    try {
-      const params = { chain };
-
-      const response = await fetch(this.SUPABASE_FUNCTION_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          endpoint: `/wallets/${address}/balance`,
-          params
-        }),
-      });
-
-      const result: MoralisResponse<{ balance: string }> = await response.json();
-      
-      if (!result.success || !result.data) {
-        throw new Error(result.error || 'Failed to fetch native balance');
-      }
-
-      const balance = result.data.balance;
-      const balanceFormatted = (parseInt(balance) / Math.pow(10, 18)).toFixed(6);
-
-      return {
-        balance,
-        balance_formatted: balanceFormatted
-      };
-    } catch (error) {
-      console.error('Error fetching native balance:', error);
-      throw error;
-    }
-  }
-
   static formatWalletBalanceData(balances: WalletBalance[]): string {
-    if (!balances || balances.length === 0) return '';
+    if (!balances || !Array.isArray(balances) || balances.length === 0) {
+      return '**WALLET TOKEN BALANCES:** No tokens found or wallet is empty';
+    }
 
     const totalValue = balances.reduce((sum, token) => sum + (token.usd_value || 0), 0);
     
+    const validTokens = balances
+      .filter(token => !token.possible_spam && parseFloat(token.balance_formatted || '0') > 0)
+      .sort((a, b) => (b.usd_value || 0) - (a.usd_value || 0))
+      .slice(0, 10);
+
+    if (validTokens.length === 0) {
+      return '**WALLET TOKEN BALANCES:** No significant token balances found';
+    }
+    
     return `**WALLET TOKEN BALANCES:**\n` +
       `**Total Portfolio Value:** $${totalValue.toLocaleString()}\n\n` +
-      balances
-        .filter(token => !token.possible_spam && (token.usd_value || 0) > 0.01)
-        .sort((a, b) => (b.usd_value || 0) - (a.usd_value || 0))
-        .slice(0, 10)
-        .map(token => 
-          `• **${token.name} (${token.symbol.toUpperCase()})**: ${token.balance_formatted} ` +
-          `${token.usd_value ? `($${token.usd_value.toLocaleString()})` : ''} ` +
-          `${token.usd_value_24hr_percent_change ? `| 24h: ${token.usd_value_24hr_percent_change > 0 ? '+' : ''}${token.usd_value_24hr_percent_change.toFixed(2)}%` : ''}`
-        ).join('\n');
+      validTokens.map(token => 
+        `• **${token.name || 'Unknown'} (${(token.symbol || 'N/A').toUpperCase()})**: ${token.balance_formatted || '0'} ` +
+        `${token.usd_value ? `($${token.usd_value.toLocaleString()})` : ''} ` +
+        `${token.usd_value_24hr_percent_change ? `| 24h: ${token.usd_value_24hr_percent_change > 0 ? '+' : ''}${token.usd_value_24hr_percent_change.toFixed(2)}%` : ''}`
+      ).join('\n');
   }
 
   static formatWalletHistoryData(transactions: WalletTransaction[]): string {
-    if (!transactions || transactions.length === 0) return '';
+    if (!transactions || !Array.isArray(transactions) || transactions.length === 0) {
+      return '';
+    }
+
+    const validTransactions = transactions.filter(tx => !tx.possible_spam);
+    
+    if (validTransactions.length === 0) {
+      return '**RECENT TRANSACTIONS:** No recent transactions found';
+    }
 
     return `**RECENT TRANSACTIONS:**\n` +
-      transactions
-        .filter(tx => !tx.possible_spam)
-        .slice(0, 5)
-        .map(tx => {
-          const date = new Date(tx.block_timestamp).toLocaleDateString();
-          const value = parseFloat(tx.value) / Math.pow(10, 18);
-          
-          return `• **${tx.method_label || 'Transfer'}** | ${date} ` +
-            `| Value: ${value.toFixed(6)} ETH ` +
-            `| From: ${tx.from_address.slice(0, 8)}... ` +
-            `| To: ${tx.to_address.slice(0, 8)}...`;
-        }).join('\n');
+      validTransactions.slice(0, 5).map(tx => {
+        const date = new Date(tx.block_timestamp).toLocaleDateString();
+        const value = parseFloat(tx.value || '0') / Math.pow(10, 18);
+        
+        return `• **${tx.method_label || 'Transfer'}** | ${date} ` +
+          `| Value: ${value.toFixed(6)} ETH ` +
+          `| From: ${tx.from_address?.slice(0, 8) || 'N/A'}... ` +
+          `| To: ${tx.to_address?.slice(0, 8) || 'N/A'}...`;
+      }).join('\n');
   }
 
   static isValidEthereumAddress(address: string): boolean {
