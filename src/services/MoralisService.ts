@@ -153,7 +153,7 @@ export class MoralisService {
 
   static formatWalletBalanceData(balances: WalletBalance[]): string {
     if (!balances || !Array.isArray(balances) || balances.length === 0) {
-      return '**WALLET TOKEN BALANCES:** No tokens found or wallet is empty';
+      return 'WALLET TOKEN BALANCES: No tokens found or wallet is empty';
     }
 
     console.log('Raw balance data:', balances);
@@ -183,30 +183,32 @@ export class MoralisService {
     console.log('Filtered tokens:', validTokens.length);
 
     if (validTokens.length === 0) {
-      return `**WALLET TOKEN BALANCES:** 
-**Total Tokens Found:** ${balances.length}
-**Filtered Tokens:** 0 (showing raw data for debugging)
+      return `WALLET TOKEN BALANCES:
+Total Tokens Found: ${balances.length}
+Filtered Tokens: 0 (showing raw data for debugging)
 
-**Raw Token Data:**
+Raw Token Data:
 ${balances.slice(0, 5).map(token => 
-  `• ${token.name || token.symbol || 'Unknown'}: ${token.balance || token.balance_formatted || 'No balance'} (USD: ${token.usd_value || 'N/A'})`
+  `- ${token.name || token.symbol || 'Unknown'}: ${token.balance || token.balance_formatted || 'No balance'} (USD: ${token.usd_value || 'N/A'})`
 ).join('\n')}`;
     }
     
-    return `**WALLET TOKEN BALANCES:**\n` +
-      `**Total Portfolio Value:** $${totalValue.toLocaleString()}\n` +
-      `**Tokens Found:** ${balances.length} | **Showing:** ${validTokens.length}\n\n` +
-      validTokens.map(token => {
+    return `WALLET TOKEN BALANCES:
+Total Portfolio Value: $${totalValue.toLocaleString()}
+Tokens Found: ${balances.length} | Showing: ${validTokens.length}
+
+TOKEN HOLDINGS:
+${validTokens.map(token => {
         const balance = token.balance_formatted || token.balance || '0';
         const symbol = (token.symbol || 'N/A').toUpperCase();
         const name = token.name || 'Unknown Token';
         const usdValue = token.usd_value ? `($${parseFloat(token.usd_value.toString()).toLocaleString()})` : '';
         const change24h = token.usd_value_24hr_percent_change 
-          ? `| 24h: ${token.usd_value_24hr_percent_change > 0 ? '+' : ''}${token.usd_value_24hr_percent_change.toFixed(2)}%` 
+          ? `24h change: ${token.usd_value_24hr_percent_change > 0 ? '+' : ''}${token.usd_value_24hr_percent_change.toFixed(2)}%` 
           : '';
         
-        return `• **${name} (${symbol})**: ${balance} ${usdValue} ${change24h}`;
-      }).join('\n');
+        return `- ${name} (${symbol}): ${balance} ${usdValue} ${change24h}`;
+      }).join('\n')}`;
   }
 
   static formatWalletHistoryData(transactions: WalletTransaction[]): string {
@@ -217,19 +219,16 @@ ${balances.slice(0, 5).map(token =>
     const validTransactions = transactions.filter(tx => !tx.possible_spam);
     
     if (validTransactions.length === 0) {
-      return '**RECENT TRANSACTIONS:** No recent transactions found';
+      return 'RECENT TRANSACTIONS: No recent transactions found';
     }
 
-    return `**RECENT TRANSACTIONS:**\n` +
-      validTransactions.slice(0, 5).map(tx => {
+    return `RECENT TRANSACTIONS:
+${validTransactions.slice(0, 5).map(tx => {
         const date = new Date(tx.block_timestamp).toLocaleDateString();
         const value = parseFloat(tx.value || '0') / Math.pow(10, 18);
         
-        return `• **${tx.method_label || 'Transfer'}** | ${date} ` +
-          `| Value: ${value.toFixed(6)} ETH ` +
-          `| From: ${tx.from_address?.slice(0, 8) || 'N/A'}... ` +
-          `| To: ${tx.to_address?.slice(0, 8) || 'N/A'}...`;
-      }).join('\n');
+        return `- ${tx.method_label || 'Transfer'} on ${date} | Value: ${value.toFixed(6)} ETH | From: ${tx.from_address?.slice(0, 8) || 'N/A'}... | To: ${tx.to_address?.slice(0, 8) || 'N/A'}...`;
+      }).join('\n')}`;
   }
 
   static isValidEthereumAddress(address: string): boolean {

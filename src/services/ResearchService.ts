@@ -552,8 +552,10 @@ export class ResearchService {
         MoralisService.getWalletHistory(walletAddress, chain, 5)
       ]);
 
-      let result = `**WALLET ANALYSIS: ${walletAddress}**\n`;
-      result += `**Blockchain:** ${chain.toUpperCase()}\n\n`;
+      let result = `WALLET ANALYSIS: ${walletAddress}
+Blockchain: ${chain.toUpperCase()}
+
+`;
 
       // Add token balances (which includes native token)
       if (balances.status === 'fulfilled') {
@@ -563,7 +565,7 @@ export class ResearchService {
         }
       } else {
         console.error('Failed to fetch balances:', balances.reason);
-        result += '**TOKEN BALANCES:** Failed to fetch wallet balances\n\n';
+        result += 'TOKEN BALANCES: Failed to fetch wallet balances\n\n';
       }
 
       // Add transaction history
@@ -574,13 +576,13 @@ export class ResearchService {
         }
       } else {
         console.error('Failed to fetch history:', history.reason);
-        result += '**TRANSACTION HISTORY:** Failed to fetch wallet history\n\n';
+        result += 'TRANSACTION HISTORY: Failed to fetch wallet history\n\n';
       }
 
       return result.trim();
     } catch (error) {
       console.error('Error fetching Moralis wallet data:', error);
-      return `**WALLET ANALYSIS ERROR:** Unable to fetch data for the provided wallet address. Please ensure the address is valid and try again.`;
+      return `WALLET ANALYSIS ERROR: Unable to fetch data for the provided wallet address. Please ensure the address is valid and try again.`;
     }
   }
 
