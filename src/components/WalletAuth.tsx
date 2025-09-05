@@ -43,7 +43,7 @@ export const WalletAuth = () => {
   }
   return <div className="flex items-center justify-between p-4 glass border-b">
       <div className="flex items-center space-x-3">
-        <img src="/lovable-uploads/33de17b2-37de-44c9-994a-e297e6beede9.png" alt="Logo" className="w-16 h-16 object-contain" />
+        <img src="/lovable-uploads/33de17b2-37de-44c9-994a-e297e6beede9.png" alt="Logo" className="w-24 h-24 object-contain" />
         <div>
           <p className="text-sm font-medium">
             {user?.wallet?.address ? `${user.wallet.address.slice(0, 6)}...${user.wallet.address.slice(-4)}` : 'Connected'}
