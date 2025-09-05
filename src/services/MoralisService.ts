@@ -59,10 +59,21 @@ export class MoralisService {
     excludeSpam: boolean = true
   ): Promise<WalletBalance[]> {
     try {
-      const params = {
-        chain,
-        exclude_spam: excludeSpam.toString()
-      };
+      let endpoint: string;
+      let params: any = {};
+
+      if (chain === 'solana') {
+        // Solana uses different API structure
+        endpoint = `/account/mainnet/${address}/tokens`;
+        // No exclude_spam parameter for Solana API
+      } else {
+        // EVM chains use the standard wallet API
+        endpoint = `/wallets/${address}/tokens`;
+        params = {
+          chain,
+          exclude_spam: excludeSpam.toString()
+        };
+      }
 
       const response = await fetch(this.SUPABASE_FUNCTION_URL, {
         method: 'POST',
@@ -70,8 +81,9 @@ export class MoralisService {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          endpoint: `/wallets/${address}/tokens`,
-          params
+          endpoint,
+          params,
+          isSolana: chain === 'solana'
         }),
       });
 
@@ -96,10 +108,21 @@ export class MoralisService {
     limit: number = 10
   ): Promise<WalletTransaction[]> {
     try {
-      const params = {
-        chain,
-        limit: limit.toString()
-      };
+      let endpoint: string;
+      let params: any = {};
+
+      if (chain === 'solana') {
+        // Solana uses different API structure - get portfolio instead
+        endpoint = `/account/mainnet/${address}/portfolio`;
+        // Solana doesn't have the same history endpoint
+      } else {
+        // EVM chains use the standard wallet API
+        endpoint = `/wallets/${address}/history`;
+        params = {
+          chain,
+          limit: limit.toString()
+        };
+      }
 
       const response = await fetch(this.SUPABASE_FUNCTION_URL, {
         method: 'POST',
@@ -107,8 +130,9 @@ export class MoralisService {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          endpoint: `/wallets/${address}/history`,
-          params
+          endpoint,
+          params,
+          isSolana: chain === 'solana'
         }),
       });
 

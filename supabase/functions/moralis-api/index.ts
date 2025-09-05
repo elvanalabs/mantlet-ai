@@ -19,15 +19,19 @@ serve(async (req) => {
       throw new Error('Moralis API key not configured');
     }
 
-    const { endpoint, params } = await req.json();
+    const { endpoint, params, isSolana } = await req.json();
     
-    console.log('Received Moralis API request:', { endpoint, params });
+    console.log('Received Moralis API request:', { endpoint, params, isSolana });
 
-    const baseUrl = 'https://deep-index.moralis.io/api/v2.2';
+    // Use different base URLs for Solana vs EVM
+    const baseUrl = isSolana 
+      ? 'https://solana-gateway.moralis.io' 
+      : 'https://deep-index.moralis.io/api/v2.2';
+    
     let url = `${baseUrl}${endpoint}`;
     
     // Add query parameters if provided
-    if (params) {
+    if (params && Object.keys(params).length > 0) {
       const searchParams = new URLSearchParams(params);
       url += `?${searchParams.toString()}`;
     }
