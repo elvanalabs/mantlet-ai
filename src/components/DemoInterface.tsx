@@ -100,11 +100,8 @@ export const DemoInterface = ({ onSetupWallet }: DemoInterfaceProps) => {
           <img 
             src="/lovable-uploads/33de17b2-37de-44c9-994a-e297e6beede9.png" 
             alt="Logo" 
-            className="w-8 h-8 object-contain"
+            className="w-12 h-12 object-contain"
           />
-          <div>
-            <p className="text-sm font-medium">Demo Mode</p>
-          </div>
         </div>
         <Button
           onClick={onSetupWallet}
