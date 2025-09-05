@@ -60,7 +60,7 @@ export const WalletAuth = () => {
         <img 
           src="/lovable-uploads/33de17b2-37de-44c9-994a-e297e6beede9.png" 
           alt="Logo" 
-          className="w-8 h-8 object-contain"
+          className="w-16 h-16 object-contain"
         />
         <div>
           <p className="text-sm font-medium">
