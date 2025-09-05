@@ -54,7 +54,7 @@ export class ResearchService {
         sources.push('Web Search');
       }
 
-      // Generate response using Claude (placeholder - would need actual API integration)
+      // Generate response using Claude AI
       const answer = await this.generateClaudeResponse(query, contextData);
 
       return {
@@ -124,13 +124,38 @@ export class ResearchService {
   }
 
   private static async generateClaudeResponse(query: string, contextData: string): Promise<string> {
-    // Placeholder for Claude API integration
-    // In a real implementation, you would call the Anthropic API here
-    
-    if (contextData) {
-      return `Based on the latest data:\n\n${contextData}\n\nRegarding your question "${query}":\n\nThis is a comprehensive analysis based on real-time Web3 data. The market shows current trends and the DeFi ecosystem continues to evolve with new protocols and innovations. For more specific analysis, please provide additional details about what aspects you'd like me to focus on.`;
-    }
+    try {
+      const response = await fetch('https://djozrzgevluayzcvenby.supabase.co/functions/v1/claude-chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: query,
+          context: contextData
+        }),
+      });
 
-    return `I understand you're asking about "${query}". While I don't have specific real-time data for this query right now, I can provide general insights about Web3 and blockchain topics. For more accurate and current information, please try asking about specific tokens, protocols, or include keywords like "price", "DeFi", or "market data".`;
+      if (!response.ok) {
+        throw new Error(`Claude API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      return data.response;
+    } catch (error) {
+      console.error('Claude response error:', error);
+      
+      // Fallback response
+      if (contextData) {
+        return `Based on the latest data:\n\n${contextData}\n\nRegarding your question "${query}":\n\nThis is a comprehensive analysis based on real-time Web3 data. The market shows current trends and the DeFi ecosystem continues to evolve with new protocols and innovations. For more specific analysis, please provide additional details about what aspects you'd like me to focus on.`;
+      }
+
+      return `I understand you're asking about "${query}". While I don't have specific real-time data for this query right now, I can provide general insights about Web3 and blockchain topics. For more accurate and current information, please try asking about specific tokens, protocols, or include keywords like "price", "DeFi", or "market data".`;
+    }
   }
 }
