@@ -41,7 +41,7 @@ export const WalletAuth = () => {
         </Card>
       </div>;
   }
-  return <div className="flex items-center justify-between p-4 glass border-b">
+  return <div className="flex items-center justify-between p-2 glass border-b">
       <div className="flex items-center space-x-3">
         <img src="/lovable-uploads/33de17b2-37de-44c9-994a-e297e6beede9.png" alt="Logo" className="w-24 h-24 object-contain" />
         <div>
