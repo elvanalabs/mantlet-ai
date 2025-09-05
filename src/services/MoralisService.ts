@@ -109,11 +109,15 @@ export class MoralisService {
       const data = result.data as any;
       
       if (chain === 'solana') {
-        // For Solana portfolio response, extract tokens array and add pricing
+        // For Solana portfolio response, extract tokens array
         const tokens = Array.isArray(data) ? data : (data.tokens || []);
         
-        // Add estimated USD values for major tokens
-        return this.addSolanaTokenPricing(tokens);
+        // Return without hardcoded pricing - will be enhanced with CoinGecko
+        return tokens.map((token: any) => ({
+          ...token,
+          balance_formatted: token.amount,
+          possible_spam: token.possibleSpam
+        }));
       } else {
         // For EVM response
         return Array.isArray(data) ? data : (data.result || []);
@@ -124,34 +128,95 @@ export class MoralisService {
     }
   }
 
-  private static addSolanaTokenPricing(tokens: any[]): WalletBalance[] {
-    // Simple price estimates for major Solana tokens (this could be enhanced with real-time pricing)
-    const tokenPrices: { [symbol: string]: number } = {
-      'USDC': 1.00,
-      'USDT': 1.00,
-      'SOL': 140.00, // Approximate - could be fetched from external API
-      'JUP': 1.25,   // Approximate
-      'RAY': 5.50,   // Approximate
-      'BONK': 0.000025, // Approximate
-      'WIF': 3.80,   // Approximate
-      'PYTH': 0.42,  // Approximate
+  static async getWalletTokenBalancesWithPricing(
+    address: string, 
+    chain: string = 'eth',
+    excludeSpam: boolean = true
+  ): Promise<WalletBalance[]> {
+    // Get raw wallet balances from Moralis
+    const balances = await this.getWalletTokenBalances(address, chain, excludeSpam);
+    
+    // Enhance with real pricing data from CoinGecko
+    return await this.enhanceWithCoinGeckoPricing(balances, chain);
+  }
+
+  private static async enhanceWithCoinGeckoPricing(balances: WalletBalance[], chain: string): Promise<WalletBalance[]> {
+    try {
+      // Create a mapping of common token symbols to CoinGecko IDs
+      const symbolToCoinGeckoId = this.getSymbolToCoinGeckoIdMap();
+      
+      // Extract unique symbols and map to CoinGecko IDs
+      const coinIds = balances
+        .map(token => {
+          const symbol = token.symbol?.toLowerCase();
+          return symbolToCoinGeckoId[symbol] || symbol;
+        })
+        .filter(id => id)
+        .join(',');
+      
+      if (!coinIds) return balances;
+
+      // Fetch prices from CoinGecko using coin IDs
+      const response = await fetch(
+        `https://api.coingecko.com/api/v3/simple/price?ids=${coinIds}&vs_currencies=usd&include_24hr_change=true`,
+        { 
+          headers: { 
+            'Accept': 'application/json',
+            'User-Agent': 'CryptoAnalyzer/1.0'
+          } 
+        }
+      );
+      
+      if (!response.ok) {
+        console.warn('CoinGecko pricing failed:', response.status);
+        return balances;
+      }
+
+      const priceData = await response.json();
+      
+      // Enhance balances with pricing data
+      return balances.map(token => {
+        const symbol = token.symbol?.toLowerCase();
+        const coinId = symbolToCoinGeckoId[symbol] || symbol;
+        const priceInfo = priceData[coinId];
+        const price = priceInfo?.usd;
+        const change24h = priceInfo?.usd_24h_change;
+        const amount = parseFloat(token.amount || token.balance_formatted || token.balance || '0');
+        
+        return {
+          ...token,
+          usd_price: price,
+          usd_value: price ? amount * price : undefined,
+          usd_value_24hr_percent_change: change24h
+        };
+      });
+    } catch (error) {
+      console.error('Error fetching CoinGecko pricing:', error);
+      return balances;
+    }
+  }
+
+  private static getSymbolToCoinGeckoIdMap(): { [symbol: string]: string } {
+    return {
+      'btc': 'bitcoin',
+      'eth': 'ethereum',
+      'usdc': 'usd-coin',
+      'usdt': 'tether',
+      'sol': 'solana',
+      'bnb': 'binancecoin',
+      'ada': 'cardano',
+      'dot': 'polkadot',
+      'matic': 'matic-network',
+      'avax': 'avalanche-2',
+      'link': 'chainlink',
+      'atom': 'cosmos',
+      'uni': 'uniswap',
+      'jup': 'jupiter-exchange-solana',
+      'ray': 'raydium',
+      'bonk': 'bonk',
+      'wif': 'dogwifcoin',
+      'pyth': 'pyth-network'
     };
-
-    return tokens.map(token => {
-      const symbol = token.symbol?.toUpperCase();
-      const amount = parseFloat(token.amount || '0');
-      const pricePerToken = tokenPrices[symbol] || 0;
-      const usdValue = amount * pricePerToken;
-
-      return {
-        ...token,
-        usd_value: usdValue > 0 ? usdValue : undefined,
-        usd_price: pricePerToken > 0 ? pricePerToken : undefined,
-        // Map Solana fields to standard format
-        balance_formatted: token.amount,
-        possible_spam: token.possibleSpam
-      };
-    });
   }
 
   static async getWalletHistory(

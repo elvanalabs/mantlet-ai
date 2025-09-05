@@ -546,9 +546,9 @@ export class ResearchService {
       
       console.log('Using chain:', chain, 'for address:', walletAddress);
 
-      // Fetch wallet data concurrently
+      // Fetch wallet data with enhanced pricing
       const [balances, history] = await Promise.allSettled([
-        MoralisService.getWalletTokenBalances(walletAddress, chain),
+        MoralisService.getWalletTokenBalancesWithPricing(walletAddress, chain),
         MoralisService.getWalletHistory(walletAddress, chain, 5)
       ]);
 
