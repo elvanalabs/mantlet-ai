@@ -166,7 +166,7 @@ export class MoralisService {
 
     console.log('Processing', balances.length, 'tokens for display');
 
-    // Calculate total value more safely
+    // Calculate total portfolio value
     const totalValue = balances.reduce((sum, token) => {
       const value = parseFloat(token.usd_value?.toString() || '0') || 0;
       return sum + value;
@@ -201,28 +201,50 @@ Total tokens received: ${balances.length}
 This might be due to filtering or all tokens being marked as spam`;
     }
     
-    let result = `WALLET TOKEN BALANCES:
-`;
-    
-    if (totalValue > 0) {
-      result += `Total Portfolio Value: $${totalValue.toLocaleString()}
-`;
-    }
-    
-    result += `Tokens Found: ${balances.length} | Showing: ${validTokens.length}
+    let result = `WALLET PORTFOLIO ANALYSIS:
+
+TOTAL PORTFOLIO VALUE: ${totalValue > 0 ? '$' + totalValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) : 'USD values not available'}
+TOKENS FOUND: ${balances.length}
+SHOWING: ${validTokens.length} tokens
 
 TOKEN HOLDINGS:
-${validTokens.map(token => {
-        const amount = token.amount || token.balance_formatted || token.balance || '0';
-        const symbol = (token.symbol || 'N/A').toUpperCase();
-        const name = token.name || 'Unknown Token';
-        const usdValue = token.usd_value ? `($${parseFloat(token.usd_value.toString()).toLocaleString()})` : '';
-        const change24h = token.usd_value_24hr_percent_change 
-          ? `24h change: ${token.usd_value_24hr_percent_change > 0 ? '+' : ''}${token.usd_value_24hr_percent_change.toFixed(2)}%` 
-          : '';
+`;
+
+    validTokens.forEach(token => {
+      const amount = token.amount || token.balance_formatted || token.balance || '0';
+      const symbol = (token.symbol || 'N/A').toUpperCase();
+      const name = token.name || 'Unknown Token';
+      
+      // Format token amount nicely
+      const formattedAmount = parseFloat(amount).toLocaleString(undefined, {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 6
+      });
+      
+      // Calculate and format USD value
+      let usdInfo = '';
+      if (token.usd_value && token.usd_value > 0) {
+        const usdValue = parseFloat(token.usd_value.toString());
+        usdInfo = ` | USD VALUE: $${usdValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
         
-        return `- ${name} (${symbol}): ${amount} ${usdValue} ${change24h}`.trim();
-      }).join('\n')}`;
+        // Add 24h change if available
+        if (token.usd_value_24hr_percent_change !== undefined) {
+          const change = token.usd_value_24hr_percent_change;
+          const changeSign = change >= 0 ? '+' : '';
+          usdInfo += ` | 24H CHANGE: ${changeSign}${change.toFixed(2)}%`;
+        }
+      } else {
+        usdInfo = ' | USD VALUE: Not available';
+      }
+
+      result += `- ${name} (${symbol}): ${formattedAmount} tokens${usdInfo}\n`;
+    });
+
+    // Add summary statistics
+    const tokensWithValue = validTokens.filter(t => t.usd_value && t.usd_value > 0);
+    result += `\nPORTFOLIO SUMMARY:
+- Tokens with USD values: ${tokensWithValue.length}/${validTokens.length}
+- Tokens without USD values: ${validTokens.length - tokensWithValue.length}/${validTokens.length}`;
 
     return result;
   }
