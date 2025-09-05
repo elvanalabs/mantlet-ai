@@ -192,7 +192,8 @@ export class ResearchService {
   private static isWalletQuery(query: string): boolean {
     const walletKeywords = [
       'wallet', 'address', 'balance', 'transaction', 'tx', 'transfer', 'send', 'receive',
-      'portfolio', 'holdings', 'assets', '0x', 'eth balance', 'token balance', 'history'
+      'portfolio', 'holdings', 'assets', '0x', 'eth balance', 'token balance', 'history',
+      'solana wallet', 'sol balance', 'spl token'
     ];
     return walletKeywords.some(keyword => query.toLowerCase().includes(keyword)) ||
            MoralisService.extractWalletAddress(query) !== null;
@@ -533,22 +534,26 @@ export class ResearchService {
   private static async fetchMoralisWalletData(query: string): Promise<string | null> {
     try {
       const walletAddress = MoralisService.extractWalletAddress(query);
-      if (!walletAddress || !MoralisService.isValidEthereumAddress(walletAddress)) {
+      if (!walletAddress || !MoralisService.isValidAddress(walletAddress)) {
         return null;
       }
 
       console.log('Fetching Moralis data for wallet:', walletAddress);
 
-      // Determine chain from query (default to Ethereum)
-      const chain = this.extractChainFromQuery(query) || 'eth';
+      // Auto-detect chain from address format, or use query override
+      const detectedChain = MoralisService.detectChainFromAddress(walletAddress);
+      const chain = this.extractChainFromQuery(query) || detectedChain;
       
+      console.log('Using chain:', chain, 'for address:', walletAddress);
+
       // Fetch wallet data concurrently (removed native balance call)
       const [balances, history] = await Promise.allSettled([
         MoralisService.getWalletTokenBalances(walletAddress, chain),
         MoralisService.getWalletHistory(walletAddress, chain, 5)
       ]);
 
-      let result = `**WALLET ANALYSIS: ${walletAddress}**\n\n`;
+      let result = `**WALLET ANALYSIS: ${walletAddress}**\n`;
+      result += `**Blockchain:** ${chain.toUpperCase()}\n\n`;
 
       // Add token balances (which includes native token)
       if (balances.status === 'fulfilled') {
@@ -594,7 +599,9 @@ export class ResearchService {
       'fantom': 'fantom',
       'ftm': 'fantom',
       'arbitrum': 'arbitrum',
-      'optimism': 'optimism'
+      'optimism': 'optimism',
+      'solana': 'solana',
+      'sol': 'solana'
     };
 
     for (const [keyword, chain] of Object.entries(chainMap)) {

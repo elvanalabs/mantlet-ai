@@ -179,9 +179,32 @@ export class MoralisService {
     return /^0x[a-fA-F0-9]{40}$/.test(address);
   }
 
+  static isValidSolanaAddress(address: string): boolean {
+    // Solana addresses are base58 encoded, 32-44 characters long
+    return /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address) && address.length >= 32 && address.length <= 44;
+  }
+
+  static isValidAddress(address: string): boolean {
+    return this.isValidEthereumAddress(address) || this.isValidSolanaAddress(address);
+  }
+
   static extractWalletAddress(query: string): string | null {
-    // Look for Ethereum address pattern in query
-    const addressMatch = query.match(/0x[a-fA-F0-9]{40}/);
-    return addressMatch ? addressMatch[0] : null;
+    // Look for Ethereum address pattern
+    const ethAddressMatch = query.match(/0x[a-fA-F0-9]{40}/);
+    if (ethAddressMatch) return ethAddressMatch[0];
+    
+    // Look for Solana address pattern (base58, 32-44 chars)
+    const solanaAddressMatch = query.match(/[1-9A-HJ-NP-Za-km-z]{32,44}/);
+    if (solanaAddressMatch && this.isValidSolanaAddress(solanaAddressMatch[0])) {
+      return solanaAddressMatch[0];
+    }
+    
+    return null;
+  }
+
+  static detectChainFromAddress(address: string): string {
+    if (this.isValidEthereumAddress(address)) return 'eth';
+    if (this.isValidSolanaAddress(address)) return 'solana';
+    return 'eth'; // default
   }
 }
