@@ -110,8 +110,12 @@ export class ResearchService {
         sources.push('CoinGecko API');
       } else if (this.isDeFiQuery(queryLower)) {
         // PROTOCOLS/PROJECTS → DeFi Llama only
-        dataPromises.push(this.fetchDeFiProtocolData(query));
-        dataPromises.push(this.fetchProtocolDetailsData(query));
+        if (queryLower.includes('stablecoin') || queryLower.includes('stable coin')) {
+          dataPromises.push(this.fetchStablecoinData());
+        } else {
+          dataPromises.push(this.fetchDeFiProtocolData(query));
+          dataPromises.push(this.fetchProtocolDetailsData(query));
+        }
         sources.push('DeFiLlama API');
       } else if (this.isChainQuery(queryLower)) {
         // CHAIN DATA → DeFi Llama for TVL, CoinGecko for prices
@@ -224,7 +228,9 @@ Blockchain: ${chain.toUpperCase()}
       'lending', 'borrowing', 'staking', 'farming', 'pool', 'vault',
       'uniswap', 'aave', 'compound', 'makerdao', 'curve', 'sushiswap',
       'pancakeswap', 'balancer', 'yearn', 'synthetix', 'dydx', 'gmx',
-      'project', 'dapp', 'platform', 'exchange', 'dao'
+      'project', 'dapp', 'platform', 'exchange', 'dao',
+      'stablecoin', 'stablecoins', 'usdt', 'usdc', 'dai', 'busd', 'frax',
+      'tether', 'circle', 'stable coin', 'stable coins', 'pegged'
     ];
     return defiKeywords.some(keyword => query.toLowerCase().includes(keyword));
   }
