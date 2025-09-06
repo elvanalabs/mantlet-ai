@@ -110,9 +110,12 @@ export class ResearchService {
         sources.push('CoinGecko API');
       } else if (this.isDeFiQuery(queryLower)) {
         // PROTOCOLS/PROJECTS → DeFi Llama only
+        console.log('Detected DeFi query:', queryLower);
         if (queryLower.includes('stablecoin') || queryLower.includes('stable coin')) {
+          console.log('Detected stablecoin query, fetching stablecoin data');
           dataPromises.push(this.fetchStablecoinData());
         } else {
+          console.log('Detected general DeFi query');
           dataPromises.push(this.fetchDeFiProtocolData(query));
           dataPromises.push(this.fetchProtocolDetailsData(query));
         }
@@ -567,20 +570,30 @@ Market Capitalization: $${coin.market_cap ? (coin.market_cap / 1e6).toFixed(2) +
 
   private static async fetchStablecoinData(): Promise<string | null> {
     try {
+      console.log('Fetching stablecoin data from DeFi Llama...');
       const response = await axios.get(`${this.DEFILLAMA_API}/stablecoins`);
-      const stablecoins = response.data.peggedAssets?.slice(0, 10) || [];
+      console.log('Stablecoin API response:', response.data);
       
-      if (stablecoins.length === 0) return null;
+      // Try different possible data structures
+      const stablecoins = response.data.peggedAssets || response.data.stablecoins || response.data || [];
+      const topStablecoins = Array.isArray(stablecoins) ? stablecoins.slice(0, 10) : [];
+      
+      if (topStablecoins.length === 0) {
+        console.log('No stablecoin data found');
+        return null;
+      }
 
+      console.log('Found stablecoins:', topStablecoins.length);
       return `TOP STABLECOINS BY MARKET CAP:\n` +
-        stablecoins.map((stable: any, index: number) => 
-          `${index + 1}. ${stable.name} (${stable.symbol}): $${(stable.circulating / 1e9).toFixed(2)}B ` +
-          `| Price: $${stable.price?.toFixed(4) || '1.0000'} ` +
-          `| Peg: ${stable.pegType || 'USD'}`
+        topStablecoins.map((stable: any, index: number) => 
+          `${index + 1}. ${stable.name || stable.symbol} (${stable.symbol || 'N/A'}): ` +
+          `$${stable.circulating ? (stable.circulating / 1e9).toFixed(2) + 'B' : 'N/A'} ` +
+          `| Price: $${stable.price?.toFixed(4) || '~1.0000'} ` +
+          `| Peg: ${stable.pegType || stable.peggingMechanism || 'USD'}`
         ).join('\n');
     } catch (error) {
       console.error('Stablecoin data error:', error);
-      return null;
+      return `Unable to fetch stablecoin data. API Error: ${error.message}`;
     }
   }
 
