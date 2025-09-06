@@ -102,29 +102,20 @@ export class ResearchService {
         };
       }
 
-      // Comprehensive market data
-      dataPromises.push(this.fetchCoinGeckoMarketData(query));
-      dataPromises.push(this.fetchGlobalMarketData());
-      dataPromises.push(this.fetchTrendingData());
-      
-      // DeFi comprehensive data
-      dataPromises.push(this.fetchDeFiProtocolData(query));
-      dataPromises.push(this.fetchChainTVLData());
-      dataPromises.push(this.fetchYieldData());
-
-      // Specific query-based data
+      // Only fetch data relevant to the specific query type
       if (this.isPriceQuery(queryLower)) {
         dataPromises.push(this.fetchDetailedCoinData(query));
         dataPromises.push(this.fetchPriceHistoryData(query));
-      }
-
-      if (this.isDeFiQuery(queryLower)) {
+      } else if (this.isDeFiQuery(queryLower)) {
+        dataPromises.push(this.fetchDeFiProtocolData(query));
         dataPromises.push(this.fetchProtocolDetailsData(query));
-        dataPromises.push(this.fetchStablecoinData());
-      }
-
-      if (this.isChainQuery(queryLower)) {
+      } else if (this.isChainQuery(queryLower)) {
+        dataPromises.push(this.fetchChainTVLData());
         dataPromises.push(this.fetchChainSpecificData(query));
+      } else {
+        // For general queries, provide basic market overview
+        dataPromises.push(this.fetchCoinGeckoMarketData(query));
+        dataPromises.push(this.fetchTrendingData());
       }
 
       // Execute all data fetches concurrently
