@@ -571,16 +571,18 @@ Market Capitalization: $${coin.market_cap ? (coin.market_cap / 1e6).toFixed(2) +
   private static async fetchStablecoinData(): Promise<string | null> {
     try {
       console.log('Fetching stablecoin data from DeFi Llama...');
-      const response = await axios.get(`${this.DEFILLAMA_API}/stablecoins`);
+      // Use the correct DeFi Llama API endpoint for stablecoins
+      const response = await axios.get(`https://stablecoins.llama.fi/stablecoins`);
       console.log('Stablecoin API response:', response.data);
       
-      // Try different possible data structures
-      const stablecoins = response.data.peggedAssets || response.data.stablecoins || response.data || [];
+      // The response should have peggedAssets array
+      const stablecoins = response.data.peggedAssets || [];
       const topStablecoins = Array.isArray(stablecoins) ? stablecoins.slice(0, 10) : [];
       
       if (topStablecoins.length === 0) {
         console.log('No stablecoin data found');
-        return null;
+        // Fallback: fetch top stablecoins from CoinGecko if DeFi Llama fails
+        return await this.fetchStablecoinDataFromCoinGecko();
       }
 
       console.log('Found stablecoins:', topStablecoins.length);
@@ -593,7 +595,37 @@ Market Capitalization: $${coin.market_cap ? (coin.market_cap / 1e6).toFixed(2) +
         ).join('\n');
     } catch (error) {
       console.error('Stablecoin data error:', error);
-      return `Unable to fetch stablecoin data. API Error: ${error.message}`;
+      // Fallback to CoinGecko for stablecoin data
+      return await this.fetchStablecoinDataFromCoinGecko();
+    }
+  }
+
+  private static async fetchStablecoinDataFromCoinGecko(): Promise<string | null> {
+    try {
+      console.log('Fetching stablecoin data from CoinGecko as fallback...');
+      const stablecoinIds = ['tether', 'usd-coin', 'binance-usd', 'dai', 'frax', 'trueusd', 'paxos-standard', 'gemini-dollar'];
+      const response = await axios.get(`${this.COINGECKO_API}/coins/markets`, {
+        params: {
+          vs_currency: 'usd',
+          ids: stablecoinIds.join(','),
+          order: 'market_cap_desc',
+          per_page: 10,
+          page: 1
+        }
+      });
+
+      if (!response.data || response.data.length === 0) return null;
+
+      return `TOP STABLECOINS BY MARKET CAP:\n` +
+        response.data.map((coin: any, index: number) => 
+          `${index + 1}. ${coin.name} (${coin.symbol.toUpperCase()}): ` +
+          `$${(coin.market_cap / 1e9).toFixed(2)}B | ` +
+          `Price: $${coin.current_price?.toFixed(4) || '1.0000'} | ` +
+          `24h: ${coin.price_change_percentage_24h?.toFixed(2) || '0.00'}%`
+        ).join('\n');
+    } catch (error) {
+      console.error('CoinGecko stablecoin fallback error:', error);
+      return null;
     }
   }
 
