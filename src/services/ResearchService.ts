@@ -102,20 +102,26 @@ export class ResearchService {
         };
       }
 
-      // Only fetch data relevant to the specific query type
+      // Route to appropriate data sources based on query type
       if (this.isPriceQuery(queryLower)) {
+        // CRYPTO PRICES → CoinGecko only
         dataPromises.push(this.fetchDetailedCoinData(query));
         dataPromises.push(this.fetchPriceHistoryData(query));
+        sources.push('CoinGecko API');
       } else if (this.isDeFiQuery(queryLower)) {
+        // PROTOCOLS/PROJECTS → DeFi Llama only
         dataPromises.push(this.fetchDeFiProtocolData(query));
         dataPromises.push(this.fetchProtocolDetailsData(query));
+        sources.push('DeFiLlama API');
       } else if (this.isChainQuery(queryLower)) {
+        // CHAIN DATA → DeFi Llama for TVL, CoinGecko for prices
         dataPromises.push(this.fetchChainTVLData());
         dataPromises.push(this.fetchChainSpecificData(query));
+        sources.push('DeFiLlama API');
       } else {
-        // For general queries, provide basic market overview
+        // GENERAL QUERIES → Basic overview from CoinGecko
         dataPromises.push(this.fetchCoinGeckoMarketData(query));
-        dataPromises.push(this.fetchTrendingData());
+        sources.push('CoinGecko API');
       }
 
       // Execute all data fetches concurrently
@@ -123,14 +129,9 @@ export class ResearchService {
       
       // Process results and collect successful data
       const dataResults: string[] = [];
-      results.forEach((result, index) => {
+      results.forEach((result) => {
         if (result.status === 'fulfilled' && result.value) {
           dataResults.push(result.value);
-          
-          // Add appropriate sources based on data type
-          if (index < 3) sources.push('CoinGecko API');
-          else if (index < 6) sources.push('DeFiLlama API');
-          else sources.push('CoinGecko API', 'DeFiLlama API');
         }
       });
 
@@ -210,15 +211,20 @@ Blockchain: ${chain.toUpperCase()}
   private static isPriceQuery(query: string): boolean {
     const priceKeywords = [
       'price', 'cost', 'value', 'worth', 'usd', 'dollar', 'how much',
-      'current price', 'market price', 'trading at', 'priced at'
+      'current price', 'market price', 'trading at', 'priced at', 'chart',
+      'bitcoin', 'btc', 'ethereum', 'eth', 'ada', 'sol', 'avax', 'matic',
+      'token price', 'coin price', 'crypto price', 'market cap'
     ];
-    return priceKeywords.some(keyword => query.includes(keyword));
+    return priceKeywords.some(keyword => query.toLowerCase().includes(keyword));
   }
 
   private static isDeFiQuery(query: string): boolean {
     const defiKeywords = [
       'defi', 'tvl', 'yield', 'liquidity', 'protocol', 'apy', 'apr',
-      'lending', 'borrowing', 'staking', 'farming', 'pool', 'vault'
+      'lending', 'borrowing', 'staking', 'farming', 'pool', 'vault',
+      'uniswap', 'aave', 'compound', 'makerdao', 'curve', 'sushiswap',
+      'pancakeswap', 'balancer', 'yearn', 'synthetix', 'dydx', 'gmx',
+      'project', 'dapp', 'platform', 'exchange', 'dao'
     ];
     return defiKeywords.some(keyword => query.toLowerCase().includes(keyword));
   }
