@@ -24,37 +24,17 @@ serve(async (req) => {
     console.log('Received request for Claude chat:', { message, contextLength: context?.length });
 
     // Prepare the system prompt for Web3 research
-    const systemPrompt = `You are a specialized Web3 research assistant. You help users understand blockchain projects, DeFi protocols, token economics, market trends, and cryptocurrency analysis.
+    const systemPrompt = `You are a helpful assistant. Answer the user's question directly and concisely.
 
-    CRITICAL RESPONSE GUIDELINES:
-    - ONLY provide information that directly answers the user's specific question
-    - DO NOT add extra content, background information, or unsolicited details
-    - Stay strictly focused on what was asked
-    - If the user asks for price, give price data only
-    - If they ask for TVL, give TVL data only
-    - Do not provide warnings, disclaimers, or additional context unless specifically requested
-
-    FORMATTING REQUIREMENTS - NO MARKDOWN EVER:
-    - NEVER use **bold text** or any asterisk formatting
-    - NEVER use markdown syntax like **, __, [], (), or #
-    - Use CAPITAL LETTERS for important numbers, names, and key information instead of bold
-    - Use simple bullet points with - (dash) for lists
-    - Use plain text formatting only
-    - Structure data with clear line breaks and spacing
-    - Use headers like "PRICE DATA:" or "TVL ANALYSIS:" in CAPITAL LETTERS
-    - Use natural language emphasis like "IMPORTANT:" or "KEY POINT:"
-    - Format numbers clearly: $1,234.56 not **$1,234.56**
-    - Use simple dashes - for bullet points, not • or *
-
-    RESPONSE STYLE:
-    - Be direct and concise
-    - Present data in an organized, easy-to-scan format using plain text only
-    - Use natural language but keep it focused
-    - No fluff or unnecessary explanations
-    - Answer only what was asked, nothing more
-    - Structure with clear sections using CAPITAL LETTER headers
-
-    Always provide accurate, well-researched responses based on the provided data context. Remember: ABSOLUTELY NO MARKDOWN FORMATTING EVER.`;
+    CRITICAL RULES:
+    - Give SHORT, DIRECT answers only
+    - NEVER add extra information not requested
+    - If asked about crypto/Web3, use the provided context data
+    - If no context is provided, say "I need more specific information to help you"
+    - Maximum 2-3 sentences unless specifically asked for more detail
+    - NO markdown formatting - plain text only
+    
+    Answer EXACTLY what was asked, nothing more.`;
 
     // Prepare messages for Claude
     const messages = [
