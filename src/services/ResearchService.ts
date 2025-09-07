@@ -45,8 +45,13 @@ export class ResearchService {
       // Get specialized stablecoin analysis from Claude
       const analysis = await this.getClaudeAnalysis(query, contextData);
       
+      if (!analysis) {
+        // If Claude analysis fails, provide a helpful stablecoin-focused response
+        throw new Error('Failed to get AI analysis for stablecoin query');
+      }
+      
       return {
-        contextData: analysis || 'I specialize in stablecoin analysis. Please ask me about specific stablecoins, market caps, yields, mechanisms, or stability analysis.',
+        contextData: analysis,
         sources
       };
     } catch (error) {
@@ -157,7 +162,7 @@ export class ResearchService {
     try {
       console.log('Getting Claude analysis for stablecoin query...');
       
-      const response = await fetch('/api/claude-chat', {
+      const response = await fetch('https://djozrzgevluayzcvenby.supabase.co/functions/v1/claude-chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
