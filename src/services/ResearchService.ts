@@ -28,40 +28,54 @@ export class ResearchService {
       let contextData = '';
       let sources: string[] = [];
 
-      // Always try to fetch stablecoin data first
-      console.log('Fetching stablecoin market data...');
-      const stablecoinData = await this.fetchStablecoinData();
-      if (stablecoinData) {
-        contextData = stablecoinData;
-        sources.push('DeFi Llama Stablecoins', 'CoinGecko Market Data');
-      }
+      // Check if this is a descriptive/educational question vs market data request
+      const isDescriptiveQuery = this.isDescriptiveQuery(query);
+      const isMarketDataQuery = this.isMarketDataQuery(query);
 
-      // If no stablecoin data available, search web for stablecoin information
-      if (!contextData) {
-        console.log('No market data available, searching web for stablecoin information...');
-        const webData = await this.searchWeb(`stablecoins ${query}`);
-        if (webData) {
-          contextData = webData;
-          sources.push('Web Search - Stablecoin Focus');
+      if (isMarketDataQuery && !isDescriptiveQuery) {
+        // Only fetch market data for specific market data requests
+        console.log('Fetching stablecoin market data for market data query...');
+        const stablecoinData = await this.fetchStablecoinData();
+        if (stablecoinData) {
+          contextData = stablecoinData;
+          sources.push('DeFi Llama Stablecoins', 'CoinGecko Market Data');
         }
-      }
-
-      // If still no data, provide stablecoin-focused guidance
-      if (!contextData) {
-        contextData = 'I specialize in stablecoin analysis. Please ask me about specific stablecoins (USDT, USDC, DAI, etc.), market caps, yields, mechanisms, or stability analysis.';
       }
 
       // Get specialized stablecoin analysis from Claude
       const analysis = await this.getClaudeAnalysis(query, contextData);
       
       return {
-        contextData: analysis || contextData,
+        contextData: analysis || 'I specialize in stablecoin analysis. Please ask me about specific stablecoins, market caps, yields, mechanisms, or stability analysis.',
         sources
       };
     } catch (error) {
       console.error('Stablecoin query processing error:', error);
       throw error;
     }
+  }
+
+  private static isDescriptiveQuery(query: string): boolean {
+    const descriptiveKeywords = [
+      'what are', 'what is', 'how do', 'how does', 'explain', 'define', 'definition',
+      'why', 'how', 'tell me about', 'describe', 'difference between', 'compare',
+      'mechanism', 'work', 'backed', 'pegged', 'stability', 'risk', 'advantage',
+      'disadvantage', 'benefit', 'problem', 'issue', 'future', 'trend', 'history'
+    ];
+    
+    const lowerQuery = query.toLowerCase();
+    return descriptiveKeywords.some(keyword => lowerQuery.includes(keyword));
+  }
+
+  private static isMarketDataQuery(query: string): boolean {
+    const marketDataKeywords = [
+      'market cap', 'price', 'top', 'list', 'ranking', 'volume', 'supply',
+      'largest', 'biggest', 'circulation', 'trading', 'performance', 'chart',
+      'current price', 'market size', 'dominance', 'mcap'
+    ];
+    
+    const lowerQuery = query.toLowerCase();
+    return marketDataKeywords.some(keyword => lowerQuery.includes(keyword));
   }
 
   private static async fetchStablecoinData(): Promise<string | null> {
