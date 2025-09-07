@@ -19,7 +19,7 @@ export const ResearchInterface = () => {
     {
       id: '1',
       type: 'system',
-      content: 'Welcome to your Web3 Research Agent. Ask me anything about cryptocurrencies, DeFi protocols, market data, or general Web3 topics. I can pull real-time data from CoinGecko, DeFi Llama, and search the web for you.',
+      content: 'Welcome to your Stablecoin Research Agent. I am your specialized AI assistant for everything stablecoin-related. Ask me about stablecoin market caps, prices, mechanisms, stability, yields, protocols, or any stablecoin analysis you need.',
       timestamp: new Date(),
     }
   ]);
@@ -146,7 +146,7 @@ export const ResearchInterface = () => {
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask about Web3, DeFi, crypto prices, or any blockchain topic..."
+            placeholder="Ask about stablecoin market caps, yields, mechanisms, USDT vs USDC, or any stablecoin analysis..."
             className="flex-1 bg-input/50 backdrop-blur-sm"
             disabled={isLoading}
           />
