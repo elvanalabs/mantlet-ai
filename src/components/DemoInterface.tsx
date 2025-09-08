@@ -95,7 +95,7 @@ export const DemoInterface = ({ onSetupWallet }: DemoInterfaceProps) => {
   return (
     <div className="h-screen flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between py-1 px-4 glass border-b">
+      <div className="flex items-center justify-between px-4 glass border-b">
         <div className="flex items-center space-x-3">
           <img 
             src="/lovable-uploads/33de17b2-37de-44c9-994a-e297e6beede9.png" 
