@@ -3,7 +3,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
-import { Send, Loader2, TrendingUp, Database, Globe, Wallet, Settings } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Send, Loader2, TrendingUp, Database, Globe, Wallet, Settings, GitCompare, HelpCircle, Newspaper } from 'lucide-react';
 import { ResearchService } from '@/services/ResearchService';
 
 interface Message {
@@ -29,6 +31,9 @@ export const DemoInterface = ({ onSetupWallet }: DemoInterfaceProps) => {
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [compareStablecoin1, setCompareStablecoin1] = useState('');
+  const [compareStablecoin2, setCompareStablecoin2] = useState('');
+  const [explainStablecoin, setExplainStablecoin] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -79,6 +84,62 @@ export const DemoInterface = ({ onSetupWallet }: DemoInterfaceProps) => {
     }
   };
 
+  const handleQuickAction = async (query: string) => {
+    if (isLoading) return;
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      type: 'user',
+      content: query,
+      timestamp: new Date(),
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setIsLoading(true);
+
+    try {
+      const response = await ResearchService.processQuery(query);
+      
+      const assistantMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        type: 'assistant',
+        content: response.contextData,
+        timestamp: new Date(),
+        sources: response.sources,
+      };
+
+      setMessages(prev => [...prev, assistantMessage]);
+    } catch (error) {
+      console.error('Research error:', error);
+      toast({
+        title: "Research Error",
+        description: "Failed to process your query. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCompareSubmit = () => {
+    if (compareStablecoin1.trim() && compareStablecoin2.trim()) {
+      handleQuickAction(`Compare ${compareStablecoin1.trim()} and ${compareStablecoin2.trim()} stablecoins`);
+      setCompareStablecoin1('');
+      setCompareStablecoin2('');
+    }
+  };
+
+  const handleExplainSubmit = () => {
+    if (explainStablecoin.trim()) {
+      handleQuickAction(`Explain ${explainStablecoin.trim()} stablecoin`);
+      setExplainStablecoin('');
+    }
+  };
+
+  const handleLatestNews = () => {
+    handleQuickAction('Latest news about stablecoins');
+  };
+
   const getMessageIcon = (type: string) => {
     switch (type) {
       case 'user':
@@ -116,34 +177,140 @@ export const DemoInterface = ({ onSetupWallet }: DemoInterfaceProps) => {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((message) => (
-          <div key={message.id} className="flex space-x-3">
-            {getMessageIcon(message.type)}
-            <div className="flex-1 min-w-0">
-              <Card className={`p-4 ${message.type === 'user' ? 'bg-secondary' : 'glass'}`}>
-                <div className="prose prose-sm dark:prose-invert max-w-none">
-                  <p className="whitespace-pre-wrap">{message.content}</p>
-                </div>
-                {message.sources && message.sources.length > 0 && (
-                  <div className="mt-3 pt-3 border-t border-border">
-                    <p className="text-xs text-muted-foreground mb-2 flex items-center">
-                      <Globe className="w-3 h-3 mr-1" />
-                      Sources:
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {message.sources.map((source, index) => (
-                        <span key={index} className="text-xs px-2 py-1 bg-muted rounded-md">
-                          {source}
-                        </span>
-                      ))}
-                    </div>
+        {messages.map((message, index) => (
+          <div key={message.id}>
+            <div className="flex space-x-3">
+              {getMessageIcon(message.type)}
+              <div className="flex-1 min-w-0">
+                <Card className={`p-4 ${message.type === 'user' ? 'bg-secondary' : 'glass'}`}>
+                  <div className="prose prose-sm dark:prose-invert max-w-none">
+                    <p className="whitespace-pre-wrap">{message.content}</p>
                   </div>
-                )}
-              </Card>
-              <p className="text-xs text-muted-foreground mt-1">
-                {message.timestamp.toLocaleTimeString()}
-              </p>
+                  {message.sources && message.sources.length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-border">
+                      <p className="text-xs text-muted-foreground mb-2 flex items-center">
+                        <Globe className="w-3 h-3 mr-1" />
+                        Sources:
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {message.sources.map((source, index) => (
+                          <span key={index} className="text-xs px-2 py-1 bg-muted rounded-md">
+                            {source}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </Card>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {message.timestamp.toLocaleTimeString()}
+                </p>
+              </div>
             </div>
+            
+            {/* Quick Start Options - Show after welcome message */}
+            {index === 0 && message.type === 'system' && (
+              <div className="mt-6 space-y-4">
+                <h3 className="text-sm font-medium text-muted-foreground flex items-center">
+                  <TrendingUp className="w-4 h-4 mr-2" />
+                  Quick Start Options
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  {/* Compare Stablecoins */}
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" className="h-auto p-4 flex flex-col items-start text-left hover:border-primary">
+                        <GitCompare className="w-5 h-5 mb-2 text-primary" />
+                        <div className="font-medium">Compare Stablecoins</div>
+                        <div className="text-xs text-muted-foreground">Compare two stablecoins side by side</div>
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Compare Stablecoins</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="stablecoin1">First Stablecoin</Label>
+                          <Input
+                            id="stablecoin1"
+                            placeholder="e.g., USDT"
+                            value={compareStablecoin1}
+                            onChange={(e) => setCompareStablecoin1(e.target.value)}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="stablecoin2">Second Stablecoin</Label>
+                          <Input
+                            id="stablecoin2"
+                            placeholder="e.g., USDC"
+                            value={compareStablecoin2}
+                            onChange={(e) => setCompareStablecoin2(e.target.value)}
+                          />
+                        </div>
+                        <DialogTrigger asChild>
+                          <Button 
+                            onClick={handleCompareSubmit}
+                            className="w-full"
+                            disabled={!compareStablecoin1.trim() || !compareStablecoin2.trim()}
+                          >
+                            Compare Stablecoins
+                          </Button>
+                        </DialogTrigger>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+
+                  {/* Explain Stablecoin */}
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" className="h-auto p-4 flex flex-col items-start text-left hover:border-primary">
+                        <HelpCircle className="w-5 h-5 mb-2 text-primary" />
+                        <div className="font-medium">Explain a Stablecoin</div>
+                        <div className="text-xs text-muted-foreground">Get detailed info about any stablecoin</div>
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Explain a Stablecoin</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="explain-stablecoin">Stablecoin Name</Label>
+                          <Input
+                            id="explain-stablecoin"
+                            placeholder="e.g., DAI, USDC, USDT"
+                            value={explainStablecoin}
+                            onChange={(e) => setExplainStablecoin(e.target.value)}
+                          />
+                        </div>
+                        <DialogTrigger asChild>
+                          <Button 
+                            onClick={handleExplainSubmit}
+                            className="w-full"
+                            disabled={!explainStablecoin.trim()}
+                          >
+                            Explain Stablecoin
+                          </Button>
+                        </DialogTrigger>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+
+                  {/* Latest News */}
+                  <Button 
+                    variant="outline" 
+                    className="h-auto p-4 flex flex-col items-start text-left hover:border-primary"
+                    onClick={handleLatestNews}
+                    disabled={isLoading}
+                  >
+                    <Newspaper className="w-5 h-5 mb-2 text-primary" />
+                    <div className="font-medium">Latest News</div>
+                    <div className="text-xs text-muted-foreground">Get recent stablecoin news</div>
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         ))}
         {isLoading && (
