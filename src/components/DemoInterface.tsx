@@ -23,7 +23,7 @@ export const DemoInterface = ({ onSetupWallet }: DemoInterfaceProps) => {
     {
       id: '1',
       type: 'system',
-      content: 'Welcome to the Web3 Research Agent Demo! You can ask me about cryptocurrencies, DeFi protocols, market data, or general Web3 topics. I can pull real-time data from CoinGecko, DeFi Llama, and search the web for you.\n\n⚠️ Demo Mode: Wallet authentication is disabled. Set up your Privy app ID to enable full wallet features.',
+      content: 'Welcome to Mantlet Research! Your expert AI Agent for everything related to Stablecoins',
       timestamp: new Date(),
     }
   ]);
