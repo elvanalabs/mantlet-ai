@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from '@/components/ui/label';
 import { Send, Loader2, TrendingUp, Database, Globe, Wallet, Settings, GitCompare, HelpCircle, Newspaper } from 'lucide-react';
 import { ResearchService } from '@/services/ResearchService';
+import { KnowledgeBaseManager } from '@/components/KnowledgeBaseManager';
 
 interface Message {
   id: string;
@@ -157,22 +158,27 @@ export const DemoInterface = ({ onSetupWallet }: DemoInterfaceProps) => {
     <div className="h-screen flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between px-4 glass border-b h-16 overflow-visible">
-        <div className="flex items-center space-x-3">
-          <img 
-            src="/lovable-uploads/33de17b2-37de-44c9-994a-e297e6beede9.png" 
-            alt="Logo" 
-            className="w-24 h-24 object-contain"
-          />
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <img 
+              src="/lovable-uploads/33de17b2-37de-44c9-994a-e297e6beede9.png" 
+              alt="Logo" 
+              className="w-24 h-24 object-contain"
+            />
+          </div>
+          <div className="flex items-center space-x-2">
+            <KnowledgeBaseManager />
+            <Button
+              onClick={onSetupWallet}
+              variant="outline"
+              size="sm"
+              className="hover:border-primary hover:text-primary"
+            >
+              <Settings className="w-4 h-4 mr-1" />
+              Setup Wallet
+            </Button>
+          </div>
         </div>
-        <Button
-          onClick={onSetupWallet}
-          variant="outline"
-          size="sm"
-          className="hover:border-primary hover:text-primary"
-        >
-          <Settings className="w-4 h-4 mr-1" />
-          Setup Wallet
-        </Button>
       </div>
 
       {/* Messages */}

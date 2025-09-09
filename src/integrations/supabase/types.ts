@@ -89,6 +89,45 @@ export type Database = {
         }
         Relationships: []
       }
+      knowledge_base: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_active: boolean | null
+          last_updated: string
+          source_type: string | null
+          summary: string | null
+          tags: string[] | null
+          title: string | null
+          url: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          last_updated?: string
+          source_type?: string | null
+          summary?: string | null
+          tags?: string[] | null
+          title?: string | null
+          url: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          last_updated?: string
+          source_type?: string | null
+          summary?: string | null
+          tags?: string[] | null
+          title?: string | null
+          url?: string
+        }
+        Relationships: []
+      }
       newsletter_subscriptions: {
         Row: {
           created_at: string
