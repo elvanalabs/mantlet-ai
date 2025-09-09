@@ -25,7 +25,7 @@ export const DemoInterface = ({ onSetupWallet }: DemoInterfaceProps) => {
     {
       id: '1',
       type: 'system',
-      content: 'Welcome to Mantlet Research! Your expert AI Agent for everything related to Stablecoins',
+      content: 'Hello! I am Mantlet, your AI assistant specialized in stablecoins. I can help you with everything related to stablecoins - comparisons, explanations, market analysis, news, and more!',
       timestamp: new Date(),
     }
   ]);
