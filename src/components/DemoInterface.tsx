@@ -227,20 +227,13 @@ export const DemoInterface = ({ onSetupWallet }: DemoInterfaceProps) => {
 
       {/* Input */}
       <div className="border-t border-border glass">
-        {/* Quick Start Options */}
-        <div className="p-4 space-y-4">
-          <h3 className="text-sm font-medium text-muted-foreground flex items-center">
-            <TrendingUp className="w-4 h-4 mr-2" />
-            Quick Start Options
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            {/* Compare Stablecoins */}
+        <div className="p-4">
+          <div className="flex gap-2 flex-wrap">
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="outline" className="h-auto p-4 flex flex-col items-start text-left hover:border-primary">
-                  <GitCompare className="w-5 h-5 mb-2 text-primary" />
-                  <div className="font-medium">Compare Stablecoins</div>
-                  <div className="text-xs text-muted-foreground">Compare two stablecoins side by side</div>
+                <Button variant="outline" size="sm" className="hover:border-primary">
+                  <GitCompare className="w-4 h-4 mr-2" />
+                  Compare Stablecoins
                 </Button>
               </DialogTrigger>
               <DialogContent>
@@ -279,13 +272,11 @@ export const DemoInterface = ({ onSetupWallet }: DemoInterfaceProps) => {
               </DialogContent>
             </Dialog>
 
-            {/* Explain Stablecoin */}
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="outline" className="h-auto p-4 flex flex-col items-start text-left hover:border-primary">
-                  <HelpCircle className="w-5 h-5 mb-2 text-primary" />
-                  <div className="font-medium">Explain a Stablecoin</div>
-                  <div className="text-xs text-muted-foreground">Get detailed info about any stablecoin</div>
+                <Button variant="outline" size="sm" className="hover:border-primary">
+                  <HelpCircle className="w-4 h-4 mr-2" />
+                  Explain Stablecoin
                 </Button>
               </DialogTrigger>
               <DialogContent>
@@ -315,16 +306,15 @@ export const DemoInterface = ({ onSetupWallet }: DemoInterfaceProps) => {
               </DialogContent>
             </Dialog>
 
-            {/* Latest News */}
             <Button 
               variant="outline" 
-              className="h-auto p-4 flex flex-col items-start text-left hover:border-primary"
+              size="sm"
+              className="hover:border-primary"
               onClick={handleLatestNews}
               disabled={isLoading}
             >
-              <Newspaper className="w-5 h-5 mb-2 text-primary" />
-              <div className="font-medium">Latest News</div>
-              <div className="text-xs text-muted-foreground">Get recent stablecoin news</div>
+              <Newspaper className="w-4 h-4 mr-2" />
+              Latest News
             </Button>
           </div>
         </div>
