@@ -11,6 +11,15 @@ export interface ResearchResponse {
       volume?: number;
     }>;
   };
+  newsResults?: Array<{
+    title: string;
+    link: string;
+    snippet: string;
+    date: string;
+    source: string;
+    thumbnail?: string;
+    position: number;
+  }>;
 }
 
 export class ResearchService {
@@ -19,10 +28,19 @@ export class ResearchService {
       // Check if query is about a specific stablecoin
       const stablecoinSymbols = this.extractStablecoinSymbols(query);
       
+      // Check if query is about news
+      const isNewsQuery = this.isNewsQuery(query);
+      
       // Get real-time market data if the query is about prices or market info
       let marketData = '';
       if (this.isMarketQuery(query)) {
         marketData = await this.getMarketData(query);
+      }
+      
+      // Get news results if it's a news query
+      let newsResults = undefined;
+      if (isNewsQuery) {
+        newsResults = await this.getNewsData(query);
       }
       
       // Generate response using Claude with market data
@@ -37,7 +55,8 @@ export class ResearchService {
       return {
         contextData,
         sources: [],
-        chartData
+        chartData,
+        newsResults
       };
     } catch (error) {
       console.error('Error processing query:', error);
@@ -46,11 +65,53 @@ export class ResearchService {
   }
 
 
+  private static isNewsQuery(query: string): boolean {
+    const newsKeywords = ['news', 'latest', 'recent', 'updates', 'headlines', 'breaking'];
+    return newsKeywords.some(keyword => 
+      query.toLowerCase().includes(keyword)
+    );
+  }
+
   private static isMarketQuery(query: string): boolean {
     const marketKeywords = ['price', 'market', 'trading', 'volume', 'market cap', 'chart'];
     return marketKeywords.some(keyword => 
       query.toLowerCase().includes(keyword)
     );
+  }
+
+  private static async getNewsData(query: string): Promise<Array<{
+    title: string;
+    link: string;
+    snippet: string;
+    date: string;
+    source: string;
+    thumbnail?: string;
+    position: number;
+  }> | undefined> {
+    try {
+      // Create a stablecoin-focused search query
+      const searchQuery = query.toLowerCase().includes('stablecoin') 
+        ? query 
+        : `${query} stablecoins`;
+
+      const { data, error } = await supabase.functions.invoke('serp-search', {
+        body: {
+          query: searchQuery,
+          location: 'United States',
+          num: 6
+        }
+      });
+
+      if (error || !data?.success) {
+        console.error('News search error:', error);
+        return undefined;
+      }
+
+      return data.results;
+    } catch (error) {
+      console.error('Error getting news data:', error);
+      return undefined;
+    }
   }
 
   private static async getMarketData(query: string): Promise<string> {

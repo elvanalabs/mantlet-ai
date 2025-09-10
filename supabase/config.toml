@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.moralis-api]
 verify_jwt = false
+
+[functions.serp-search]
+verify_jwt = false

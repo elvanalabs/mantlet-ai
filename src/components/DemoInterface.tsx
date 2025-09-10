@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Send, Loader2, TrendingUp, Database, Globe, Wallet, Settings, GitCompare, HelpCircle, Newspaper } from 'lucide-react';
 import { ResearchService } from '@/services/ResearchService';
 import StablecoinChart from './StablecoinChart';
+import NewsGrid from './NewsGrid';
 
 
 interface Message {
@@ -24,6 +25,15 @@ interface Message {
       volume?: number;
     }>;
   };
+  newsResults?: Array<{
+    title: string;
+    link: string;
+    snippet: string;
+    date: string;
+    source: string;
+    thumbnail?: string;
+    position: number;
+  }>;
 }
 
 interface DemoInterfaceProps {
@@ -118,6 +128,7 @@ export const DemoInterface = ({ onSetupWallet }: DemoInterfaceProps) => {
         timestamp: new Date(),
         sources: response.sources,
         chartData: response.chartData,
+        newsResults: response.newsResults,
       };
 
       setMessages(prev => [...prev, assistantMessage]);
@@ -215,6 +226,11 @@ export const DemoInterface = ({ onSetupWallet }: DemoInterfaceProps) => {
                 {message.chartData && (
                   <div className="mt-3">
                     <StablecoinChart chartData={message.chartData} />
+                  </div>
+                )}
+                {message.newsResults && message.newsResults.length > 0 && (
+                  <div className="mt-3">
+                    <NewsGrid newsResults={message.newsResults} />
                   </div>
                 )}
               </Card>
