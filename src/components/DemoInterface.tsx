@@ -184,6 +184,58 @@ export const DemoInterface = ({ onSetupWallet }: DemoInterfaceProps) => {
     handleQuickAction('Latest news about stablecoins');
   };
 
+  const formatTextWithBoldTitles = (text: string): string => {
+    if (!text) return '';
+    
+    // Split text into lines for processing
+    const lines = text.split('\n');
+    const formattedLines = lines.map(line => {
+      // Pattern 1: Text followed by colon (e.g., "Key Benefits:")
+      if (line.match(/^[A-Z][^:]*:$/)) {
+        return `<strong>${line}</strong>`;
+      }
+      
+      // Pattern 2: Text with year in parentheses (e.g., "Current Market Status (2025)")
+      if (line.match(/^[A-Z][^(]*\(\d{4}\)$/)) {
+        return `<strong>${line}</strong>`;
+      }
+      
+      // Pattern 3: Standalone titles that are not bullet points and start with capital
+      if (line.match(/^[A-Z][A-Za-z\s-]+$/) && 
+          !line.match(/^[A-Z][a-z]/) && // Not just a sentence
+          !line.includes('.') && // No periods
+          !line.includes(',') && // No commas
+          line.length < 60 && // Not too long
+          line.length > 3) { // Not too short
+        return `<strong>${line}</strong>`;
+      }
+      
+      // Pattern 4: Section headers with specific keywords
+      if (line.match(/^(TYPES?|CATEGORIES|BENEFITS?|FEATURES?|MECHANISMS?|BACKING|COLLATERAL|RISKS?|ADVANTAGES?|DISADVANTAGES?|COMPARISON|OVERVIEW|SUMMARY|CONCLUSION)[A-Za-z\s]*$/i)) {
+        return `<strong>${line}</strong>`;
+      }
+      
+      // Pattern 5: Numbered or lettered section titles
+      if (line.match(/^\d+\.\s+[A-Z][A-Za-z\s-]*:?$/) || line.match(/^[A-Z]\.\s+[A-Z][A-Za-z\s-]*:?$/)) {
+        return `<strong>${line}</strong>`;
+      }
+      
+      // Pattern 6: Text in ALL CAPS (but not too long to avoid false positives)
+      if (line.match(/^[A-Z\s]{4,25}$/) && !line.match(/^\s*$/)) {
+        return `<strong>${line}</strong>`;
+      }
+      
+      // Pattern 7: Common stablecoin terminology titles
+      if (line.match(/^(Fiat-Collateralized|Crypto-Collateralized|Algorithmic|Hybrid|Market Cap|Trading Volume|Supply|Circulation|Protocol|Technology|Governance|Regulation|Compliance)[A-Za-z\s()]*$/)) {
+        return `<strong>${line}</strong>`;
+      }
+      
+      return line;
+    });
+    
+    return formattedLines.join('\n');
+  };
+
   const handleCopyMessage = async (message: Message) => {
     try {
       let textToCopy = message.content;
@@ -378,7 +430,12 @@ export const DemoInterface = ({ onSetupWallet }: DemoInterfaceProps) => {
               <Card className={`p-4 ${message.type === 'user' ? 'bg-secondary' : 'glass'}`} id={`message-${message.id}`}>
                 {message.content && message.content.trim() && (
                   <div className="prose prose-sm dark:prose-invert max-w-none">
-                    <p className="whitespace-pre-wrap">{message.content}</p>
+                    <div 
+                      className="whitespace-pre-wrap"
+                      dangerouslySetInnerHTML={{ 
+                        __html: formatTextWithBoldTitles(message.content).replace(/\n/g, '<br/>') 
+                      }}
+                    />
                   </div>
                 )}
                 {message.sources && message.sources.length > 0 && (
