@@ -5,11 +5,13 @@ import { Card } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Send, Loader2, TrendingUp, Database, Globe, Wallet, Settings, GitCompare, HelpCircle, Newspaper } from 'lucide-react';
+import { Send, Loader2, TrendingUp, Database, Globe, Wallet, Settings, GitCompare, HelpCircle, Newspaper, Copy, Download, Check } from 'lucide-react';
 import { ResearchService } from '@/services/ResearchService';
 import StablecoinChart from './StablecoinChart';
 import NewsGrid from './NewsGrid';
 import ComparisonTable from './ComparisonTable';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 
 interface Message {
@@ -69,6 +71,7 @@ export const DemoInterface = ({ onSetupWallet }: DemoInterfaceProps) => {
   const [compareStablecoin1, setCompareStablecoin1] = useState('');
   const [compareStablecoin2, setCompareStablecoin2] = useState('');
   const [explainStablecoin, setExplainStablecoin] = useState('');
+  const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -181,6 +184,150 @@ export const DemoInterface = ({ onSetupWallet }: DemoInterfaceProps) => {
     handleQuickAction('Latest news about stablecoins');
   };
 
+  const handleCopyMessage = async (message: Message) => {
+    try {
+      let textToCopy = message.content;
+      
+      // Add chart data info if present
+      if (message.chartData) {
+        textToCopy += `\n\n--- ${message.chartData.symbol} Chart Data ---\n`;
+        textToCopy += `Price Range: $${Math.min(...message.chartData.data.map(d => d.price)).toFixed(4)} - $${Math.max(...message.chartData.data.map(d => d.price)).toFixed(4)}\n`;
+        textToCopy += `Current Price: $${message.chartData.data[message.chartData.data.length - 1]?.price.toFixed(6)}`;
+      }
+      
+      // Add news results if present
+      if (message.newsResults && message.newsResults.length > 0) {
+        textToCopy += '\n\n--- Related News ---\n';
+        message.newsResults.forEach((news, index) => {
+          textToCopy += `${index + 1}. ${news.title}\n   ${news.snippet}\n   Source: ${news.source} | ${news.link}\n\n`;
+        });
+      }
+      
+      // Add comparison data if present
+      if (message.comparisonData) {
+        textToCopy += '\n\n--- Stablecoin Comparison ---\n';
+        message.comparisonData.coins.forEach((coin, index) => {
+          textToCopy += `${index + 1}. ${coin.symbol} (${coin.name})\n`;
+          textToCopy += `   Backing: ${coin.backing}\n`;
+          textToCopy += `   Market Cap: ${coin.marketCap}\n`;
+          textToCopy += `   Issuer: ${coin.issuer}\n`;
+          textToCopy += `   Risk Level: ${coin.risk_level}\n\n`;
+        });
+      }
+      
+      await navigator.clipboard.writeText(textToCopy);
+      setCopiedMessageId(message.id);
+      
+      toast({
+        title: "Copied!",
+        description: "Response copied to clipboard successfully.",
+      });
+      
+      setTimeout(() => setCopiedMessageId(null), 2000);
+    } catch (error) {
+      toast({
+        title: "Copy Failed",
+        description: "Unable to copy to clipboard. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDownloadPDF = async (message: Message) => {
+    try {
+      const messageElement = document.getElementById(`message-${message.id}`);
+      if (!messageElement) {
+        toast({
+          title: "Download Failed",
+          description: "Unable to find message content for PDF generation.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Create a temporary container for better PDF rendering
+      const tempContainer = document.createElement('div');
+      tempContainer.style.cssText = `
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+        width: 800px;
+        background: white;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+        color: black;
+      `;
+      document.body.appendChild(tempContainer);
+
+      // Clone and style the content for PDF
+      const clonedContent = messageElement.cloneNode(true) as HTMLElement;
+      
+      // Style the cloned content for PDF
+      clonedContent.style.cssText = `
+        background: white !important;
+        color: black !important;
+        font-size: 12px;
+        line-height: 1.5;
+      `;
+      
+      // Fix styling for all nested elements
+      const allElements = clonedContent.querySelectorAll('*');
+      allElements.forEach((el) => {
+        const element = el as HTMLElement;
+        element.style.background = 'white';
+        element.style.color = 'black';
+        element.style.border = 'none';
+        element.style.boxShadow = 'none';
+      });
+
+      tempContainer.appendChild(clonedContent);
+
+      // Generate PDF
+      const canvas = await html2canvas(tempContainer, {
+        backgroundColor: '#ffffff',
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+      });
+
+      document.body.removeChild(tempContainer);
+
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgData = canvas.toDataURL('image/png');
+      
+      const imgWidth = 190;
+      const pageHeight = 297;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+      let position = 10;
+
+      pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight + 10;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+      pdf.save(`mantlet-response-${timestamp}.pdf`);
+
+      toast({
+        title: "PDF Downloaded!",
+        description: "Response saved as PDF successfully.",
+      });
+    } catch (error) {
+      console.error('PDF generation error:', error);
+      toast({
+        title: "Download Failed",
+        description: "Unable to generate PDF. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getMessageIcon = (type: string) => {
     switch (type) {
       case 'user':
@@ -222,7 +369,7 @@ export const DemoInterface = ({ onSetupWallet }: DemoInterfaceProps) => {
           <div key={message.id} className="flex space-x-3">
             {getMessageIcon(message.type)}
             <div className="flex-1 min-w-0">
-              <Card className={`p-4 ${message.type === 'user' ? 'bg-secondary' : 'glass'}`}>
+              <Card className={`p-4 ${message.type === 'user' ? 'bg-secondary' : 'glass'}`} id={`message-${message.id}`}>
                 {message.content && message.content.trim() && (
                   <div className="prose prose-sm dark:prose-invert max-w-none">
                     <p className="whitespace-pre-wrap">{message.content}</p>
@@ -256,6 +403,34 @@ export const DemoInterface = ({ onSetupWallet }: DemoInterfaceProps) => {
                 {message.comparisonData && (
                   <div className="mt-3">
                     <ComparisonTable comparisonData={message.comparisonData} />
+                  </div>
+                )}
+                
+                {/* Copy and Download buttons for assistant messages */}
+                {message.type === 'assistant' && (
+                  <div className="mt-4 pt-3 border-t border-border flex items-center justify-end gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleCopyMessage(message)}
+                      className="text-muted-foreground hover:text-foreground"
+                    >
+                      {copiedMessageId === message.id ? (
+                        <Check className="w-4 h-4 mr-1 text-green-500" />
+                      ) : (
+                        <Copy className="w-4 h-4 mr-1" />
+                      )}
+                      {copiedMessageId === message.id ? 'Copied!' : 'Copy'}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDownloadPDF(message)}
+                      className="text-muted-foreground hover:text-foreground"
+                    >
+                      <Download className="w-4 h-4 mr-1" />
+                      PDF
+                    </Button>
                   </div>
                 )}
               </Card>
