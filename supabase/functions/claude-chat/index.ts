@@ -78,6 +78,53 @@ serve(async (req) => {
     39. AVUSD (Avant USD) - $105M market cap - Avant protocol
     40. SRUSD (Reservoir srUSD) - $101M market cap - Reservoir protocol
     
+    ADDITIONAL EMERGING STABLECOINS (Page 2):
+    41. RUSDC-HYPER (Relend Network USDC HyperEVM) - $12M market cap
+    42. YUSD (YUSD Stablecoin) - $11.8M market cap - Liquity protocol variant
+    43. XSGD (Singapore Dollar) - $11.1M market cap - SGD-pegged stablecoin
+    44. IDRT (Rupiah Token) - $10.7M market cap - Indonesian Rupiah stablecoin
+    45. INALPHA (Nest Alpha Vault) - $10.1M market cap - Vault token
+    46. USDA (Anzens USDA) - $10M market cap - Anzens protocol
+    47. MONEY (Defi.money) - $9.9M market cap - DeFi protocol
+    48. IUSD (Indigo Protocol iUSD) - $9.5M market cap - Cardano ecosystem
+    49. OUSD (Origin Dollar) - $9.5M market cap - Origin Protocol
+    50. PINTO - $9.2M market cap - Philippine peso stablecoin
+    
+    51. USDZ (Zedxion USDZ) - $8.7M market cap - Zedxion protocol
+    52. BTCUSD (Bitcoin USD BTCFi) - $8.5M market cap - Bitcoin-focused
+    53. CEUR (Celo Euro) - $7.1M market cap - Euro on Celo network
+    54. USDH (Hermetica USDh) - $6.7M market cap - Hermetica protocol
+    55. USDR (StablR USD) - $6.7M market cap - StablR protocol
+    56. USDQ (Quantoz USDQ) - $6.6M market cap - Quantoz protocol
+    57. BNUSD (Balanced Dollars) - $6.1M market cap - ICON ecosystem
+    58. RUSDC (Relend Network USDC Swell) - $6M market cap - Swell network
+    59. EURT (Euro Tether) - $6M market cap - Tether's euro stablecoin
+    60. HUSD - $6M market cap - Huobi stablecoin (deprecated)
+    
+    61. GYEN - $5.8M market cap - Japanese Yen stablecoin
+    62. EURQ (Quantoz EURQ) - $5.4M market cap - Euro by Quantoz
+    63. FASTUSD (Sei fastUSD) - $5.3M market cap - Sei network
+    64. VCHF (VNX Swiss Franc) - $5.1M market cap - Swiss Franc stablecoin
+    65. SUSP (Pareto Staked USP) - $4.8M market cap - Pareto protocol
+    66. NECT (Nectar) - $4.7M market cap - Nectar protocol
+    67. WUSD (Worldwide USD) - $4.6M market cap - Global protocol
+    68. MUSD (Meta USD) - $4.4M market cap - Meta ecosystem
+    69. USDL (Liquid Loans USDL) - $4.3M market cap - Liquid Loans protocol
+    70. FUSD (Freedom Dollar) - $4M market cap - Freedom protocol
+    
+    71. PHT (PHT Stablecoin) - $4M market cap - Philippine token
+    72. DJED - $4M market cap - Cardano algorithmic stablecoin
+    73. USDN (SMARDEX USDN) - $3.9M market cap - SMARDEX protocol
+    74. FEI (Fei USD) - $3.8M market cap - Fei Protocol (deprecated)
+    75. GGUSD (Good Game US Dollar) - $3.6M market cap - Gaming-focused
+    76. ZARP (ZARP Stablecoin) - $3.6M market cap - South African Rand
+    77. MSUSD (Main Street USD) - $3.5M market cap - Main Street protocol
+    78. YLDS - $3.4M market cap - Yield protocol
+    79. USDGLO (Glo Dollar) - $3.4M market cap - Charitable stablecoin
+    80. VEUR (VNX EURO) - $3.2M market cap - VNX Euro stablecoin
+    81. USDXL (Last USD) - $3.2M market cap - Last protocol
+    82. RAI (Rai Reflex Index) - $3.1M market cap - Reflexer Labs
+
     And many more emerging stablecoins across various protocols and chains.
 
     === RECENT STABLECOIN DEVELOPMENTS (2025) ===
