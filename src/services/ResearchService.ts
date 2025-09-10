@@ -102,8 +102,15 @@ export class ResearchService {
     marketData: string
   ): Promise<string> {
     try {
+      // Improve the query format for single words
+      let formattedQuery = query;
+      if (query.trim().split(' ').length === 1) {
+        // If it's a single word (like "USDT"), make it a proper question
+        formattedQuery = `What is ${query}? Please provide comprehensive information.`;
+      }
+
       // Prepare the prompt for Claude
-      const prompt = `Query: ${query}
+      const prompt = `Query: ${formattedQuery}
 
 ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
 
