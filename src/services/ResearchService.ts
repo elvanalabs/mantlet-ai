@@ -25,10 +25,22 @@ export interface ResearchResponse {
 export class ResearchService {
   static async processQuery(query: string): Promise<ResearchResponse> {
     try {
-      // Check if query is about a specific stablecoin
-      const stablecoinSymbols = this.extractStablecoinSymbols(query);
+      // Check if this is a pure news query - skip Claude if so
+      const isPureNews = this.isPureNewsQuery(query);
       
-      // Check if query is about news
+      if (isPureNews) {
+        console.log('Pure news query detected, skipping Claude API');
+        const newsResults = await this.getNewsData(query);
+        
+        return {
+          contextData: '', // Empty since we're not using Claude
+          sources: [],
+          newsResults
+        };
+      }
+      
+      // For other queries, proceed with normal flow
+      const stablecoinSymbols = this.extractStablecoinSymbols(query);
       const isNewsQuery = this.isNewsQuery(query);
       
       // Get real-time market data if the query is about prices or market info
@@ -64,6 +76,20 @@ export class ResearchService {
     }
   }
 
+
+  private static isPureNewsQuery(query: string): boolean {
+    const pureNewsPatterns = [
+      /^latest news/i,
+      /^recent news/i,
+      /^news about/i,
+      /^stablecoin news/i,
+      /^breaking news/i,
+      /^headlines/i,
+      /^updates/i
+    ];
+    
+    return pureNewsPatterns.some(pattern => pattern.test(query.trim()));
+  }
 
   private static isNewsQuery(query: string): boolean {
     const newsKeywords = ['news', 'latest', 'recent', 'updates', 'headlines', 'breaking'];

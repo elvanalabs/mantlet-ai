@@ -86,10 +86,11 @@ export const DemoInterface = ({ onSetupWallet }: DemoInterfaceProps) => {
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'assistant',
-        content: response.contextData,
+        content: response.contextData || 'Here are the latest news results:',
         timestamp: new Date(),
         sources: response.sources,
         chartData: response.chartData,
+        newsResults: response.newsResults,
       };
 
       setMessages(prev => [...prev, assistantMessage]);
@@ -124,7 +125,7 @@ export const DemoInterface = ({ onSetupWallet }: DemoInterfaceProps) => {
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'assistant',
-        content: response.contextData,
+        content: response.contextData || 'Here are the latest news results:',
         timestamp: new Date(),
         sources: response.sources,
         chartData: response.chartData,
@@ -205,9 +206,11 @@ export const DemoInterface = ({ onSetupWallet }: DemoInterfaceProps) => {
             {getMessageIcon(message.type)}
             <div className="flex-1 min-w-0">
               <Card className={`p-4 ${message.type === 'user' ? 'bg-secondary' : 'glass'}`}>
-                <div className="prose prose-sm dark:prose-invert max-w-none">
-                  <p className="whitespace-pre-wrap">{message.content}</p>
-                </div>
+                {message.content && message.content.trim() && (
+                  <div className="prose prose-sm dark:prose-invert max-w-none">
+                    <p className="whitespace-pre-wrap">{message.content}</p>
+                  </div>
+                )}
                 {message.sources && message.sources.length > 0 && (
                   <div className="mt-3 pt-3 border-t border-border">
                     <p className="text-xs text-muted-foreground mb-2 flex items-center">
