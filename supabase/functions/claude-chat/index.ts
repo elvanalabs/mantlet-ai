@@ -222,8 +222,9 @@ serve(async (req) => {
         });
 
       return new Response(JSON.stringify({ 
+        success: true,
         response: assistantMessage,
-        model: 'claude-opus-4-20250514'
+        model: 'claude-3-5-sonnet-20241022'
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
