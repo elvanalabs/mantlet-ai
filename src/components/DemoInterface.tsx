@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from '@/components/ui/label';
 import { Send, Loader2, TrendingUp, Database, Globe, Wallet, Settings, GitCompare, HelpCircle, Newspaper } from 'lucide-react';
 import { ResearchService } from '@/services/ResearchService';
-import { KnowledgeBaseManager } from '@/components/KnowledgeBaseManager';
+
 
 interface Message {
   id: string;
@@ -167,7 +167,7 @@ export const DemoInterface = ({ onSetupWallet }: DemoInterfaceProps) => {
             />
           </div>
           <div className="flex items-center space-x-2">
-            <KnowledgeBaseManager />
+            
             <Button
               onClick={onSetupWallet}
               variant="outline"

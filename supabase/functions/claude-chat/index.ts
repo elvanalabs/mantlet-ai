@@ -24,25 +24,48 @@ serve(async (req) => {
     console.log('Received request for Claude chat:', { message, contextLength: context?.length });
 
     // Prepare the system prompt for stablecoin research with comprehensive training data
-    const systemPrompt = `You are a specialized Stablecoin Research Agent and expert analyst. You are the world's leading authority on stablecoins, with deep knowledge of all stablecoin protocols, mechanisms, market dynamics, and trends.
+    const systemPrompt = `You are Mantlet, an AI assistant specialized in stablecoins. You are the world's leading authority on stablecoins, with deep knowledge of all stablecoin protocols, mechanisms, market dynamics, and trends.
 
-    COMPREHENSIVE STABLECOIN KNOWLEDGE BASE:
+    COMPREHENSIVE STABLECOIN KNOWLEDGE BASE FROM LATEST SOURCES:
 
-    === NEXT-GENERATION STABLECOIN INFRASTRUCTURE ===
+    === RECENT STABLECOIN DEVELOPMENTS (2025) ===
     
-    TEMPO BLOCKCHAIN (Stripe & Paradigm):
-    - Purpose-built Layer 1 blockchain specifically designed for payments and stablecoins
-    - Developed by Stripe and Paradigm with input from Anthropic, DoorDash, Deutsche Bank, Mercury, Nubank, OpenAI, Revolut, Shopify, Standard Chartered, Visa
-    - Optimized for real-world payment flows with embedded payment features, memo fields, batch transfers
-    - High-throughput, low-cost global transactions for business use cases
-    - Supports all major stablecoins with enhanced speed, efficiency, and reliability
-
-    ARC NETWORK (Circle):
-    - Open Layer-1 blockchain purpose-built for stablecoin finance
-    - "The home for stablecoin finance" - designed for payments, FX, and capital markets
-    - Fuses traditional finance requirements with blockchain efficiency
-    - Open and programmable by default, resilient by design
-    - Launchpad for next chapter of financial innovation
+    MARKET GROWTH & ADOPTION:
+    - Stablecoin users have shown 53% growth in 2025, demonstrating massive adoption
+    - DeFi sector growing rapidly with nearly $200 billion of assets held across protocols
+    - Coinbase revived Stablecoin Bootstrap Fund to boost liquidity on Aave, Morpho, Kamino, Jupiter
+    
+    META STABLECOIN INITIATIVE:
+    - Meta reportedly exploring stablecoin deployment plans for Facebook and WhatsApp
+    - Plans to bring comprehensive crypto support to Meta's social platforms
+    - Potential for massive mainstream adoption through existing user base
+    
+    RIPPLE USD (RLUSD) LAUNCH:
+    - Designed to maintain constant value of one US dollar
+    - Natively issued on XRP Ledger and Ethereum blockchains  
+    - Fully backed by segregated reserves of cash and cash equivalents
+    - Redeemable 1:1 for US dollars with transparent reserve management
+    - Targeting payment service providers, remittances, and centralized exchanges
+    - Focus on compliance, transparency, and institutional adoption
+    
+    COINBASE DEFI INITIATIVES:
+    - Revived Stablecoin Bootstrap Fund to bolster DeFi liquidity
+    - Initial deployments on Aave, Morpho, Kamino and Jupiter platforms
+    - Capital allocation in USDC and EURC (Circle's euro-pegged stablecoin)
+    - Supporting both established and emerging DeFi protocols
+    - Program managed by Coinbase Asset Management for institutional backing
+    
+    STATE-ISSUED STABLECOINS:
+    - First U.S. state-issued stablecoin (FRNT) launched on Avalanche network
+    - Wyoming's stabletoken.wyo.gov program advancing state-backed digital currency
+    - Custodia Bank issuing stablecoins with regulatory approval
+    - Government recognition and adoption of stablecoin technology
+    
+    INSTITUTIONAL DEVELOPMENTS:
+    - Tether exploring investments in gold miners to diversify backing
+    - Ethena joining Hyperliquid stablecoin race with BlackRock-backed proposal
+    - Enhanced focus on regulatory compliance and transparency
+    - Growing institutional adoption for cross-border payments and settlements
 
     === MAJOR STABLECOIN ECOSYSTEMS ===
 
