@@ -262,6 +262,12 @@ export const DemoInterface = ({ onSetupWallet }: DemoInterfaceProps) => {
       // Clone and style the content for PDF
       const clonedContent = messageElement.cloneNode(true) as HTMLElement;
       
+      // Remove the copy/download buttons section from the cloned content
+      const buttonsSection = clonedContent.querySelector('.border-t.border-border');
+      if (buttonsSection && buttonsSection.textContent?.includes('Copy')) {
+        buttonsSection.remove();
+      }
+      
       // Style the cloned content for PDF
       clonedContent.style.cssText = `
         background: white !important;
