@@ -9,6 +9,7 @@ import { Send, Loader2, TrendingUp, Database, Globe, Wallet, Settings, GitCompar
 import { ResearchService } from '@/services/ResearchService';
 import StablecoinChart from './StablecoinChart';
 import NewsGrid from './NewsGrid';
+import ComparisonTable from './ComparisonTable';
 
 
 interface Message {
@@ -34,6 +35,20 @@ interface Message {
     thumbnail?: string;
     position: number;
   }>;
+  comparisonData?: {
+    coins: Array<{
+      symbol: string;
+      name: string;
+      backing: string;
+      marketCap: string;
+      chain: string;
+      yield: string;
+      issuer: string;
+      regulation: string;
+      use_case: string;
+      risk_level: string;
+    }>;
+  };
 }
 
 interface DemoInterfaceProps {
@@ -91,6 +106,7 @@ export const DemoInterface = ({ onSetupWallet }: DemoInterfaceProps) => {
         sources: response.sources,
         chartData: response.chartData,
         newsResults: response.newsResults,
+        comparisonData: response.comparisonData,
       };
 
       setMessages(prev => [...prev, assistantMessage]);
@@ -130,6 +146,7 @@ export const DemoInterface = ({ onSetupWallet }: DemoInterfaceProps) => {
         sources: response.sources,
         chartData: response.chartData,
         newsResults: response.newsResults,
+        comparisonData: response.comparisonData,
       };
 
       setMessages(prev => [...prev, assistantMessage]);
@@ -234,6 +251,11 @@ export const DemoInterface = ({ onSetupWallet }: DemoInterfaceProps) => {
                 {message.newsResults && message.newsResults.length > 0 && (
                   <div className="mt-3">
                     <NewsGrid newsResults={message.newsResults} />
+                  </div>
+                )}
+                {message.comparisonData && (
+                  <div className="mt-3">
+                    <ComparisonTable comparisonData={message.comparisonData} />
                   </div>
                 )}
               </Card>

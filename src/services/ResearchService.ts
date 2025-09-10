@@ -20,6 +20,20 @@ export interface ResearchResponse {
     thumbnail?: string;
     position: number;
   }>;
+  comparisonData?: {
+    coins: Array<{
+      symbol: string;
+      name: string;
+      backing: string;
+      marketCap: string;
+      chain: string;
+      yield: string;
+      issuer: string;
+      regulation: string;
+      use_case: string;
+      risk_level: string;
+    }>;
+  };
 }
 
 export class ResearchService {
@@ -39,8 +53,22 @@ export class ResearchService {
         };
       }
       
-      // For other queries, proceed with normal flow
+      // Check if this is a comparison query
+      const isComparison = this.isComparisonQuery(query);
       const stablecoinSymbols = this.extractStablecoinSymbols(query);
+      
+      if (isComparison && stablecoinSymbols.length >= 2) {
+        console.log('Comparison query detected for:', stablecoinSymbols);
+        const comparisonData = this.generateComparisonData(stablecoinSymbols.slice(0, 2));
+        
+        return {
+          contextData: `Comparison between ${stablecoinSymbols[0]} and ${stablecoinSymbols[1]}`,
+          sources: [],
+          comparisonData
+        };
+      }
+      
+      // For other queries, proceed with normal flow
       const isNewsQuery = this.isNewsQuery(query);
       
       // Get real-time market data if the query is about prices or market info
@@ -76,6 +104,13 @@ export class ResearchService {
     }
   }
 
+
+  private static isComparisonQuery(query: string): boolean {
+    const comparisonKeywords = ['compare', 'vs', 'versus', 'difference between', 'comparison'];
+    return comparisonKeywords.some(keyword => 
+      query.toLowerCase().includes(keyword)
+    );
+  }
 
   private static isPureNewsQuery(query: string): boolean {
     const pureNewsPatterns = [
@@ -285,6 +320,107 @@ ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
     }
     
     return data;
+  }
+
+  private static generateComparisonData(symbols: string[]): {
+    coins: Array<{
+      symbol: string;
+      name: string;
+      backing: string;
+      marketCap: string;
+      chain: string;
+      yield: string;
+      issuer: string;
+      regulation: string;
+      use_case: string;
+      risk_level: string;
+    }>;
+  } {
+    const stablecoinData: { [key: string]: any } = {
+      'USDT': {
+        name: 'Tether',
+        backing: 'USD Reserves',
+        marketCap: '$120B+',
+        chain: 'Multi-chain',
+        yield: 'None',
+        issuer: 'Tether Ltd',
+        regulation: 'Limited',
+        use_case: 'Trading, Payments',
+        risk_level: 'Medium'
+      },
+      'USDC': {
+        name: 'USD Coin',
+        backing: 'USD + Treasuries',
+        marketCap: '$40B+',
+        chain: 'Multi-chain',
+        yield: 'None',
+        issuer: 'Circle',
+        regulation: 'High Compliance',
+        use_case: 'DeFi, Payments',
+        risk_level: 'Low'
+      },
+      'DAI': {
+        name: 'MakerDAO',
+        backing: 'Crypto Collateral',
+        marketCap: '$5B+',
+        chain: 'Ethereum',
+        yield: 'DSR 5%+',
+        issuer: 'MakerDAO',
+        regulation: 'Decentralized',
+        use_case: 'DeFi',
+        risk_level: 'Medium'
+      },
+      'BUSD': {
+        name: 'Binance USD',
+        backing: 'USD Reserves',
+        marketCap: '$2B+',
+        chain: 'Multi-chain',
+        yield: 'None',
+        issuer: 'Paxos/Binance',
+        regulation: 'NY Regulated',
+        use_case: 'Trading',
+        risk_level: 'Medium'
+      },
+      'FRAX': {
+        name: 'Frax Protocol',
+        backing: 'Algorithmic + Collateral',
+        marketCap: '$1B+',
+        chain: 'Multi-chain',
+        yield: 'Variable',
+        issuer: 'Frax Finance',
+        regulation: 'Decentralized',
+        use_case: 'DeFi Innovation',
+        risk_level: 'High'
+      },
+      'TUSD': {
+        name: 'TrueUSD',
+        backing: 'USD Reserves',
+        marketCap: '$500M+',
+        chain: 'Multi-chain',
+        yield: 'None',
+        issuer: 'Techteryx',
+        regulation: 'Attested',
+        use_case: 'Trading, Storage',
+        risk_level: 'Medium'
+      }
+    };
+
+    return {
+      coins: symbols.map(symbol => ({
+        symbol,
+        ...(stablecoinData[symbol] || {
+          name: symbol,
+          backing: 'Unknown',
+          marketCap: 'N/A',
+          chain: 'N/A',
+          yield: 'N/A',
+          issuer: 'N/A',
+          regulation: 'N/A',
+          use_case: 'N/A',
+          risk_level: 'N/A'
+        })
+      }))
+    };
   }
 
   private static generateFallbackResponse(
