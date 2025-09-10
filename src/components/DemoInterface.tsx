@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from '@/components/ui/label';
 import { Send, Loader2, TrendingUp, Database, Globe, Wallet, Settings, GitCompare, HelpCircle, Newspaper } from 'lucide-react';
 import { ResearchService } from '@/services/ResearchService';
+import StablecoinChart from './StablecoinChart';
 
 
 interface Message {
@@ -15,6 +16,14 @@ interface Message {
   content: string;
   timestamp: Date;
   sources?: string[];
+  chartData?: {
+    symbol: string;
+    data: Array<{
+      date: string;
+      price: number;
+      volume?: number;
+    }>;
+  };
 }
 
 interface DemoInterfaceProps {
@@ -70,6 +79,7 @@ export const DemoInterface = ({ onSetupWallet }: DemoInterfaceProps) => {
         content: response.contextData,
         timestamp: new Date(),
         sources: response.sources,
+        chartData: response.chartData,
       };
 
       setMessages(prev => [...prev, assistantMessage]);
@@ -107,6 +117,7 @@ export const DemoInterface = ({ onSetupWallet }: DemoInterfaceProps) => {
         content: response.contextData,
         timestamp: new Date(),
         sources: response.sources,
+        chartData: response.chartData,
       };
 
       setMessages(prev => [...prev, assistantMessage]);
@@ -199,6 +210,11 @@ export const DemoInterface = ({ onSetupWallet }: DemoInterfaceProps) => {
                         </span>
                       ))}
                     </div>
+                  </div>
+                )}
+                {message.chartData && (
+                  <div className="mt-3">
+                    <StablecoinChart chartData={message.chartData} />
                   </div>
                 )}
               </Card>

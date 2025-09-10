@@ -3,11 +3,22 @@ import { supabase } from '@/integrations/supabase/client';
 export interface ResearchResponse {
   contextData: string;
   sources: string[];
+  chartData?: {
+    symbol: string;
+    data: Array<{
+      date: string;
+      price: number;
+      volume?: number;
+    }>;
+  };
 }
 
 export class ResearchService {
   static async processQuery(query: string): Promise<ResearchResponse> {
     try {
+      // Check if query is about a specific stablecoin
+      const stablecoinSymbols = this.extractStablecoinSymbols(query);
+      
       // Get real-time market data if the query is about prices or market info
       let marketData = '';
       if (this.isMarketQuery(query)) {
@@ -17,9 +28,16 @@ export class ResearchService {
       // Generate response using Claude with market data
       const contextData = await this.generateResponse(query, marketData);
       
+      // Get chart data if it's a single stablecoin query
+      let chartData = undefined;
+      if (stablecoinSymbols.length === 1) {
+        chartData = await this.getChartData(stablecoinSymbols[0]);
+      }
+      
       return {
         contextData,
-        sources: []
+        sources: [],
+        chartData
       };
     } catch (error) {
       console.error('Error processing query:', error);
@@ -134,6 +152,52 @@ ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
       console.error('Error generating response:', error);
       return this.generateFallbackResponse(query, marketData);
     }
+  }
+
+  private static async getChartData(symbol: string): Promise<{
+    symbol: string;
+    data: Array<{
+      date: string;
+      price: number;
+      volume?: number;
+    }>;
+  } | undefined> {
+    try {
+      // Generate mock historical data for now (can be replaced with real API later)
+      const mockData = this.generateMockChartData(symbol);
+      
+      return {
+        symbol,
+        data: mockData
+      };
+    } catch (error) {
+      console.error('Error getting chart data:', error);
+      return undefined;
+    }
+  }
+
+  private static generateMockChartData(symbol: string): Array<{
+    date: string;
+    price: number;
+    volume?: number;
+  }> {
+    const data = [];
+    const basePrice = symbol === 'USDT' ? 1.0005 : 0.9998; // Slight variation around $1
+    const now = new Date();
+    
+    for (let i = 29; i >= 0; i--) {
+      const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+      const variation = (Math.random() - 0.5) * 0.003; // Small price variations
+      const price = Math.max(0.995, Math.min(1.005, basePrice + variation));
+      
+      data.push({
+        date: date.toISOString().split('T')[0],
+        price: Number(price.toFixed(6)),
+        volume: Math.floor(Math.random() * 100000000) + 50000000
+      });
+    }
+    
+    return data;
   }
 
   private static generateFallbackResponse(
