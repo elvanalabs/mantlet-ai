@@ -158,27 +158,22 @@ export const DemoInterface = ({ onSetupWallet }: DemoInterfaceProps) => {
     <div className="h-screen flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between px-4 glass border-b h-16 overflow-visible">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <img 
-              src="/lovable-uploads/33de17b2-37de-44c9-994a-e297e6beede9.png" 
-              alt="Logo" 
-              className="w-24 h-24 object-contain"
-            />
-          </div>
-          <div className="flex items-center space-x-2">
-            
-            <Button
-              onClick={onSetupWallet}
-              variant="outline"
-              size="sm"
-              className="hover:border-primary hover:text-primary"
-            >
-              <Settings className="w-4 h-4 mr-1" />
-              Setup Wallet
-            </Button>
-          </div>
+        <div className="flex items-center space-x-3">
+          <img 
+            src="/lovable-uploads/33de17b2-37de-44c9-994a-e297e6beede9.png" 
+            alt="Logo" 
+            className="w-24 h-24 object-contain"
+          />
         </div>
+        <Button
+          onClick={onSetupWallet}
+          variant="outline"
+          size="sm"
+          className="hover:border-primary hover:text-primary"
+        >
+          <Wallet className="w-4 h-4 mr-1" />
+          Connect Wallet
+        </Button>
       </div>
 
       {/* Messages */}
