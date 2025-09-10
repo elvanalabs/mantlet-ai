@@ -169,7 +169,14 @@ serve(async (req) => {
       }
     ];
 
-    console.log('Making request to Claude API...');
+    const requestBody = {
+      model: 'claude-3-5-sonnet-20241022',
+      max_tokens: 2000,
+      system: systemPrompt,
+      messages: messages
+    };
+
+    console.log('Making request to Claude API with body:', JSON.stringify(requestBody, null, 2));
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -179,12 +186,7 @@ serve(async (req) => {
         'x-api-key': claudeApiKey,
         'anthropic-version': '2023-06-01'
       },
-      body: JSON.stringify({
-        model: 'claude-3-5-sonnet-20241022',
-        max_tokens: 2000,
-        system: systemPrompt,
-        messages: messages
-      }),
+      body: JSON.stringify(requestBody),
     });
 
     if (!response.ok) {
