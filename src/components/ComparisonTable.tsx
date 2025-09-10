@@ -27,6 +27,27 @@ interface ComparisonTableProps {
 const ComparisonTable: React.FC<ComparisonTableProps> = ({ comparisonData }) => {
   const { coins } = comparisonData;
 
+  const getStablecoinLogo = (symbol: string) => {
+    const logoMap: { [key: string]: string } = {
+      'USDT': 'https://cryptologos.cc/logos/tether-usdt-logo.png',
+      'USDC': 'https://cryptologos.cc/logos/usd-coin-usdc-logo.png',
+      'BUSD': 'https://cryptologos.cc/logos/binance-usd-busd-logo.png',
+      'DAI': 'https://cryptologos.cc/logos/multi-collateral-dai-dai-logo.png',
+      'FRAX': 'https://cryptologos.cc/logos/frax-frax-logo.png',
+      'TUSD': 'https://cryptologos.cc/logos/trueusd-tusd-logo.png',
+      'USDP': 'https://cryptologos.cc/logos/paxos-standard-pax-logo.png',
+      'LUSD': 'https://cryptologos.cc/logos/liquity-usd-lusd-logo.png',
+      'PYUSD': 'https://cryptologos.cc/logos/paypal-usd-pyusd-logo.png',
+      'USDE': 'https://assets.coingecko.com/coins/images/33613/small/ethena.png',
+      'SUSD': 'https://cryptologos.cc/logos/synthetix-snx-logo.png',
+      'FDUSD': 'https://assets.coingecko.com/coins/images/31079/small/FDUSD.png',
+      'GUSD': 'https://cryptologos.cc/logos/gemini-dollar-gusd-logo.png',
+      'PAXG': 'https://cryptologos.cc/logos/pax-gold-paxg-logo.png'
+    };
+    
+    return logoMap[symbol] || null;
+  };
+
   const getRiskBadgeVariant = (risk: string) => {
     switch (risk.toLowerCase()) {
       case 'low': return 'default';
@@ -107,15 +128,30 @@ const ComparisonTable: React.FC<ComparisonTableProps> = ({ comparisonData }) => 
                 {coins.map((coin) => (
                   <th key={coin.symbol} className="text-center p-4 min-w-[160px]">
                     <div className="flex flex-col items-center gap-2">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-gradient-primary rounded-full flex items-center justify-center text-primary-foreground text-xs font-bold">
-                          {coin.symbol.charAt(0)}
-                        </div>
-                        <div>
-                          <div className="font-semibold text-foreground">{coin.symbol}</div>
-                          <div className="text-xs text-muted-foreground">{coin.name}</div>
-                        </div>
-                      </div>
+                       <div className="flex items-center gap-2">
+                         {getStablecoinLogo(coin.symbol) ? (
+                           <img 
+                             src={getStablecoinLogo(coin.symbol)!} 
+                             alt={`${coin.name} logo`}
+                             className="w-8 h-8 rounded-full object-cover border border-border/20"
+                             onError={(e) => {
+                               // Fallback to first letter if image fails to load
+                               const target = e.target as HTMLImageElement;
+                               target.style.display = 'none';
+                               target.nextElementSibling!.classList.remove('hidden');
+                             }}
+                           />
+                         ) : null}
+                         <div className={`w-8 h-8 bg-gradient-primary rounded-full flex items-center justify-center text-primary-foreground text-xs font-bold ${
+                           getStablecoinLogo(coin.symbol) ? 'hidden' : ''
+                         }`}>
+                           {coin.symbol.charAt(0)}
+                         </div>
+                         <div>
+                           <div className="font-semibold text-foreground">{coin.symbol}</div>
+                           <div className="text-xs text-muted-foreground">{coin.name}</div>
+                         </div>
+                       </div>
                       <Badge 
                         variant={getRiskBadgeVariant(coin.risk_level)}
                         className="text-xs"
