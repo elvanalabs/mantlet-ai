@@ -107,18 +107,21 @@ export class ResearchService {
 
 ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
 
+      console.log('Calling Claude with prompt:', prompt);
+
       const { data, error } = await supabase.functions.invoke('claude-chat', {
         body: {
           message: prompt,
-          model: 'claude-sonnet-4-20250514'
+          model: 'claude-opus-4-20250514'
         }
       });
 
       if (error || !data?.success) {
-        console.error('Claude API error:', error);
+        console.error('Claude API error details:', { error, data });
         return this.generateFallbackResponse(query, marketData);
       }
 
+      console.log('Claude response received:', data);
       return data.response;
     } catch (error) {
       console.error('Error generating response:', error);

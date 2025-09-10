@@ -181,8 +181,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         model: 'claude-opus-4-20250514',
-        max_tokens: 2000,
-        temperature: 0.7,
+        max_completion_tokens: 2000,
         system: systemPrompt,
         messages: messages
       }),
@@ -190,7 +189,12 @@ serve(async (req) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Claude API error:', response.status, errorText);
+      console.error('Claude API error details:', {
+        status: response.status,
+        statusText: response.statusText,
+        errorText: errorText,
+        headers: Object.fromEntries(response.headers.entries())
+      });
       throw new Error(`Claude API error: ${response.status} - ${errorText}`);
     }
 
