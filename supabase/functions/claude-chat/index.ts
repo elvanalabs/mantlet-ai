@@ -30,6 +30,56 @@ serve(async (req) => {
 
     COMPREHENSIVE STABLECOIN KNOWLEDGE BASE FROM LATEST SOURCES:
 
+    === COMPLETE STABLECOIN REFERENCE LIST (CoinGecko 2025) ===
+    Total stablecoin market cap: ~$290 billion with 0.1% daily change
+    
+    TOP STABLECOINS BY MARKET CAP:
+    1. USDT (Tether) - $169.1B market cap - Fiat-backed, multi-chain
+    2. USDC (USD Coin) - $72.3B market cap - Fiat-backed, Circle/Coinbase
+    3. USDE (Ethena USDe) - $13.1B market cap - Synthetic dollar via delta hedging
+    4. USDS - $7.9B market cap - Sky Protocol's new stablecoin  
+    5. DAI (MakerDAO) - $4.4B market cap - Crypto-collateralized
+    6. USD1 - $2.6B market cap - New entrant backed by WLFI
+    7. USDTB - $1.7B market cap - Beta/testnet version of USDT
+    8. BFUSD - $1.7B market cap - Binance Futures USD
+    9. USDF (Falcon USD) - $1.7B market cap - Falcon Finance
+    10. XAUT (Tether Gold) - $1.4B market cap - Gold-backed, $3,652 per token
+    
+    11. PYUSD (PayPal USD) - $1.2B market cap - PayPal's stablecoin
+    12. FDUSD (First Digital USD) - $1.1B market cap - First Digital Limited
+    13. PAXG (PAX Gold) - $1.0B market cap - Gold-backed, $3,644 per token
+    14. RLUSD (Ripple USD) - $728M market cap - Ripple's new stablecoin
+    15. USDX (Stables Labs) - $677M market cap - Stables Labs protocol
+    16. USD0 (Usual USD) - $566M market cap - Usual protocol
+    17. USDG (Global Dollar) - $561M market cap - Global Dollar Network
+    18. TUSD (TrueUSD) - $493M market cap - TrustToken platform
+    19. USDD - $485M market cap - TRON ecosystem
+    20. USDB - $406M market cap - Blast network
+    
+    21. GHO (Aave) - $352M market cap - Aave protocol's stablecoin
+    22. USR (Resolv USR) - $317M market cap - Resolv protocol
+    23. BUSD (Binance-Peg) - $312M market cap - Binance USD (deprecated)
+    24. FRAX (Legacy Frax Dollar) - $296M market cap - Frax Finance
+    25. USDO (OpenEden OpenDollar) - $277M market cap - OpenEden protocol
+    26. SATUSD (Satoshi Stablecoin) - $273M market cap - Bitcoin-themed
+    27. EURC - $239M market cap - Euro stablecoin by Circle
+    28. USDA - $224M market cap - USDa protocol
+    29. AUSD (Agora Dollar) - $210M market cap - Agora Finance
+    30. KAU (Kinesis Gold) - $169M market cap - Gold-backed, $118 per token
+    
+    31. KAG (Kinesis Silver) - $158M market cap - Silver-backed, $41 per token  
+    32. EURS (STASIS EURO) - $144M market cap - Euro-pegged
+    33. DEUSD (Elixir deUSD) - $135M market cap - Elixir protocol
+    34. YU (Yala Stablecoin) - $128M market cap - Yala protocol
+    35. FXUSD (f(x) Protocol) - $125M market cap - f(x) Finance
+    36. DOLA - $122M market cap - Inverse Finance
+    37. CRVUSD - $120M market cap - Curve Finance
+    38. USDZ (Anzen USDz) - $119M market cap - Anzen protocol
+    39. AVUSD (Avant USD) - $105M market cap - Avant protocol
+    40. SRUSD (Reservoir srUSD) - $101M market cap - Reservoir protocol
+    
+    And many more emerging stablecoins across various protocols and chains.
+
     === RECENT STABLECOIN DEVELOPMENTS (2025) ===
     
     MARKET GROWTH & ADOPTION:
@@ -135,13 +185,8 @@ serve(async (req) => {
     - GHO allowing collateral earning while minting stablecoins
     - Traditional yield through treasury-backed reserves
 
-    === CURRENT MARKET DATA ===
-    Total stablecoin market cap: ~$290 billion
-    Major categories: Fiat-backed, crypto-backed, algorithmic, synthetic
-    Leading by market cap: USDT, USDC, DAI, USDe, USDS, FRAX, TUSD, GHO
-
     YOUR EXPERTISE AREAS:
-    - All major stablecoins and emerging protocols
+    - All major stablecoins and emerging protocols (see comprehensive list above)
     - Stablecoin mechanisms and risk profiles
     - Market cap analysis, trading volumes, and liquidity
     - Yield opportunities and DeFi integrations
