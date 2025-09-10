@@ -212,14 +212,26 @@ export class ResearchService {
       'frax': 'FRAX',
       'tusd': 'TUSD',
       'usdp': 'USDP',
-      'lusd': 'LUSD'
+      'lusd': 'LUSD',
+      'pyusd': 'PYUSD',
+      'paypal usd': 'PYUSD',
+      'usde': 'USDE',
+      'ethena': 'USDE',
+      'susd': 'SUSD',
+      'fdusd': 'FDUSD',
+      'mkr': 'MKR',
+      'gusd': 'GUSD',
+      'paxg': 'PAXG'
     };
 
     const symbols: string[] = [];
     const lowerQuery = query.toLowerCase();
     
-    Object.keys(stablecoinMap).forEach(key => {
-      if (lowerQuery.includes(key)) {
+    // Sort keys by length (descending) to match longer phrases first
+    const sortedKeys = Object.keys(stablecoinMap).sort((a, b) => b.length - a.length);
+    
+    sortedKeys.forEach(key => {
+      if (lowerQuery.includes(key) && !symbols.includes(stablecoinMap[key])) {
         symbols.push(stablecoinMap[key]);
       }
     });
