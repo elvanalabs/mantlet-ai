@@ -319,11 +319,12 @@ function getStablecoinMetrics(stablecoin: string) {
       volume24h: '8800000000', // Realistic ~12% daily turnover
       growth30d: { percentage: '1.8', direction: 'up' },
       chainDistribution: [
-        { chain: 'Ethereum', percentage: '72.5', amount: '52345000000' },
-        { chain: 'Polygon', percentage: '12.3', amount: '8881000000' },
-        { chain: 'Arbitrum', percentage: '8.1', amount: '5848000000' },
-        { chain: 'Base', percentage: '4.2', amount: '3032000000' },
-        { chain: 'Avalanche', percentage: '2.9', amount: '2094000000' }
+        { chain: 'Ethereum', percentage: '65.2', amount: '47074400000' },
+        { chain: 'Solana', percentage: '15.8', amount: '11407600000' },
+        { chain: 'Polygon', percentage: '8.1', amount: '5848200000' },
+        { chain: 'Arbitrum', percentage: '4.9', amount: '3537800000' },
+        { chain: 'Base', percentage: '3.6', amount: '2599200000' },
+        { chain: 'Avalanche', percentage: '2.4', amount: '1732800000' }
       ]
     },
     'DAI': {
