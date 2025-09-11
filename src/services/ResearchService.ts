@@ -500,7 +500,7 @@ export class ResearchService {
 3. Usecases
 4. Risks/Criticism
 
-Format your response with clear headings for each section and add proper spacing between sections. Add two line breaks between each section for better readability. Do not include any other information outside these 4 sections.
+Format your response with clear headings using **bold** markdown formatting for each section title only (e.g., **Overview**). Add proper spacing between sections with two line breaks between each section for better readability. The content under each section should be in regular text, not bold. Do not include any other information outside these 4 sections.
 
 ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
       } else {
