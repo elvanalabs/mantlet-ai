@@ -415,7 +415,6 @@ function getStablecoinMetrics(stablecoin: string) {
       ]
     }
   };
-  };
 
   // Algorithmic Stablecoins - Adjusted for realistic market dynamics
   const algorithmicStablecoins: Record<string, any> = {
