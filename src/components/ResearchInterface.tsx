@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
 import { Send, Loader2, TrendingUp, Database, Globe } from 'lucide-react';
 import { ResearchService } from '@/services/ResearchService';
+import { validateStablecoin } from '@/utils/stablecoinValidation';
 
 interface Message {
   id: string;
@@ -36,9 +37,43 @@ export const ResearchInterface = () => {
     scrollToBottom();
   }, [messages]);
 
+  const validateQuery = (query: string): boolean => {
+    // Allow common stablecoin-related keywords
+    const stablecoinKeywords = [
+      'stablecoin', 'usdt', 'usdc', 'dai', 'tether', 'circle', 'maker', 
+      'price', 'market', 'adoption', 'compare', 'explain', 'news',
+      'backing', 'collateral', 'mechanism', 'yield', 'protocol',
+      'ethena', 'usde', 'pyusd', 'paypal', 'fdusd', 'paxg', 'xaut',
+      'eurs', 'eurc', 'frax', 'mim', 'gho', 'aave', 'curve', 'crvusd',
+      'treasury', 'reserves', 'defi', 'celsius', 'terra', 'anchor'
+    ];
+
+    const lowerQuery = query.toLowerCase();
+    
+    // Check if query contains stablecoin-related terms
+    const hasStablecoinTerms = stablecoinKeywords.some(keyword => 
+      lowerQuery.includes(keyword)
+    );
+    
+    // Check if query mentions specific stablecoin symbols/names
+    const mentionsStablecoin = validateStablecoin(query).isValid;
+    
+    return hasStablecoinTerms || mentionsStablecoin;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
+
+    // Validate if query is stablecoin-related
+    if (!validateQuery(input.trim())) {
+      toast({
+        title: "Invalid Query",
+        description: "I can only provide information about stablecoins. Please ask about stablecoin prices, mechanisms, comparisons, or other stablecoin-related topics.",
+        variant: "destructive"
+      });
+      return;
+    }
 
     const userMessage: Message = {
       id: Date.now().toString(),
