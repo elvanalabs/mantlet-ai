@@ -289,11 +289,56 @@ export class ResearchService {
       'usds': 'USDS',
       'sky protocol': 'USDS',
       'usd1': 'USD1',
+      'world liberty financial': 'USD1',
       'usdtb': 'USDTB',
-      'bfusd': 'BFUSD',
-      'binance futures usd': 'BFUSD',
+      'pyusd': 'PYUSD',
+      'paypal usd': 'PYUSD',
+      'fdusd': 'FDUSD',
+      'first digital usd': 'FDUSD',
+      'rlusd': 'RLUSD',
+      'ripple usd': 'RLUSD',
+      'usdy': 'USDY',
+      'ondo us dollar yield': 'USDY',
       'usdf': 'USDF',
       'falcon usd': 'USDF',
+      'usdo': 'USDO',
+      'openeden opendollar': 'USDO',
+      'satusd': 'SATUSD',
+      'satoshi stablecoin': 'SATUSD',
+      'deusd': 'DEUSD',
+      'elixir deusd': 'DEUSD',
+      'yu': 'YU',
+      'yala stablecoin': 'YU',
+      'srusd': 'SRUSD',
+      'reservoir srusd': 'SRUSD',
+      'rusd': 'RUSD',
+      'reservoir rusd': 'RUSD',
+      'usdp': 'USDP',
+      'pax dollar': 'USDP',
+      'usda': 'USDA',
+      'frxusd': 'FRXUSD',
+      'frax usd': 'FRXUSD',
+      'mim': 'MIM',
+      'magic internet money': 'MIM',
+      'usdn': 'USDN',
+      'noble dollar': 'USDN',
+      'usdl': 'USDL',
+      'lift dollar': 'USDL',
+      'byusd': 'BYUSD',
+      'lusd': 'LUSD',
+      'liquity usd': 'LUSD',
+      'yusd': 'YUSD',
+      'aegis yusd': 'YUSD',
+      'mimatic': 'MIMATIC',
+      'mai': 'MIMATIC',
+      
+      // Euro stablecoins
+      'eurs': 'EURS',
+      'stasis euro': 'EURS',
+      'eurc': 'EURC',
+      'euro coin': 'EURC',
+      'ceur': 'CEUR',
+      'celo euro': 'CEUR',
       
       // Algorithmic stablecoins
       'susd': 'SUSD',
@@ -303,164 +348,71 @@ export class ResearchService {
       'tron usdd': 'USDD',
       'ampl': 'AMPL',
       'ampleforth': 'AMPL',
+      'cusd': 'CUSD',
+      'celo dollar': 'CUSD',
       'fei': 'FEI',
       'fei usd': 'FEI',
       'ustc': 'USTC',
       'terraclassicusd': 'USTC',
       'terra classic usd': 'USTC',
+      'blc': 'BLC',
+      'balance coin': 'BLC',
+      'par': 'PAR',
+      'parallel': 'PAR',
+      'usnbt': 'USNBT',
+      'nubits': 'USNBT',
+      'dusd': 'DUSD',
+      'defidollar': 'DUSD',
       'usn': 'USN',
       'near usn': 'USN',
+      
+      // Other fiat-backed
+      'xsgd': 'XSGD',
+      'singapore dollar': 'XSGD',
+      'gyen': 'GYEN',
+      'japanese yen': 'GYEN',
+      'idrt': 'IDRT',
+      'rupiah token': 'IDRT',
+      'zarp': 'ZARP',
+      'zar token': 'ZARP',
+      'vchf': 'VCHF',
+      'vnx swiss franc': 'VCHF',
       
       // Gold/commodity backed
       'xaut': 'XAUT',
       'tether gold': 'XAUT',
       'paxg': 'PAXG',
       'pax gold': 'PAXG',
-      
-      // Major protocols
-      'pyusd': 'PYUSD',
-      'paypal usd': 'PYUSD',
-      'fdusd': 'FDUSD',
-      'first digital usd': 'FDUSD',
-      'rlusd': 'RLUSD',
-      'ripple usd': 'RLUSD',
-      'usdx': 'USDX',
-      'stables labs usdx': 'USDX',
-      'usd0': 'USD0',
-      'usual usd': 'USD0',
-      'usdg': 'USDG',
-      'global dollar': 'USDG',
-      'tusd': 'TUSD',
-      'trueusd': 'TUSD',
-      'usdb': 'USDB',
-      'gho': 'GHO',
-      'aave gho': 'GHO',
-      'usr': 'USR',
-      'resolv usr': 'USR',
-      'busd': 'BUSD',
-      'binance usd': 'BUSD',
-      'frax': 'FRAX',
-      'frax dollar': 'FRAX',
-      'usdo': 'USDO',
-      'openeden opendollar': 'USDO',
-      'satusd': 'SATUSD',
-      'satoshi stablecoin': 'SATUSD',
-      
-      // Euro stablecoins
-      'eurc': 'EURC',
-      'euro coin': 'EURC',
-      'eurs': 'EURS',
-      'stasis euro': 'EURS',
-      'eurt': 'EURT',
-      'euro tether': 'EURT',
-      'eurq': 'EURQ',
-      'quantoz eurq': 'EURQ',
-      'veur': 'VEUR',
-      'vnx euro': 'VEUR',
-      'ceur': 'CEUR',
-      'celo euro': 'CEUR',
-      
-      // Other fiat pegged
-      'xsgd': 'XSGD',
-      'singapore dollar': 'XSGD',
-      'idrt': 'IDRT',
-      'rupiah token': 'IDRT',
-      'gyen': 'GYEN',
-      'japanese yen': 'GYEN',
-      'zarp': 'ZARP',
-      'south african rand': 'ZARP',
-      'vchf': 'VCHF',
-      'vnx swiss franc': 'VCHF',
-      'pht': 'PHT',
-      'philippine token': 'PHT',
-      
-      // Precious metals
       'kau': 'KAU',
       'kinesis gold': 'KAU',
       'kag': 'KAG',
       'kinesis silver': 'KAG',
       
-      // Protocol specific
-      'usda': 'USDA',
-      'usda protocol': 'USDA',
-      'ausd': 'AUSD',
-      'agora dollar': 'AUSD',
-      'deusd': 'DEUSD',
-      'elixir deusd': 'DEUSD',
-      'yu': 'YU',
-      'yala stablecoin': 'YU',
-      'fxusd': 'FXUSD',
-      'f(x) protocol fxusd': 'FXUSD',
-      'dola': 'DOLA',
-      'inverse finance': 'DOLA',
+      // Legacy/Other protocols  
+      'tusd': 'TUSD',
+      'trueusd': 'TUSD',
+      'busd': 'BUSD',
+      'binance usd': 'BUSD',
+      'frax': 'FRAX',
+      'frax dollar': 'FRAX',
+      'gho': 'GHO',
+      'aave gho': 'GHO',
       'crvusd': 'CRVUSD',
       'curve usd': 'CRVUSD',
-      'usdz': 'USDZ',
-      'anzen usdz': 'USDZ',
-      'avusd': 'AVUSD',
-      'avant usd': 'AVUSD',
-      'srusd': 'SRUSD',
-      'reservoir srusd': 'SRUSD',
-      
-      // Emerging stablecoins
-      'rusdc': 'RUSDC',
-      'relend network usdc': 'RUSDC',
-      'yusd': 'YUSD',
-      'yusd stablecoin': 'YUSD',
-      'inalpha': 'INALPHA',
-      'nest alpha vault': 'INALPHA',
-      'money': 'MONEY',
-      'defi.money': 'MONEY',
-      'iusd': 'IUSD',
-      'indigo protocol iusd': 'IUSD',
       'ousd': 'OUSD',
       'origin dollar': 'OUSD',
-      'pinto': 'PINTO',
-      'btcusd': 'BTCUSD',
-      'bitcoin usd': 'BTCUSD',
-      'usdh': 'USDH',
-      'hermetica usdh': 'USDH',
-      'usdr': 'USDR',
-      'stablr usd': 'USDR',
-      'usdq': 'USDQ',
-      'quantoz usdq': 'USDQ',
-      'bnusd': 'BNUSD',
-      'balanced dollars': 'BNUSD',
-      'husd': 'HUSD',
-      'fastusd': 'FASTUSD',
-      'sei fastusd': 'FASTUSD',
-      'susp': 'SUSP',
-      'pareto staked usp': 'SUSP',
-      'nect': 'NECT',
-      'nectar': 'NECT',
-      'wusd': 'WUSD',
-      'worldwide usd': 'WUSD',
-      'musd': 'MUSD',
-      'meta usd': 'MUSD',
-      'usdl': 'USDL',
-      'liquid loans usdl': 'USDL',
-      'fusd': 'FUSD',
-      'freedom dollar': 'FUSD',
-      'djed': 'DJED',
-      'cardano djed': 'DJED',
-      'usdn': 'USDN',
-      'smardex usdn': 'USDN',
-      'ggusd': 'GGUSD',
-      'good game us dollar': 'GGUSD',
-      'ylds': 'YLDS',
-      'usdglo': 'USDGLO',
-      'glo dollar': 'USDGLO',
-      'usdxl': 'USDXL',
-      'last usd': 'USDXL',
+      'usdx': 'USDX',
+      'usd0': 'USD0',
+      'usual usd': 'USD0',
+      'usdg': 'USDG',
+      'global dollar': 'USDG',
+      'usdb': 'USDB',
+      'usr': 'USR',
+      'resolv usr': 'USR',
       'rai': 'RAI',
       'rai reflex index': 'RAI',
-      'msusd': 'MSUSD',
-      'main street usd': 'MSUSD',
-      'susda': 'SUSDA',
-      'cusd': 'CUSD',
-      'cap usd': 'CUSD',
-      'reusd': 'REUSD',
-      'resupply usd': 'REUSD'
+      'dola': 'DOLA',
+      'inverse finance': 'DOLA'
     };
 
     const symbols: string[] = [];
@@ -618,8 +570,9 @@ ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
     
     // Set appropriate base prices for different types of stablecoins/tokens
     switch (symbol.toUpperCase()) {
+      // Gold-backed tokens
       case 'PAXG':
-      case 'XAUT': // Gold-backed tokens (PAX Gold, Tether Gold)
+      case 'XAUT': 
         basePrice = 2650.00; // Approximate gold price per ounce
         break;
       case 'KAU': // Kinesis Gold (per gram)
@@ -628,6 +581,8 @@ ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
       case 'KAG': // Kinesis Silver (per ounce)
         basePrice = 30.00; // Approximate silver price per ounce
         break;
+        
+      // Algorithmic stablecoins with different risk profiles
       case 'AMPL': // Ampleforth (elastic supply)
         basePrice = 1.25; // Can fluctuate significantly
         break;
@@ -652,6 +607,17 @@ ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
       case 'DUSD': // DefiDollar (can depeg)
         basePrice = 0.95; // Often below $1
         break;
+      case 'CUSD': // Celo Dollar
+        basePrice = 0.9998; // Usually stable
+        break;
+      case 'BLC': // Balance Coin
+        basePrice = 0.9926; // Slightly below $1
+        break;
+      case 'PAR': // Parallel
+        basePrice = 1.00; // Target $1
+        break;
+        
+      // Major USD stablecoins with slight variations
       case 'USDT':
         basePrice = 1.0005;
         break;
@@ -664,11 +630,88 @@ ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
       case 'USDE':
         basePrice = 1.0003;
         break;
+      case 'USDS':
+        basePrice = 0.9996;
+        break;
+      case 'USD1':
+        basePrice = 0.9996;
+        break;
+      case 'USDTB':
+        basePrice = 0.9996;
+        break;
+      case 'PYUSD':
+        basePrice = 0.9998;
+        break;
+      case 'FDUSD':
+        basePrice = 0.9979;
+        break;
+      case 'RLUSD':
+        basePrice = 1.00;
+        break;
+      case 'USDY':
+        basePrice = 1.09; // Yield-bearing
+        break;
+      case 'USDF':
+        basePrice = 1.00;
+        break;
+      case 'USDO':
+        basePrice = 0.9971;
+        break;
+      case 'SATUSD':
+        basePrice = 0.9974;
+        break;
+      case 'DEUSD':
+        basePrice = 0.9993;
+        break;
+      case 'YU':
+        basePrice = 0.9993;
+        break;
+      case 'SRUSD':
+        basePrice = 1.09; // Yield-bearing
+        break;
+      case 'RUSD':
+        basePrice = 1.00;
+        break;
+      case 'USDP':
+        basePrice = 0.9999;
+        break;
+      case 'USDA':
+        basePrice = 0.995;
+        break;
+      case 'FRXUSD':
+        basePrice = 0.9995;
+        break;
+      case 'MIM':
+        basePrice = 1.00;
+        break;
+      case 'USDN':
+        basePrice = 0.9998;
+        break;
+      case 'USDL':
+        basePrice = 0.9985;
+        break;
+      case 'BYUSD':
+        basePrice = 1.00;
+        break;
+      case 'LUSD':
+        basePrice = 1.00;
+        break;
+      case 'YUSD':
+        basePrice = 1.00;
+        break;
+      case 'MIMATIC':
+        basePrice = 0.9927;
+        break;
+        
+      // Euro stablecoins
       case 'EURC':
       case 'EURS':
-      case 'EURT': // Euro stablecoins
+      case 'EURT':
+      case 'CEUR':
         basePrice = 1.05; // Approximate EUR/USD rate
         break;
+        
+      // Other fiat currencies
       case 'XSGD': // Singapore Dollar
         basePrice = 0.74; // Approximate SGD/USD rate
         break;
@@ -684,6 +727,7 @@ ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
       case 'VCHF': // Swiss Franc
         basePrice = 1.10; // Approximate CHF/USD rate
         break;
+        
       default:
         basePrice = 0.9998; // Default for other USD stablecoins
     }
@@ -695,7 +739,7 @@ ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
       
       // Different variation ranges based on token type
       let variation;
-      if (symbol.toUpperCase() === 'PAXG' || symbol.toUpperCase() === 'XAUT') {
+      if (['PAXG', 'XAUT'].includes(symbol.toUpperCase())) {
         // Gold tokens have larger price movements
         variation = (Math.random() - 0.5) * 100; // ±$50 variation
       } else if (symbol.toUpperCase() === 'KAU') {
@@ -710,10 +754,16 @@ ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
       } else if (['USTC', 'USN', 'USNBT', 'DUSD'].includes(symbol.toUpperCase())) {
         // Depegged algorithmic stablecoins - high volatility
         variation = (Math.random() - 0.5) * 0.2; // ±$0.1 variation
-      } else if (['SUSD', 'FEI', 'USDD'].includes(symbol.toUpperCase())) {
+      } else if (['SUSD', 'FEI', 'BLC', 'PAR'].includes(symbol.toUpperCase())) {
         // Algorithmic stablecoins - moderate volatility
         variation = (Math.random() - 0.5) * 0.05; // ±$0.025 variation
-      } else if (symbol.toUpperCase().includes('EUR')) {
+      } else if (['USDD', 'CUSD'].includes(symbol.toUpperCase())) {
+        // More stable algorithmic stablecoins
+        variation = (Math.random() - 0.5) * 0.01; // ±$0.005 variation
+      } else if (['USDY', 'SRUSD'].includes(symbol.toUpperCase())) {
+        // Yield-bearing stablecoins - small variations around higher base
+        variation = (Math.random() - 0.5) * 0.02; // ±$0.01 variation
+      } else if (symbol.toUpperCase().includes('EUR') || ['EURC', 'EURS', 'EURT', 'CEUR'].includes(symbol.toUpperCase())) {
         // Euro stablecoins have small variations
         variation = (Math.random() - 0.5) * 0.01; // ±0.005 variation
       } else if (['XSGD', 'GYEN', 'IDRT', 'ZARP', 'VCHF'].includes(symbol.toUpperCase())) {
@@ -727,7 +777,7 @@ ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
       let price = basePrice + variation;
       
       // Set appropriate bounds based on token type
-      if (symbol.toUpperCase() === 'PAXG' || symbol.toUpperCase() === 'XAUT') {
+      if (['PAXG', 'XAUT'].includes(symbol.toUpperCase())) {
         price = Math.max(2500, Math.min(2800, price));
       } else if (symbol.toUpperCase() === 'KAU') {
         price = Math.max(80, Math.min(90, price));
@@ -743,11 +793,13 @@ ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
         price = Math.max(0.05, Math.min(0.15, price)); // Very depegged
       } else if (symbol.toUpperCase() === 'DUSD') {
         price = Math.max(0.90, Math.min(1.00, price)); // Usually below $1
-      } else if (['SUSD', 'FEI'].includes(symbol.toUpperCase())) {
+      } else if (['SUSD', 'FEI', 'BLC'].includes(symbol.toUpperCase())) {
         price = Math.max(0.96, Math.min(1.02, price)); // Mild depegging risk
-      } else if (symbol.toUpperCase() === 'USDD') {
+      } else if (['USDD', 'CUSD', 'PAR'].includes(symbol.toUpperCase())) {
         price = Math.max(0.995, Math.min(1.005, price)); // Usually stable
-      } else if (symbol.toUpperCase().includes('EUR')) {
+      } else if (['USDY', 'SRUSD'].includes(symbol.toUpperCase())) {
+        price = Math.max(1.06, Math.min(1.12, price)); // Yield-bearing range
+      } else if (['EURC', 'EURS', 'EURT', 'CEUR'].includes(symbol.toUpperCase())) {
         price = Math.max(1.02, Math.min(1.08, price));
       } else if (symbol.toUpperCase() === 'XSGD') {
         price = Math.max(0.72, Math.min(0.76, price));
