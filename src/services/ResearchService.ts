@@ -150,16 +150,29 @@ export class ResearchService {
     position: number;
   }> | undefined> {
     try {
-      // Create a stablecoin-focused search query
-      const searchQuery = query.toLowerCase().includes('stablecoin') 
-        ? query 
-        : `${query} stablecoins`;
+      // Create varied search queries to get different results
+      const searchVariations = [
+        query,
+        query.toLowerCase().includes('stablecoin') ? query : `${query} stablecoins`,
+        query.toLowerCase().includes('stablecoin') ? query : `${query} USDT USDC`,
+        `latest ${query}`,
+        `breaking ${query}`,
+        `${query} news today`
+      ];
+      
+      // Pick a random variation to get different results each time
+      const searchQuery = searchVariations[Math.floor(Math.random() * searchVariations.length)];
+      
+      // Vary time filters to get fresh content
+      const timeFilters = ['recent', 'week', 'month', 'mixed'];
+      const randomTimeFilter = timeFilters[Math.floor(Math.random() * timeFilters.length)];
 
       const { data, error } = await supabase.functions.invoke('serp-search', {
         body: {
           query: searchQuery,
           location: 'United States',
-          num: 6
+          num: 8, // Get more results for variety
+          timeFilter: randomTimeFilter
         }
       });
 

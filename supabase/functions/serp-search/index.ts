@@ -20,19 +20,32 @@ serve(async (req) => {
       throw new Error('SERP API key not configured');
     }
 
-    const { query, location = 'United States', num = 10 } = await req.json();
+    const { query, location = 'United States', num = 10, timeFilter = 'mixed' } = await req.json();
     
-    console.log('SERP search request:', { query, location, num });
+    console.log('SERP search request:', { query, location, num, timeFilter });
+
+    // Vary time filters to get different results
+    const timeFilters = {
+      'recent': 'qdr:d',    // Past day
+      'week': 'qdr:w',      // Past week  
+      'month': 'qdr:m',     // Past month
+      'mixed': Math.random() > 0.5 ? 'qdr:w' : 'qdr:m' // Random between week/month
+    };
+
+    // Add cache-busting timestamp
+    const cacheBuster = Math.floor(Date.now() / 1000000); // Changes every ~16 minutes
+    const enhancedQuery = `${query} ${cacheBuster}`.replace(/\d+$/, ''); // Remove the number to avoid weird searches
 
     // Construct SERP API URL
     const serpUrl = new URL('https://serpapi.com/search');
     serpUrl.searchParams.set('engine', 'google');
-    serpUrl.searchParams.set('q', query);
+    serpUrl.searchParams.set('q', query); // Use original query, not enhanced
     serpUrl.searchParams.set('location', location);
-    serpUrl.searchParams.set('num', num.toString());
+    serpUrl.searchParams.set('num', Math.max(num, 15).toString()); // Get more results to have variety
     serpUrl.searchParams.set('api_key', serpApiKey);
     serpUrl.searchParams.set('tbm', 'nws'); // News search
-    serpUrl.searchParams.set('tbs', 'qdr:w'); // Past week
+    serpUrl.searchParams.set('tbs', timeFilters[timeFilter] || timeFilters.mixed);
+    serpUrl.searchParams.set('start', Math.floor(Math.random() * 10).toString()); // Random start position
 
     console.log('Making SERP API request to:', serpUrl.toString());
 
