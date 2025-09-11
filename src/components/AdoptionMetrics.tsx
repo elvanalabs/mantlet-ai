@@ -109,8 +109,8 @@ const AdoptionMetrics: React.FC<AdoptionMetricsProps> = ({ adoptionData }) => {
       'gnosis': '/lovable-uploads/a2cb7eff-989e-4bf6-8e47-7f2d8e526fcc.png',
       'hedera': '/lovable-uploads/e6dafb87-9343-4c68-a809-9da1aa75a4b2.png',
       'celo': '/lovable-uploads/5f630daa-b5bc-4e96-ad07-1acf1d13b61a.png',
-      'xrpledger': '/lovable-uploads/b8ec2af1-41ea-4718-ad31-c8f47484c004.png',
-      'xrp': '/lovable-uploads/b8ec2af1-41ea-4718-ad31-c8f47484c004.png',
+      'xrpledger': '/lovable-uploads/0f17d950-ef5f-4990-83d3-bf136a070b81.png',
+      'xrp': '/lovable-uploads/0f17d950-ef5f-4990-83d3-bf136a070b81.png',
       'terraclassic': '/lovable-uploads/33de17b2-37de-44c9-994a-e297e6beede9.png',
       'terra': '/lovable-uploads/33de17b2-37de-44c9-994a-e297e6beede9.png',
     };
