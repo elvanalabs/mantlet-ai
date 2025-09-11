@@ -412,8 +412,8 @@ export const DemoInterface = ({
                     <ComparisonTable comparisonData={message.comparisonData} />
                   </div>}
                 
-                {/* Copy and Download buttons for assistant messages */}
-                {message.type === 'assistant' && <div className="mt-4 pt-3 border-t border-border flex items-center justify-end gap-2">
+                {/* Copy and Download buttons for assistant messages (except when showing news) */}
+                {message.type === 'assistant' && !message.newsResults && <div className="mt-4 pt-3 border-t border-border flex items-center justify-end gap-2">
                     <Button variant="ghost" size="sm" onClick={() => handleCopyMessage(message)} className="text-muted-foreground hover:text-foreground">
                       {copiedMessageId === message.id ? <Check className="w-4 h-4 mr-1 text-green-500" /> : <Copy className="w-4 h-4 mr-1" />}
                       {copiedMessageId === message.id ? 'Copied!' : 'Copy'}
