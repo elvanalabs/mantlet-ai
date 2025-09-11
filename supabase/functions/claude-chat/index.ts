@@ -125,7 +125,94 @@ serve(async (req) => {
     81. USDXL (Last USD) - $3.2M market cap - Last protocol
     82. RAI (Rai Reflex Index) - $3.1M market cap - Reflexer Labs
 
-    And many more emerging stablecoins across various protocols and chains.
+    ADDITIONAL STABLECOINS (Updated CoinGecko Reference 2025):
+    - USD3 (Web 3 Dollar) - Multi-chain protocol stablecoin
+    - LUSD (Liquity USD) - Decentralized, ETH-backed stablecoin  
+    - LISUSD (Lista USD) - Lista protocol stablecoin
+    - UTY (Unity) - Unity protocol stablecoin
+    - CUSD (Celo Dollar) - Celo ecosystem stablecoin
+    - HBD (Hive Dollar) - Hive blockchain stablecoin
+    - HONEY - Berachain ecosystem stablecoin
+    - XTUSD (XT Stablecoin) - XT exchange stablecoin
+    - YUSD (Aegis YUSD) - Aegis protocol stablecoin
+    - DUSD (StandX DUSD) - StandX protocol stablecoin
+    - MIMATIC (MAI) - QiDao protocol multi-chain stablecoin
+    - EURE (Monerium EUR emoney) - European Euro stablecoin
+    - EUSD (Electronic USD) - Electronic dollar implementation
+    - GYD (Gyroscope GYD) - Gyroscope protocol stablecoin
+    - USN (Noon USN) - Noon protocol stablecoin
+    - EURAU (AllUnity EUR) - AllUnity Euro stablecoin
+    - EURA - Angle Protocol Euro stablecoin
+    - GUSD - Gemini regulated stablecoin
+    - PUSD (Plume USD) - Plume network stablecoin
+    - FLEXUSD - FlexUSD protocol
+    - MUSD (MetaMask USD) - MetaMask's stablecoin
+    - MSUSD (Metronome Synth USD) - Metronome protocol
+    - SUSD (sUSD Optimism) - Synthetix stablecoin variant
+    - USC (Orby Network USC) - Orby network stablecoin
+    - TRYB (BiLira) - Turkish Lira stablecoin
+    - WEMIX$ (WEMIX Dollar) - WEMIX network stablecoin
+    - EURR (StablR Euro) - StablR protocol Euro stablecoin
+    - BRLA (BRLA Digital) - Brazilian Real stablecoin
+    - ZCHF (Frankencoin) - Swiss Franc stablecoin
+    - USX (dForce USD) - dForce protocol stablecoin
+    - RUSDC-STARK (Relend Network USDC Starknet) - Starknet variant
+    - ALUSD (Alchemix USD) - Alchemix protocol stablecoin
+    - ASUSD (Astera USD) - Astera protocol stablecoin
+    - DOC (Dollar On Chain) - RSK network stablecoin
+    - BBUSD (BounceBit USD) - BounceBit network stablecoin
+    - XSTUSD (SORA Synthetic USD) - SORA network synthetic stablecoin
+    - CEUR (Celo Euro) - Celo network Euro stablecoin
+    - EURT (Euro Tether) - Tether's Euro stablecoin
+    - GYEN - Japanese Yen stablecoin
+    - XSGD (Singapore Dollar) - SGD-pegged stablecoin
+    - IDRT (Rupiah Token) - Indonesian Rupiah stablecoin
+    - PINTO - Philippine peso stablecoin
+    - ZARP - South African Rand stablecoin
+    - DJED - Cardano algorithmic stablecoin
+    - BEAN - Beanstalk algorithmic stablecoin
+    - CKES (Celo Kenyan Shilling) - Kenyan Shilling stablecoin
+    - CCHF (Celo Swiss Franc) - Swiss Franc on Celo
+    - JPYC (JPY Coin v1) - Japanese Yen stablecoin
+    - XUSD (xDollar Stablecoin) - xDollar protocol
+    - AEUR (Anchored Coins AEUR) - Anchored Euro stablecoin
+    - UUSD (Youves uUSD) - Tezos ecosystem stablecoin
+    - RZUSD - RZUSD protocol stablecoin
+    - HYDT - HYDT protocol stablecoin
+    - GBPE (Monerium GBP emoney) - British Pound stablecoin
+    - CGUSD (Cygnus Finance Global USD) - Cygnus protocol
+    - EEUR (ARYZE eEUR) - ARYZE Euro stablecoin
+    - EGBP (ARYZE eGBP) - ARYZE British Pound stablecoin
+    - EUSD (ARYZE eUSD) - ARYZE USD stablecoin
+    - NXUSD - NXUSD protocol stablecoin
+    - EUROP (EURØP) - Schuman Euro stablecoin
+    - DLLR (Sovryn Dollar) - Sovryn protocol stablecoin
+
+    STABLECOIN CATEGORIES BY TYPE:
+    - Fiat-Collateralized: USDT, USDC, TUSD, PYUSD, FDUSD, BUSD
+    - Crypto-Collateralized: DAI, LUSD, ALUSD, CRVUSD, GHO
+    - Algorithmic: FRAX, BEAN, DJED, UST (historical)
+    - Synthetic: USDe, XSTUSD
+    - Commodity-Backed: PAXG, XAUT, KAU, KAG, ONSS, EDLC
+    - Multi-Chain: USDT, USDC, DAI, MIMATIC
+    - Regional Fiat: EURE, EURA, TRYB, BRLA, ZCHF, GYEN, XSGD, IDRT
+
+    BLOCKCHAIN ECOSYSTEMS:
+    - Ethereum: USDT, USDC, DAI, USDe, GHO, LUSD, ALUSD
+    - Tron: USDT, USDD
+    - BNB Chain: USDT, USDC, BUSD, FDUSD
+    - Solana: USDT, USDC, PYUSD
+    - Polygon: USDT, USDC, DAI, MIMATIC
+    - Avalanche: USDT, USDC, DAI, FRAX
+    - Arbitrum: USDT, USDC, DAI, LUSD
+    - Optimism: USDT, USDC, DAI, SUSD
+    - Celo: CUSD, CEUR, CKES, CCHF
+    - Cardano: DJED, IUSD
+    - Base: USDC
+    - Blast: USDB
+    - Starknet: RUSDC-STARK
+
+    Total market cap: ~$290 billion across 350+ stablecoins globally.
 
     === RECENT STABLECOIN DEVELOPMENTS (2025) ===
     
