@@ -510,15 +510,6 @@ export const DemoInterface = ({
           </div>
         </div>
         
-        {/* Text Input */}
-        <div className="p-4 border-t border-border">
-        <form onSubmit={handleSubmit} className="flex space-x-2">
-          <Input value={input} onChange={e => setInput(e.target.value)} placeholder="Ask about Web3, DeFi, crypto prices, or any blockchain topic..." className="flex-1 bg-input/50 backdrop-blur-sm" disabled={isLoading} />
-          <Button type="submit" disabled={isLoading || !input.trim()} className="bg-gradient-primary hover:opacity-90 glow-primary">
-            <Send className="w-4 h-4" />
-          </Button>
-        </form>
-        </div>
       </div>
     </div>;
 };
