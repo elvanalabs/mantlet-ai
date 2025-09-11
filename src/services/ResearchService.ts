@@ -86,9 +86,26 @@ export class ResearchService {
         }
       }
       
+      // Check if this is an explain stablecoin query
+      const isExplainQuery = query.toLowerCase().includes('explain') && 
+                           (query.toLowerCase().includes('stablecoin') || 
+                            this.extractStablecoinSymbols(query).length > 0);
+      const stablecoinSymbols = this.extractStablecoinSymbols(query);
+      
+      if (isExplainQuery && stablecoinSymbols.length > 0) {
+        console.log('Explain stablecoin query detected for:', stablecoinSymbols[0]);
+        const contextData = await this.generateResponse(query, '');
+        const chartData = await this.getChartData(stablecoinSymbols[0]);
+        
+        return {
+          contextData,
+          sources: [],
+          chartData
+        };
+      }
+      
       // Check if this is a comparison query
       const isComparison = this.isComparisonQuery(query);
-      const stablecoinSymbols = this.extractStablecoinSymbols(query);
       
       if (isComparison && stablecoinSymbols.length >= 2) {
         console.log('Comparison query detected for:', stablecoinSymbols);
