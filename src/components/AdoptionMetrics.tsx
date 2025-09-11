@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -23,6 +23,63 @@ interface AdoptionData {
 interface AdoptionMetricsProps {
   adoptionData: AdoptionData;
 }
+
+// Mobile-friendly tooltip component
+const MobileTooltip: React.FC<{
+  content: string;
+  children: React.ReactNode;
+}> = ({ content, children }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768 || 'ontouchstart' in window);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  if (isMobile) {
+    return (
+      <div className="relative">
+        <div 
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsOpen(!isOpen);
+          }}
+          className="cursor-pointer"
+        >
+          {children}
+        </div>
+        {isOpen && (
+          <>
+            <div 
+              className="fixed inset-0 z-[9998]" 
+              onClick={() => setIsOpen(false)}
+            />
+            <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 z-[9999] bg-popover border rounded-md shadow-lg px-3 py-2 text-sm text-popover-foreground max-w-[200px] whitespace-normal">
+              {content}
+            </div>
+          </>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        {children}
+      </TooltipTrigger>
+      <TooltipContent>
+        <p>{content}</p>
+      </TooltipContent>
+    </Tooltip>
+  );
+};
 
 const AdoptionMetrics: React.FC<AdoptionMetricsProps> = ({ adoptionData }) => {
   const formatNumber = (value: string): string => {
@@ -72,19 +129,14 @@ const AdoptionMetrics: React.FC<AdoptionMetricsProps> = ({ adoptionData }) => {
           <Card className="glass border border-border/50 hover:border-primary/20 transition-colors">
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
-                    Total Circulating Supply
-                  </CardTitle>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Info className="w-3 h-3 text-muted-foreground hover:text-primary cursor-help" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Stablecoin supply in circulation</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
+                 <div className="flex items-center gap-1">
+                   <CardTitle className="text-sm font-medium text-muted-foreground">
+                     Total Circulating Supply
+                   </CardTitle>
+                   <MobileTooltip content="Stablecoin supply in circulation">
+                     <Info className="w-3 h-3 text-muted-foreground hover:text-primary cursor-help" />
+                   </MobileTooltip>
+                 </div>
                 <Coins className="w-4 h-4 text-primary" />
               </div>
             </CardHeader>
@@ -99,19 +151,14 @@ const AdoptionMetrics: React.FC<AdoptionMetricsProps> = ({ adoptionData }) => {
           <Card className="glass border border-border/50 hover:border-primary/20 transition-colors">
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
-                    Market Share
-                  </CardTitle>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Info className="w-3 h-3 text-muted-foreground hover:text-primary cursor-help" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Share of total stablecoin market</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
+                 <div className="flex items-center gap-1">
+                   <CardTitle className="text-sm font-medium text-muted-foreground">
+                     Market Share
+                   </CardTitle>
+                   <MobileTooltip content="Share of total stablecoin market">
+                     <Info className="w-3 h-3 text-muted-foreground hover:text-primary cursor-help" />
+                   </MobileTooltip>
+                 </div>
                 <Users className="w-4 h-4 text-primary" />
               </div>
             </CardHeader>
@@ -126,19 +173,14 @@ const AdoptionMetrics: React.FC<AdoptionMetricsProps> = ({ adoptionData }) => {
           <Card className="glass border border-border/50 hover:border-primary/20 transition-colors">
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
-                    24H Transaction Volume
-                  </CardTitle>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Info className="w-3 h-3 text-muted-foreground hover:text-primary cursor-help" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Value moved in last 24h</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
+                 <div className="flex items-center gap-1">
+                   <CardTitle className="text-sm font-medium text-muted-foreground">
+                     24H Transaction Volume
+                   </CardTitle>
+                   <MobileTooltip content="Value moved in last 24h">
+                     <Info className="w-3 h-3 text-muted-foreground hover:text-primary cursor-help" />
+                   </MobileTooltip>
+                 </div>
                 <BarChart3 className="w-4 h-4 text-primary" />
               </div>
             </CardHeader>
@@ -153,19 +195,14 @@ const AdoptionMetrics: React.FC<AdoptionMetricsProps> = ({ adoptionData }) => {
           <Card className="glass border border-border/50 hover:border-primary/20 transition-colors">
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
-                    30-Day Growth/Decline
-                  </CardTitle>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Info className="w-3 h-3 text-muted-foreground hover:text-primary cursor-help" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Supply change over 30 days</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
+                 <div className="flex items-center gap-1">
+                   <CardTitle className="text-sm font-medium text-muted-foreground">
+                     30-Day Growth/Decline
+                   </CardTitle>
+                   <MobileTooltip content="Supply change over 30 days">
+                     <Info className="w-3 h-3 text-muted-foreground hover:text-primary cursor-help" />
+                   </MobileTooltip>
+                 </div>
                 {adoptionData.growthDecline30d.direction === 'up' ? (
                   <TrendingUp className="w-4 h-4 text-green-500" />
                 ) : (
@@ -191,19 +228,14 @@ const AdoptionMetrics: React.FC<AdoptionMetricsProps> = ({ adoptionData }) => {
           <Card className="glass border border-border/50 hover:border-primary/20 transition-colors md:col-span-2">
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
-                    Chain Distribution
-                  </CardTitle>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Info className="w-3 h-3 text-muted-foreground hover:text-primary cursor-help" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Supply split across blockchains</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
+                 <div className="flex items-center gap-1">
+                   <CardTitle className="text-sm font-medium text-muted-foreground">
+                     Chain Distribution
+                   </CardTitle>
+                   <MobileTooltip content="Supply split across blockchains">
+                     <Info className="w-3 h-3 text-muted-foreground hover:text-primary cursor-help" />
+                   </MobileTooltip>
+                 </div>
                 <Globe className="w-4 h-4 text-primary" />
               </div>
             </CardHeader>
