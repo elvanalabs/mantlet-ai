@@ -547,6 +547,172 @@ export const STABLECOIN_REFERENCE_DATA: StablecoinData[] = [
     useCase: 'Multi-chain DeFi, collateralized borrowing',
     riskLevel: 'Medium'
   },
+  // Algorithmic stablecoins from CoinMarketCap
+  {
+    symbol: 'USDD',
+    name: 'USDD',
+    rank: 126,
+    price: 0.9999,
+    marketCap: 483588467,
+    volume24h: 7219573,
+    category: 'Algorithmic',
+    backing: 'Algorithmic mechanism with TRX collateral',
+    description: 'TRON-based algorithmic stablecoin with over-collateralization',
+    chains: ['TRON', 'Ethereum', 'BSC'],
+    issuer: 'TRON DAO',
+    useCase: 'TRON ecosystem payments, DeFi',
+    riskLevel: 'High'
+  },
+  {
+    symbol: 'SUSD',
+    name: 'sUSD',
+    rank: 603,
+    price: 0.9754,
+    marketCap: 46771372,
+    volume24h: 109466,
+    category: 'Algorithmic',
+    backing: 'SNX token collateral and debt mechanism',
+    description: 'Synthetix synthetic USD with SNX backing',
+    chains: ['Ethereum', 'Optimism'],
+    issuer: 'Synthetix',
+    useCase: 'Synthetic assets, DeFi trading',
+    riskLevel: 'High'
+  },
+  {
+    symbol: 'AMPL',
+    name: 'Ampleforth',
+    rank: 701,
+    price: 1.26,
+    marketCap: 35724933,
+    volume24h: 82586,
+    category: 'Algorithmic',
+    backing: 'Elastic supply mechanism',
+    description: 'Elastic supply token that adjusts total supply based on demand',
+    chains: ['Ethereum'],
+    issuer: 'Ampleforth Protocol',
+    useCase: 'Uncorrelated asset, portfolio diversification',
+    riskLevel: 'High'
+  },
+  {
+    symbol: 'CUSD',
+    name: 'Celo Dollar',
+    rank: 704,
+    price: 0.9998,
+    marketCap: 35548986,
+    volume24h: 1791949,
+    category: 'Algorithmic',
+    backing: 'CELO token collateral and algorithmic stabilization',
+    description: 'Celo ecosystem USD stablecoin with mobile-first design',
+    chains: ['Celo'],
+    issuer: 'Celo Protocol',
+    useCase: 'Mobile payments, financial inclusion, remittances',
+    riskLevel: 'Medium'
+  },
+  {
+    symbol: 'FEI',
+    name: 'Fei USD',
+    rank: 1571,
+    price: 0.9932,
+    marketCap: 3755106,
+    volume24h: 61708,
+    category: 'Algorithmic',
+    backing: 'Protocol-controlled value and direct incentives',
+    description: 'Decentralized stablecoin with protocol-controlled value',
+    chains: ['Ethereum'],
+    issuer: 'Fei Protocol',
+    useCase: 'DeFi, protocol-owned liquidity',
+    riskLevel: 'High'
+  },
+  {
+    symbol: 'CEUR',
+    name: 'Celo Euro',
+    rank: 1573,
+    price: 1.17,
+    marketCap: 3746195,
+    volume24h: 39707,
+    category: 'Algorithmic',
+    backing: 'CELO token collateral and algorithmic stabilization',
+    description: 'Celo ecosystem EUR stablecoin for European markets',
+    chains: ['Celo'],
+    issuer: 'Celo Protocol',
+    useCase: 'European mobile payments, EUR exposure',
+    riskLevel: 'Medium'
+  },
+  {
+    symbol: 'BLC',
+    name: 'Balance Coin',
+    rank: 4598,
+    price: 0.9926,
+    marketCap: 3487025,
+    volume24h: 36628,
+    category: 'Algorithmic',
+    backing: 'Algorithmic supply adjustment mechanism',
+    description: 'Algorithmic stablecoin with supply balancing',
+    chains: ['Ethereum'],
+    issuer: 'Balance Protocol',
+    useCase: 'DeFi, algorithmic stability experiments',
+    riskLevel: 'High'
+  },
+  {
+    symbol: 'PAR',
+    name: 'Parallel',
+    rank: 6646,
+    price: 1.00,
+    marketCap: 1000000, // Estimated since no data provided
+    volume24h: 10000, // Estimated since no data provided
+    category: 'Algorithmic',
+    backing: 'Algorithmic mechanism',
+    description: 'Algorithmic stablecoin protocol',
+    chains: ['Ethereum'],
+    issuer: 'Parallel Protocol',
+    useCase: 'DeFi, algorithmic experiments',
+    riskLevel: 'High'
+  },
+  {
+    symbol: 'USNBT',
+    name: 'NuBits',
+    rank: 10000, // Very low since inactive
+    price: 0.10, // Estimated since depegged
+    marketCap: 100000, // Very small since mostly inactive
+    volume24h: 1000, // Very low volume
+    category: 'Algorithmic',
+    backing: 'Dual-token mechanism with NuShares',
+    description: 'Early algorithmic stablecoin (largely abandoned)',
+    chains: ['NuBits'],
+    issuer: 'Nu Network',
+    useCase: 'Historical interest, largely inactive',
+    riskLevel: 'High'
+  },
+  {
+    symbol: 'DUSD',
+    name: 'DefiDollar',
+    rank: 8000,
+    price: 0.95, // Estimated
+    marketCap: 500000, // Estimated small cap
+    volume24h: 5000, // Very low volume
+    category: 'Algorithmic',
+    backing: 'Multi-stablecoin index with algorithmic rebalancing',
+    description: 'Index of stablecoins with algorithmic rebalancing',
+    chains: ['Ethereum'],
+    issuer: 'DefiDollar',
+    useCase: 'Stablecoin diversification, reduced single-point risk',
+    riskLevel: 'High'
+  },
+  {
+    symbol: 'USN',
+    name: 'USN',
+    rank: 9000,
+    price: 0.80, // Depegged
+    marketCap: 200000, // Very small
+    volume24h: 2000, // Very low
+    category: 'Algorithmic',
+    backing: 'NEAR token collateral and algorithmic mechanism',
+    description: 'NEAR ecosystem algorithmic stablecoin (depegged)',
+    chains: ['NEAR'],
+    issuer: 'NEAR Protocol',
+    useCase: 'NEAR ecosystem (largely inactive)',
+    riskLevel: 'High'
+  },
   // Other fiat-backed stablecoins
   {
     symbol: 'XSGD',

@@ -615,6 +615,30 @@ ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
       case 'KAG': // Kinesis Silver (per ounce)
         basePrice = 30.00; // Approximate silver price per ounce
         break;
+      case 'AMPL': // Ampleforth (elastic supply)
+        basePrice = 1.25; // Can fluctuate significantly
+        break;
+      case 'SUSD': // Synthetix sUSD (can depeg)
+        basePrice = 0.975; // Often slightly below $1
+        break;
+      case 'USDD': // TRON USDD
+        basePrice = 0.9999; // Usually close to $1
+        break;
+      case 'FEI': // Fei USD (can depeg)
+        basePrice = 0.993; // Often slightly below $1
+        break;
+      case 'USTC': // TerraClassic USD (heavily depegged)
+        basePrice = 0.014; // Very low after collapse
+        break;
+      case 'USN': // NEAR USN (depegged)
+        basePrice = 0.80; // Significantly depegged
+        break;
+      case 'USNBT': // NuBits (depegged)
+        basePrice = 0.10; // Heavily depegged
+        break;
+      case 'DUSD': // DefiDollar (can depeg)
+        basePrice = 0.95; // Often below $1
+        break;
       case 'USDT':
         basePrice = 1.0005;
         break;
@@ -667,6 +691,15 @@ ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
       } else if (symbol.toUpperCase() === 'KAG') {
         // Kinesis Silver - moderate movements
         variation = (Math.random() - 0.5) * 2; // ±$1 variation
+      } else if (symbol.toUpperCase() === 'AMPL') {
+        // Ampleforth - very volatile due to elastic supply
+        variation = (Math.random() - 0.5) * 0.5; // ±$0.25 variation
+      } else if (['USTC', 'USN', 'USNBT', 'DUSD'].includes(symbol.toUpperCase())) {
+        // Depegged algorithmic stablecoins - high volatility
+        variation = (Math.random() - 0.5) * 0.2; // ±$0.1 variation
+      } else if (['SUSD', 'FEI', 'USDD'].includes(symbol.toUpperCase())) {
+        // Algorithmic stablecoins - moderate volatility
+        variation = (Math.random() - 0.5) * 0.05; // ±$0.025 variation
       } else if (symbol.toUpperCase().includes('EUR')) {
         // Euro stablecoins have small variations
         variation = (Math.random() - 0.5) * 0.01; // ±0.005 variation
@@ -687,6 +720,20 @@ ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
         price = Math.max(80, Math.min(90, price));
       } else if (symbol.toUpperCase() === 'KAG') {
         price = Math.max(25, Math.min(35, price));
+      } else if (symbol.toUpperCase() === 'AMPL') {
+        price = Math.max(0.80, Math.min(1.80, price)); // Elastic supply range
+      } else if (symbol.toUpperCase() === 'USTC') {
+        price = Math.max(0.010, Math.min(0.020, price)); // Heavily depegged
+      } else if (symbol.toUpperCase() === 'USN') {
+        price = Math.max(0.70, Math.min(0.90, price)); // Depegged
+      } else if (symbol.toUpperCase() === 'USNBT') {
+        price = Math.max(0.05, Math.min(0.15, price)); // Very depegged
+      } else if (symbol.toUpperCase() === 'DUSD') {
+        price = Math.max(0.90, Math.min(1.00, price)); // Usually below $1
+      } else if (['SUSD', 'FEI'].includes(symbol.toUpperCase())) {
+        price = Math.max(0.96, Math.min(1.02, price)); // Mild depegging risk
+      } else if (symbol.toUpperCase() === 'USDD') {
+        price = Math.max(0.995, Math.min(1.005, price)); // Usually stable
       } else if (symbol.toUpperCase().includes('EUR')) {
         price = Math.max(1.02, Math.min(1.08, price));
       } else if (symbol.toUpperCase() === 'XSGD') {
