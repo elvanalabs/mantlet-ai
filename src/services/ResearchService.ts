@@ -495,12 +495,27 @@ export class ResearchService {
         // Create a specific prompt for explain queries that only returns the 4 sections
         prompt = `Please provide information about the ${stablecoinName} stablecoin in exactly these 4 sections only:
 
-1. Overview
-2. Backing Mechanism 
-3. Usecases
-4. Risks/Criticism
+**Overview**
+**Backing Mechanism**
+**Usecases** 
+**Risks/Criticism**
 
-Format your response with clear headings using **bold** markdown formatting for each section title only (e.g., **Overview**). Add proper spacing between sections with two line breaks between each section for better readability. The content under each section should be in regular text, not bold. Do not include any other information outside these 4 sections.
+IMPORTANT FORMATTING RULES:
+1. Each section title must be in bold using **title** format
+2. Add two blank lines between each section
+3. If any section contains multiple points, format them as bullet points using "- " (dash and space)
+4. Each bullet point should be on a separate line
+5. Content under each section should be in regular text (not bold)
+6. Do not include any other information outside these 4 sections
+
+Example format:
+**Overview**
+Content here...
+
+**Backing Mechanism**
+- Point 1
+- Point 2
+- Point 3
 
 ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
       } else {
