@@ -31,7 +31,7 @@ export const WalletAuth = () => {
               Connect your wallet to access AI-powered Web3 research tools
             </p>
           </div>
-          <Button onClick={login} className="w-full bg-gradient-primary hover:opacity-90 transition-all duration-300 glow-primary mb-3" size="lg">
+          <Button onClick={login} className="w-full bg-gradient-primary transition-all duration-300 glow-primary mb-3" size="lg">
             <Wallet className="w-5 h-5 mr-2" />
             Connect Wallet
           </Button>
@@ -50,7 +50,7 @@ export const WalletAuth = () => {
           </p>
         </div>
       </div>
-      <Button onClick={logout} variant="outline" size="sm" className="hover:border-destructive hover:text-destructive">
+      <Button onClick={logout} variant="outline" size="sm">
         <LogOut className="w-4 h-4 mr-1" />
         Disconnect
       </Button>

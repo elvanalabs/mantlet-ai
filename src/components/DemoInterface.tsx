@@ -399,7 +399,7 @@ export const DemoInterface = ({
         <div className="flex items-center space-x-3">
           <img src="/lovable-uploads/33de17b2-37de-44c9-994a-e297e6beede9.png" alt="Logo" className="w-24 h-24 object-contain" />
         </div>
-        <Button onClick={onSetupWallet} variant="outline" size="sm" className="hover:border-primary hover:text-primary">
+        <Button onClick={onSetupWallet} variant="outline" size="sm">
           <Wallet className="w-4 h-4 mr-1" />
           Connect Wallet
         </Button>
@@ -479,7 +479,7 @@ export const DemoInterface = ({
           <div className="flex gap-2 flex-wrap">
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="hover:border-primary">
+                <Button variant="outline" size="sm">
                   <GitCompare className="w-4 h-4 mr-2" />
                   Compare Stablecoins
                 </Button>
@@ -508,7 +508,7 @@ export const DemoInterface = ({
 
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="hover:border-primary">
+                <Button variant="outline" size="sm">
                   <HelpCircle className="w-4 h-4 mr-2" />
                   Explain Stablecoin
                 </Button>
@@ -533,7 +533,7 @@ export const DemoInterface = ({
 
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="hover:border-primary">
+                <Button variant="outline" size="sm">
                   <BarChart3 className="w-4 h-4 mr-2" />
                   Adoption Tracker
                 </Button>
@@ -556,7 +556,7 @@ export const DemoInterface = ({
               </DialogContent>
             </Dialog>
 
-            <Button variant="outline" size="sm" className="hover:border-primary" onClick={handleLatestNews} disabled={isLoading}>
+            <Button variant="outline" size="sm" onClick={handleLatestNews} disabled={isLoading}>
               <Newspaper className="w-4 h-4 mr-2" />
               Latest News
             </Button>
