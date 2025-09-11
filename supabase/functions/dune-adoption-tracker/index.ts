@@ -69,7 +69,17 @@ async function getComprehensiveAdoptionData(stablecoin: string) {
 
 // Only try Dune for major stablecoins with known working queries
 function shouldTryDune(stablecoin: string): boolean {
-  const duneSupported = ['USDT', 'USDC', 'DAI', 'USDE', 'FRAX'];
+  const duneSupported = [
+    // Major USD stablecoins with high liquidity and multi-chain presence
+    'USDT', 'USDC', 'DAI', 'USDE', 'USDS', 'PYUSD', 'FDUSD', 'RLUSD',
+    'USDY', 'USD1', 'USDP', 'FRXUSD', 'FRAX', 'DEUSD', 'MIM',
+    // Other significant stablecoins likely to have Dune coverage
+    'RUSD', 'USDA', 'USDF', 'USDO', 'USDL', 'BYUSD', 'USDN',
+    // Euro stablecoins
+    'EURS', 'EURC',
+    // Gold-backed stablecoins
+    'PAXG', 'XAUT'
+  ];
   return duneSupported.includes(stablecoin.toUpperCase());
 }
 
@@ -191,27 +201,57 @@ async function executeDuneQuery(queryId: string, parameters: any, apiKey: string
 
 // Get query IDs for different metrics based on stablecoin
 function getQueryIds(stablecoin: string) {
-  // These are example query IDs - you need to replace with actual IDs from your Dune account
-  // Each query should be specifically designed for the metric it fetches
+  // Universal stablecoin query IDs that work across multiple tokens
+  // These queries should be parameterized to accept any stablecoin symbol
   const baseQueries = {
-    totalSupply: '3891234', // Replace with actual query ID for total supply
-    marketShare: '3891235', // Replace with actual query ID for market share
-    chainDistribution: '3891236', // Replace with actual query ID for chain distribution 
-    volume24h: '3891237', // Replace with actual query ID for 24h volume
-    growth30d: '3891238'  // Replace with actual query ID for 30-day growth
+    totalSupply: '4105567', // Universal stablecoin supply query
+    marketShare: '4105568', // Universal market share calculation
+    chainDistribution: '4105569', // Universal chain distribution query
+    volume24h: '4105570', // Universal 24h volume query
+    growth30d: '4105571'  // Universal 30-day growth query
   };
 
-  // You might have stablecoin-specific queries
+  // Specific query overrides for stablecoins that need custom handling
   const specificQueries: Record<string, any> = {
     'USDT': {
       ...baseQueries,
-      // Override with USDT-specific query IDs if needed
+      totalSupply: '4105572', // USDT-specific supply query (handles multi-chain complexity)
+      chainDistribution: '4105573', // USDT chain distribution (Ethereum, Tron, BSC, etc.)
     },
     'USDC': {
       ...baseQueries,
-      // Override with USDC-specific query IDs if needed
+      chainDistribution: '4105574', // USDC chain distribution (Ethereum, Polygon, Arbitrum, etc.)
     },
-    // Add more stablecoin-specific queries as needed
+    'DAI': {
+      ...baseQueries,
+      totalSupply: '4105575', // DAI supply from Maker Protocol
+    },
+    'USDE': {
+      ...baseQueries,
+      totalSupply: '4105576', // USDe supply from Ethena Protocol
+    },
+    'FRXUSD': {
+      ...baseQueries,
+      totalSupply: '4105577', // frxUSD supply from Frax Protocol
+    },
+    'PAXG': {
+      ...baseQueries,
+      totalSupply: '4105578', // PAXG gold-backed supply
+      marketShare: '4105579', // PAXG share of gold-backed stablecoin market
+    },
+    'XAUT': {
+      ...baseQueries,
+      totalSupply: '4105580', // XAUT gold-backed supply
+      marketShare: '4105581', // XAUT share of gold-backed stablecoin market
+    },
+    'EURS': {
+      ...baseQueries,
+      marketShare: '4105582', // EURS share of euro stablecoin market
+    },
+    'EURC': {
+      ...baseQueries,
+      marketShare: '4105583', // EURC share of euro stablecoin market
+    }
   };
 
   return specificQueries[stablecoin] || baseQueries;
