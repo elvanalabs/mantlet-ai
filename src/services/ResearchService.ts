@@ -566,17 +566,67 @@ ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
     volume?: number;
   }> {
     const data = [];
-    const basePrice = symbol === 'USDT' ? 1.0005 : 0.9998; // Slight variation around $1
+    let basePrice = 1.0000; // Default for USD stablecoins
+    
+    // Set appropriate base prices for different types of stablecoins/tokens
+    switch (symbol.toUpperCase()) {
+      case 'PAXG':
+      case 'XAUT': // Gold-backed tokens
+        basePrice = 2650.00; // Approximate gold price
+        break;
+      case 'USDT':
+        basePrice = 1.0005;
+        break;
+      case 'USDC':
+        basePrice = 1.0002;
+        break;
+      case 'DAI':
+        basePrice = 1.0001;
+        break;
+      case 'USDE':
+        basePrice = 1.0003;
+        break;
+      case 'EURC':
+      case 'EURS':
+      case 'EURT': // Euro stablecoins
+        basePrice = 1.05; // Approximate EUR/USD rate
+        break;
+      default:
+        basePrice = 0.9998; // Default for other USD stablecoins
+    }
+    
     const now = new Date();
     
     for (let i = 29; i >= 0; i--) {
       const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
-      const variation = (Math.random() - 0.5) * 0.003; // Small price variations
-      const price = Math.max(0.995, Math.min(1.005, basePrice + variation));
+      
+      // Different variation ranges based on token type
+      let variation;
+      if (symbol.toUpperCase() === 'PAXG' || symbol.toUpperCase() === 'XAUT') {
+        // Gold tokens have larger price movements
+        variation = (Math.random() - 0.5) * 100; // ±$50 variation
+      } else if (symbol.toUpperCase().includes('EUR')) {
+        // Euro stablecoins have small variations
+        variation = (Math.random() - 0.5) * 0.01; // ±0.005 variation
+      } else {
+        // USD stablecoins have very small variations
+        variation = (Math.random() - 0.5) * 0.003; // ±0.0015 variation
+      }
+      
+      let price = basePrice + variation;
+      
+      // Set appropriate bounds based on token type
+      if (symbol.toUpperCase() === 'PAXG' || symbol.toUpperCase() === 'XAUT') {
+        price = Math.max(2500, Math.min(2800, price));
+      } else if (symbol.toUpperCase().includes('EUR')) {
+        price = Math.max(1.02, Math.min(1.08, price));
+      } else {
+        price = Math.max(0.995, Math.min(1.005, price));
+      }
       
       data.push({
         date: date.toISOString().split('T')[0],
-        price: Number(price.toFixed(6)),
+        price: Number(price.toFixed(symbol.toUpperCase() === 'PAXG' || symbol.toUpperCase() === 'XAUT' ? 2 : 6)),
         volume: Math.floor(Math.random() * 100000000) + 50000000
       });
     }
