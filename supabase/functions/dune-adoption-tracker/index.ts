@@ -361,10 +361,12 @@ function getStablecoinMetrics(stablecoin: string) {
       ]
     },
     'USD1': {
-        { chain: 'Arbitrum', percentage: '2.1', amount: '92400000' },
-        { chain: 'Optimism', percentage: '1.2', amount: '52800000' },
-        { chain: 'Base', percentage: '0.8', amount: '35200000' },
-        { chain: 'Avalanche', percentage: '0.5', amount: '22000000' }
+      supply: '2600000000', // $2.6B (from reference data)
+      marketShare: '0.9', // Corrected: 2.6/290 = 0.9%
+      volume24h: '315000000', // Realistic ~12% daily turnover
+      growth30d: { percentage: '12.4', direction: 'up' },
+      chainDistribution: [
+        { chain: 'Ethereum', percentage: '100.0', amount: '2600000000' }
       ]
     },
     'USDE': {
