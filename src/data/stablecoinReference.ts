@@ -94,6 +94,21 @@ export const STABLECOIN_REFERENCE_DATA: StablecoinData[] = [
     riskLevel: 'Medium'
   },
   {
+    symbol: 'BUSD',
+    name: 'Binance USD',
+    rank: 999,
+    price: 1.00,
+    marketCap: 0, // Discontinued
+    volume24h: 0, // Discontinued
+    category: 'Fiat-backed',
+    backing: 'US Dollar reserves (discontinued)',
+    description: 'Former Binance and Paxos issued USD-backed stablecoin. Discontinued in February 2024.',
+    chains: ['Ethereum', 'BSC'],
+    issuer: 'Paxos/Binance (discontinued)',
+    useCase: 'Trading (discontinued), legacy conversions',
+    riskLevel: 'High'
+  },
+  {
     symbol: 'USDTB',
     name: 'USDtb',
     rank: 84,

@@ -86,7 +86,9 @@ export const validateStablecoin = (input: string): {
     'magic internet money': 'MIM',
     'terraclassic': 'USTC',
     'terra classic': 'USTC',
-    'first digital': 'FDUSD'
+    'first digital': 'FDUSD',
+    'binance usd': 'BUSD',
+    'binance': 'BUSD'
   };
 
   const aliasMatch = aliases[cleanInput];
