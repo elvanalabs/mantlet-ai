@@ -45,6 +45,12 @@ const AdoptionMetrics: React.FC<AdoptionMetricsProps> = ({ adoptionData }) => {
       'avalanche': '/lovable-uploads/e01e2c59-001f-4e00-bb5e-4e98a291fdcd.png',
       'base': '/lovable-uploads/0d9c5a57-3480-4453-bbcd-a5e18d307317.png',
       'near': '/lovable-uploads/aaf3e3cf-e6ee-4031-93cf-7765c8b0d36f.png',
+      'sui': '/lovable-uploads/533fae76-1099-4256-975c-478d24e3c053.png',
+      'aptos': '/lovable-uploads/8d7736df-a593-4cda-af6d-4a6e47ed8834.png',
+      'zksync': '/lovable-uploads/39a3fce6-4893-4928-90d6-3329b311dabb.png',
+      'gnosis': '/lovable-uploads/a2cb7eff-989e-4bf6-8e47-7f2d8e526fcc.png',
+      'hedera': '/lovable-uploads/e6dafb87-9343-4c68-a809-9da1aa75a4b2.png',
+      'celo': '/lovable-uploads/5f630daa-b5bc-4e96-ad07-1acf1d13b61a.png',
     };
     
     const normalizedChainName = chainName.toLowerCase().replace(/\s+/g, '');
