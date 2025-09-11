@@ -32,6 +32,22 @@ const AdoptionMetrics: React.FC<AdoptionMetricsProps> = ({ adoptionData }) => {
     return `$${num.toFixed(2)}`;
   };
 
+  const getChainLogo = (chainName: string): string | null => {
+    const chainLogos: { [key: string]: string } = {
+      'optimism': '/lovable-uploads/c3194579-1e23-4eb9-b649-53e5cea7e618.png',
+      'polygon': '/lovable-uploads/8cb30a58-d85d-497a-a440-35a477445205.png',
+      'arbitrum': '/lovable-uploads/665b65d1-9659-49ac-b579-5076efe5cee2.png',
+      'solana': '/lovable-uploads/a80659c7-3fde-45e0-8f1c-9908c66cfa78.png',
+      'ethereum': '/lovable-uploads/31c83ad3-f264-4a4d-9f48-71f027fd57da.png',
+      'tron': '/lovable-uploads/16f45e0e-8229-48ef-a08e-7b5f36dba809.png',
+      'bsc': '/lovable-uploads/e0869e6e-cd55-45f8-a4d9-c43ba68b3098.png',
+      'avalanche': '/lovable-uploads/e01e2c59-001f-4e00-bb5e-4e98a291fdcd.png',
+    };
+    
+    const normalizedChainName = chainName.toLowerCase().replace(/\s+/g, '');
+    return chainLogos[normalizedChainName] || null;
+  };
+
   return (
     <div className="w-full mt-4">
       <div className="flex items-center gap-2 mb-4">
@@ -133,29 +149,39 @@ const AdoptionMetrics: React.FC<AdoptionMetricsProps> = ({ adoptionData }) => {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {adoptionData.chainDistribution.map((chain, index) => (
-                <div key={index} className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="text-xs">
-                      {chain.chain}
-                    </Badge>
-                    <span className="text-sm text-muted-foreground">
-                      {formatNumber(chain.amount)}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-16 bg-muted rounded-full h-2">
-                      <div 
-                        className="bg-primary h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${chain.percentage}%` }}
-                      />
+              {adoptionData.chainDistribution.map((chain, index) => {
+                const chainLogo = getChainLogo(chain.chain);
+                return (
+                  <div key={index} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      {chainLogo && (
+                        <img 
+                          src={chainLogo} 
+                          alt={`${chain.chain} logo`}
+                          className="w-5 h-5 rounded-full"
+                        />
+                      )}
+                      <Badge variant="outline" className="text-xs">
+                        {chain.chain}
+                      </Badge>
+                      <span className="text-sm text-muted-foreground">
+                        {formatNumber(chain.amount)}
+                      </span>
                     </div>
-                    <span className="text-sm font-medium text-foreground min-w-[3rem] text-right">
-                      {chain.percentage}%
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-16 bg-muted rounded-full h-2">
+                        <div 
+                          className="bg-primary h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${chain.percentage}%` }}
+                        />
+                      </div>
+                      <span className="text-sm font-medium text-foreground min-w-[3rem] text-right">
+                        {chain.percentage}%
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </CardContent>
         </Card>
