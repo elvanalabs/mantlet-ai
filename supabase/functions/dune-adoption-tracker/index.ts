@@ -418,7 +418,6 @@ function getStablecoinMetrics(stablecoin: string) {
         { chain: 'XRP Ledger', percentage: '75.0', amount: '546000000' },
         { chain: 'Ethereum', percentage: '25.0', amount: '182000000' }
       ]
-    }
     },
     'USD1': {
       supply: '2600000000', // $2.6B (from reference data)
