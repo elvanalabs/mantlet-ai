@@ -419,7 +419,6 @@ function getStablecoinMetrics(stablecoin: string) {
         { chain: 'Ethereum', percentage: '25.0', amount: '182000000' }
       ]
     }
-      ]
     },
     'USD1': {
       supply: '2600000000', // $2.6B (from reference data)
