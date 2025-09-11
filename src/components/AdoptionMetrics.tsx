@@ -99,6 +99,7 @@ const AdoptionMetrics: React.FC<AdoptionMetricsProps> = ({ adoptionData }) => {
       'ethereum': '/lovable-uploads/87e1a4ce-91d0-4a97-a09d-6cc07774927e.png',
       'tron': '/lovable-uploads/16f45e0e-8229-48ef-a08e-7b5f36dba809.png',
       'bsc': '/lovable-uploads/e0869e6e-cd55-45f8-a4d9-c43ba68b3098.png',
+      'binancesmartchain': '/lovable-uploads/e0869e6e-cd55-45f8-a4d9-c43ba68b3098.png',
       'avalanche': '/lovable-uploads/e01e2c59-001f-4e00-bb5e-4e98a291fdcd.png',
       'base': '/lovable-uploads/0d9c5a57-3480-4453-bbcd-a5e18d307317.png',
       'near': '/lovable-uploads/aaf3e3cf-e6ee-4031-93cf-7765c8b0d36f.png',
@@ -108,9 +109,20 @@ const AdoptionMetrics: React.FC<AdoptionMetricsProps> = ({ adoptionData }) => {
       'gnosis': '/lovable-uploads/a2cb7eff-989e-4bf6-8e47-7f2d8e526fcc.png',
       'hedera': '/lovable-uploads/e6dafb87-9343-4c68-a809-9da1aa75a4b2.png',
       'celo': '/lovable-uploads/5f630daa-b5bc-4e96-ad07-1acf1d13b61a.png',
+      'xrpledger': '/lovable-uploads/b8ec2af1-41ea-4718-ad31-c8f47484c004.png',
+      'xrp': '/lovable-uploads/b8ec2af1-41ea-4718-ad31-c8f47484c004.png',
+      'terraclassic': '/lovable-uploads/33de17b2-37de-44c9-994a-e297e6beede9.png',
+      'terra': '/lovable-uploads/33de17b2-37de-44c9-994a-e297e6beede9.png',
     };
     
-    const normalizedChainName = chainName.toLowerCase().replace(/\s+/g, '');
+    // Normalize chain name: lowercase, remove spaces, hyphens, and common words
+    const normalizedChainName = chainName.toLowerCase()
+      .replace(/\s+/g, '')
+      .replace(/-/g, '')
+      .replace(/chain/g, '')
+      .replace(/network/g, '')
+      .replace(/ledger/g, '');
+    
     return chainLogos[normalizedChainName] || null;
   };
 
@@ -241,39 +253,45 @@ const AdoptionMetrics: React.FC<AdoptionMetricsProps> = ({ adoptionData }) => {
             </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {adoptionData.chainDistribution.map((chain, index) => {
-                const chainLogo = getChainLogo(chain.chain);
-                return (
-                  <div key={index} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                    <div className="flex items-center gap-2">
-                      {chainLogo && (
-                        <img 
-                          src={chainLogo} 
-                          alt={`${chain.chain} logo`}
-                          className="w-5 h-5 rounded-full"
-                        />
-                      )}
-                      <Badge variant="outline" className="text-xs">
-                        {chain.chain}
-                      </Badge>
-                      <span className="text-sm text-muted-foreground">
-                        {formatNumber(chain.amount)}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 ml-7 sm:ml-0">
-                      <div className="w-20 sm:w-16 bg-muted rounded-full h-2">
-                        <div 
-                          className="bg-primary h-2 rounded-full transition-all duration-300"
-                          style={{ width: `${chain.percentage}%` }}
-                        />
-                      </div>
-                      <span className="text-sm font-medium text-foreground min-w-[3rem] text-right">
-                        {chain.percentage}%
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
+                 {adoptionData.chainDistribution.map((chain, index) => {
+                 const chainLogo = getChainLogo(chain.chain);
+                 return (
+                   <div key={index} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                     <div className="flex items-center gap-2">
+                       {chainLogo ? (
+                         <img 
+                           src={chainLogo} 
+                           alt={`${chain.chain} logo`}
+                           className="w-5 h-5 rounded-full"
+                         />
+                       ) : (
+                         <div className="w-5 h-5 rounded-full bg-muted border flex items-center justify-center">
+                           <span className="text-xs font-bold text-muted-foreground">
+                             {chain.chain.charAt(0).toUpperCase()}
+                           </span>
+                         </div>
+                       )}
+                       <Badge variant="outline" className="text-xs">
+                         {chain.chain}
+                       </Badge>
+                       <span className="text-sm text-muted-foreground">
+                         {formatNumber(chain.amount)}
+                       </span>
+                     </div>
+                     <div className="flex items-center gap-2 ml-7 sm:ml-0">
+                       <div className="w-20 sm:w-16 bg-muted rounded-full h-2">
+                         <div 
+                           className="bg-primary h-2 rounded-full transition-all duration-300"
+                           style={{ width: `${Math.min(100, parseFloat(chain.percentage) || 0)}%` }}
+                         />
+                       </div>
+                       <span className="text-sm font-medium text-foreground min-w-[3rem] text-right">
+                         {parseFloat(chain.percentage || '0').toFixed(1)}%
+                       </span>
+                     </div>
+                   </div>
+                 );
+               })}
             </div>
           </CardContent>
         </Card>
