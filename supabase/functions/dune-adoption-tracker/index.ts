@@ -333,11 +333,13 @@ function getStablecoinMetrics(stablecoin: string) {
       volume24h: '91000000', // Realistic ~2% daily turnover
       growth30d: { percentage: '0.5', direction: 'down' },
       chainDistribution: [
-        { chain: 'Ethereum', percentage: '89.4', amount: '3934000000' },
-        { chain: 'Polygon', percentage: '6.8', amount: '299000000' },
-        { chain: 'Arbitrum', percentage: '2.1', amount: '92000000' },
-        { chain: 'Optimism', percentage: '1.2', amount: '53000000' },
-        { chain: 'Base', percentage: '0.5', amount: '22000000' }
+        { chain: 'Ethereum', percentage: '85.4', amount: '3757600000' },
+        { chain: 'Polygon', percentage: '6.8', amount: '299200000' },
+        { chain: 'BSC', percentage: '3.2', amount: '140800000' },
+        { chain: 'Arbitrum', percentage: '2.1', amount: '92400000' },
+        { chain: 'Optimism', percentage: '1.2', amount: '52800000' },
+        { chain: 'Base', percentage: '0.8', amount: '35200000' },
+        { chain: 'Avalanche', percentage: '0.5', amount: '22000000' }
       ]
     },
     'USDE': {
@@ -593,7 +595,43 @@ function generateDynamicMetrics(symbol: string) {
 function getDynamicChainDistribution(symbol: string, totalSupply: number) {
   const distributions = [];
   
-  // Ethereum is usually dominant
+  // Check for known non-EVM chain preferences
+  const nonEvmChains: Record<string, string[]> = {
+    'USDT': ['TRON', 'Ethereum'],
+    'USDC': ['Solana', 'Ethereum'], 
+    'PYUSD': ['Solana', 'Ethereum'],
+    'RLUSD': ['XRP Ledger', 'Ethereum'],
+    'USTC': ['Terra Classic'],
+    'USN': ['NEAR'],
+    'CUSD': ['Celo'],
+    'CEUR': ['Celo']
+  };
+
+  const preferredChains = nonEvmChains[symbol] || [];
+  
+  if (preferredChains.length > 0) {
+    // Use known chain preferences
+    let remaining = 100;
+    
+    preferredChains.forEach((chain, index) => {
+      const isLast = index === preferredChains.length - 1;
+      const maxPercent = isLast ? remaining : Math.floor(remaining * 0.7);
+      const minPercent = isLast ? remaining : Math.floor(remaining * 0.3);
+      const chainPercent = Math.floor(Math.random() * (maxPercent - minPercent + 1)) + minPercent;
+      
+      distributions.push({
+        chain,
+        percentage: chainPercent.toString(),
+        amount: Math.floor(totalSupply * chainPercent / 100).toString()
+      });
+      
+      remaining -= chainPercent;
+    });
+    
+    return distributions;
+  }
+  
+  // Default EVM-focused distribution for unknown tokens
   const ethPercent = Math.floor(Math.random() * 40 + 50); // 50-90%
   distributions.push({
     chain: 'Ethereum',
@@ -603,15 +641,15 @@ function getDynamicChainDistribution(symbol: string, totalSupply: number) {
 
   let remaining = 100 - ethPercent;
   
-  // Add 1-3 other chains
-  const otherChains = ['Polygon', 'Arbitrum', 'Optimism', 'BSC', 'Avalanche', 'Base'];
+  // Add 1-3 other EVM chains
+  const evmChains = ['Polygon', 'Arbitrum', 'Optimism', 'BSC', 'Avalanche', 'Base'];
   const numChains = Math.floor(Math.random() * 3) + 1;
   
   for (let i = 0; i < numChains && remaining > 0; i++) {
     const chainPercent = Math.min(Math.floor(Math.random() * remaining / 2 + 1), remaining);
     if (chainPercent > 0) {
       distributions.push({
-        chain: otherChains[i],
+        chain: evmChains[i],
         percentage: chainPercent.toString(),
         amount: Math.floor(totalSupply * chainPercent / 100).toString()
       });
