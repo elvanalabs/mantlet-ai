@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { STABLECOIN_REFERENCE_DATA, getStablecoinBySymbol } from '@/data/stablecoinReference';
 
 export interface ResearchResponse {
   contextData: string;
@@ -492,6 +493,23 @@ export class ResearchService {
         const stablecoinSymbols = this.extractStablecoinSymbols(query);
         const stablecoinName = stablecoinSymbols.length > 0 ? stablecoinSymbols[0] : query.replace(/explain|stablecoin/gi, '').trim();
         
+        // Get reference data for the stablecoin
+        const referenceData = getStablecoinBySymbol(stablecoinName);
+        let referenceInfo = '';
+        
+        if (referenceData) {
+          referenceInfo = `
+Reference Data for ${referenceData.name} (${referenceData.symbol}):
+- Category: ${referenceData.category}
+- Backing: ${referenceData.backing}
+- Market Cap: $${(referenceData.marketCap / 1e9).toFixed(2)}B
+- Issuer: ${referenceData.issuer || 'N/A'}
+- Chains: ${referenceData.chains.join(', ')}
+- Use Cases: ${referenceData.useCase}
+- Risk Level: ${referenceData.riskLevel}
+- Description: ${referenceData.description}`;
+        }
+        
         // Create a specific prompt for explain queries that only returns the 4 sections
         prompt = `Please provide information about the ${stablecoinName} stablecoin in exactly these 4 sections only:
 
@@ -516,6 +534,8 @@ Content here...
 - Point 1
 - Point 2
 - Point 3
+
+${referenceInfo}
 
 ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
       } else {
@@ -723,6 +743,34 @@ ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
       risk_level: string;
     }>;
   } {
+    return {
+      coins: symbols.map(symbol => {
+        // Get reference data if available
+        const referenceData = getStablecoinBySymbol(symbol);
+        
+        if (referenceData) {
+          return {
+            symbol: referenceData.symbol,
+            name: referenceData.name,
+            backing: referenceData.backing,
+            marketCap: `$${(referenceData.marketCap / 1e9).toFixed(2)}B`,
+            chain: referenceData.chains.length > 1 ? 'Multi-chain' : referenceData.chains[0],
+            yield: referenceData.category === 'Yield-bearing' ? '3-5% APY' : 'None',
+            issuer: referenceData.issuer || 'Decentralized',
+            regulation: referenceData.riskLevel === 'Low' ? 'High Compliance' : 
+                       referenceData.riskLevel === 'Medium' ? 'Moderate' : 'Limited',
+            use_case: referenceData.useCase,
+            risk_level: referenceData.riskLevel
+          };
+        }
+        
+        // Fallback to existing mock data if not in reference
+        return this.getFallbackStablecoinData(symbol);
+      })
+    };
+  }
+
+  private static getFallbackStablecoinData(symbol: string) {
     const stablecoinData: { [key: string]: any } = {
       'USDT': {
         name: 'Tether',
@@ -793,20 +841,18 @@ ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
     };
 
     return {
-      coins: symbols.map(symbol => ({
-        symbol,
-        ...(stablecoinData[symbol] || {
-          name: symbol,
-          backing: 'Unknown',
-          marketCap: 'N/A',
-          chain: 'N/A',
-          yield: 'N/A',
-          issuer: 'N/A',
-          regulation: 'N/A',
-          use_case: 'N/A',
-          risk_level: 'N/A'
-        })
-      }))
+      symbol,
+      ...(stablecoinData[symbol] || {
+        name: symbol,
+        backing: 'Unknown',
+        marketCap: 'N/A',
+        chain: 'N/A',
+        yield: 'N/A',
+        issuer: 'N/A',
+        regulation: 'N/A',
+        use_case: 'N/A',
+        risk_level: 'N/A'
+      })
     };
   }
 
