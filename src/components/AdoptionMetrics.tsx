@@ -154,7 +154,7 @@ const AdoptionMetrics: React.FC<AdoptionMetricsProps> = ({ adoptionData }) => {
               {adoptionData.chainDistribution.map((chain, index) => {
                 const chainLogo = getChainLogo(chain.chain);
                 return (
-                  <div key={index} className="flex items-center justify-between">
+                  <div key={index} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                     <div className="flex items-center gap-2">
                       {chainLogo && (
                         <img 
@@ -170,8 +170,8 @@ const AdoptionMetrics: React.FC<AdoptionMetricsProps> = ({ adoptionData }) => {
                         {formatNumber(chain.amount)}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-16 bg-muted rounded-full h-2">
+                    <div className="flex items-center gap-2 ml-7 sm:ml-0">
+                      <div className="w-20 sm:w-16 bg-muted rounded-full h-2">
                         <div 
                           className="bg-primary h-2 rounded-full transition-all duration-300"
                           style={{ width: `${chain.percentage}%` }}
