@@ -38,7 +38,7 @@ const AdoptionMetrics: React.FC<AdoptionMetricsProps> = ({ adoptionData }) => {
       'polygon': '/lovable-uploads/8cb30a58-d85d-497a-a440-35a477445205.png',
       'arbitrum': '/lovable-uploads/665b65d1-9659-49ac-b579-5076efe5cee2.png',
       'solana': '/lovable-uploads/a80659c7-3fde-45e0-8f1c-9908c66cfa78.png',
-      'ethereum': '/lovable-uploads/31c83ad3-f264-4a4d-9f48-71f027fd57da.png',
+      'ethereum': '/lovable-uploads/87e1a4ce-91d0-4a97-a09d-6cc07774927e.png',
       'tron': '/lovable-uploads/16f45e0e-8229-48ef-a08e-7b5f36dba809.png',
       'bsc': '/lovable-uploads/e0869e6e-cd55-45f8-a4d9-c43ba68b3098.png',
       'avalanche': '/lovable-uploads/e01e2c59-001f-4e00-bb5e-4e98a291fdcd.png',
