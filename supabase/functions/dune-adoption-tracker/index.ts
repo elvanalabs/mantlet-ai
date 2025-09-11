@@ -298,26 +298,68 @@ function getEnhancedFallbackData(stablecoin: string) {
 function getStablecoinMetrics(stablecoin: string) {
   const symbol = stablecoin.toUpperCase();
   
-  // Major USD Stablecoins - Updated with accurate market data and realistic ratios
+  // Major USD Stablecoins - Corrected with accurate market share calculations (Total market: ~$290B)
   const majorStablecoins: Record<string, any> = {
     'USDT': {
-      supply: '169000000000', // ~$169B (from reference data)
-      marketShare: '68.2',
+      supply: '169100000000', // $169.1B (from reference data)
+      marketShare: '58.3', // Corrected: 169.1/290 = 58.3%
       volume24h: '97800000000', // Realistic ~58% of supply daily
       growth30d: { percentage: '2.1', direction: 'up' },
       chainDistribution: [
-        { chain: 'Ethereum', percentage: '48.2', amount: '81458000000' },
-        { chain: 'TRON', percentage: '41.6', amount: '70304000000' },
-        { chain: 'BSC', percentage: '6.8', amount: '11492000000' },
-        { chain: 'Polygon', percentage: '2.1', amount: '3549000000' },
-        { chain: 'Avalanche', percentage: '1.3', amount: '2197000000' }
+        { chain: 'Ethereum', percentage: '48.2', amount: '81503620000' },
+        { chain: 'TRON', percentage: '41.6', amount: '70337600000' },
+        { chain: 'BSC', percentage: '6.8', amount: '11498800000' },
+        { chain: 'Polygon', percentage: '2.1', amount: '3551100000' },
+        { chain: 'Avalanche', percentage: '1.3', amount: '2198300000' }
       ]
     },
     'USDC': {
-      supply: '72200000000', // ~$72B (from reference data)
-      marketShare: '29.1', // Corrected based on realistic total market size
+      supply: '72300000000', // $72.3B (from reference data)
+      marketShare: '24.9', // Corrected: 72.3/290 = 24.9%
       volume24h: '8800000000', // Realistic ~12% daily turnover
       growth30d: { percentage: '1.8', direction: 'up' },
+      chainDistribution: [
+        { chain: 'Ethereum', percentage: '65.2', amount: '47139600000' },
+        { chain: 'Solana', percentage: '15.8', amount: '11423400000' },
+        { chain: 'Polygon', percentage: '8.1', amount: '5856300000' },
+        { chain: 'Arbitrum', percentage: '4.9', amount: '3542700000' },
+        { chain: 'Base', percentage: '3.6', amount: '2602800000' },
+        { chain: 'Avalanche', percentage: '2.4', amount: '1735200000' }
+      ]
+    },
+    'USDE': {
+      supply: '13100000000', // $13.1B (from reference data)
+      marketShare: '4.5', // Corrected: 13.1/290 = 4.5%
+      volume24h: '231000000', // Realistic ~1.8% daily turnover
+      growth30d: { percentage: '15.2', direction: 'up' },
+      chainDistribution: [
+        { chain: 'Ethereum', percentage: '100.0', amount: '13100000000' }
+      ]
+    },
+    'USDS': {
+      supply: '7900000000', // $7.9B (from reference data)
+      marketShare: '2.7', // Corrected: 7.9/290 = 2.7%
+      volume24h: '12600000', // Realistic ~0.16% daily turnover
+      growth30d: { percentage: '8.3', direction: 'up' },
+      chainDistribution: [
+        { chain: 'Ethereum', percentage: '100.0', amount: '7900000000' }
+      ]
+    },
+    'DAI': {
+      supply: '4400000000', // $4.4B (from reference data)
+      marketShare: '1.5', // Corrected: 4.4/290 = 1.5%
+      volume24h: '91000000', // Realistic ~2% daily turnover
+      growth30d: { percentage: '0.5', direction: 'down' },
+      chainDistribution: [
+        { chain: 'Ethereum', percentage: '85.4', amount: '3757600000' },
+        { chain: 'Polygon', percentage: '6.8', amount: '299200000' },
+        { chain: 'BSC', percentage: '3.2', amount: '140800000' },
+        { chain: 'Arbitrum', percentage: '2.1', amount: '92400000' },
+        { chain: 'Optimism', percentage: '1.2', amount: '52800000' },
+        { chain: 'Base', percentage: '0.8', amount: '35200000' },
+        { chain: 'Avalanche', percentage: '0.5', amount: '22000000' }
+      ]
+    },
       chainDistribution: [
         { chain: 'Ethereum', percentage: '65.2', amount: '47074400000' },
         { chain: 'Solana', percentage: '15.8', amount: '11407600000' },
@@ -361,8 +403,8 @@ function getStablecoinMetrics(stablecoin: string) {
       ]
     },
     'USD1': {
-      supply: '2600000000', // From reference data
-      marketShare: '1.1',
+      supply: '2600000000', // $2.6B (from reference data)
+      marketShare: '0.9', // Corrected: 2.6/290 = 0.9%
       volume24h: '315000000', // Realistic ~12% daily turnover
       growth30d: { percentage: '12.4', direction: 'up' },
       chainDistribution: [
@@ -370,51 +412,89 @@ function getStablecoinMetrics(stablecoin: string) {
       ]
     },
     'USDTB': {
-      supply: '1750000000', // From reference data
-      marketShare: '0.7',
+      supply: '1700000000', // $1.7B (from reference data)
+      marketShare: '0.6', // Corrected: 1.7/290 = 0.6%
       volume24h: '445000', // Realistic ~0.025% daily turnover
       growth30d: { percentage: '25.8', direction: 'up' },
       chainDistribution: [
-        { chain: 'Ethereum', percentage: '100.0', amount: '1750000000' }
+        { chain: 'Ethereum', percentage: '100.0', amount: '1700000000' }
+      ]
+    },
+    'BFUSD': {
+      supply: '1700000000', // $1.7B (from reference data)
+      marketShare: '0.6', // Corrected: 1.7/290 = 0.6%
+      volume24h: '295000000', // Active futures trading
+      growth30d: { percentage: '18.3', direction: 'up' },
+      chainDistribution: [
+        { chain: 'BSC', percentage: '100.0', amount: '1700000000' }
+      ]
+    },
+    'USDF': {
+      supply: '1700000000', // $1.7B (from reference data)  
+      marketShare: '0.6', // Corrected: 1.7/290 = 0.6%
+      volume24h: '87000000', // Moderate turnover
+      growth30d: { percentage: '14.2', direction: 'up' },
+      chainDistribution: [
+        { chain: 'Ethereum', percentage: '100.0', amount: '1700000000' }
+      ]
+    },
+    'XAUT': {
+      supply: '383000000', // $1.4B market cap (~383 tokens at ~$3652 each)
+      marketShare: '0.5', // Corrected: 1.4/290 = 0.5%
+      volume24h: '15000000', // Decent precious metals volume
+      growth30d: { percentage: '2.8', direction: 'up' },
+      chainDistribution: [
+        { chain: 'Ethereum', percentage: '70.0', amount: '268100000' },
+        { chain: 'TRON', percentage: '30.0', amount: '114900000' }
       ]
     },
     'PYUSD': {
-      supply: '1240000000', // From reference data
-      marketShare: '0.5',
+      supply: '1200000000', // $1.2B (from reference data)
+      marketShare: '0.4', // Corrected: 1.2/290 = 0.4%
       volume24h: '69900000', // Realistic ~5.6% daily turnover
       growth30d: { percentage: '3.2', direction: 'up' },
       chainDistribution: [
-        { chain: 'Ethereum', percentage: '75.0', amount: '930000000' },
-        { chain: 'Solana', percentage: '25.0', amount: '310000000' }
+        { chain: 'Ethereum', percentage: '75.0', amount: '900000000' },
+        { chain: 'Solana', percentage: '25.0', amount: '300000000' }
       ]
     },
     'FDUSD': {
-      supply: '1110000000', // From reference data
-      marketShare: '0.4',
+      supply: '1100000000', // $1.1B (from reference data)
+      marketShare: '0.4', // Corrected: 1.1/290 = 0.4%
       volume24h: '5209000000', // High but realistic for exchange-backed stablecoin
       growth30d: { percentage: '1.8', direction: 'up' },
       chainDistribution: [
-        { chain: 'Ethereum', percentage: '60.0', amount: '666000000' },
-        { chain: 'BSC', percentage: '40.0', amount: '444000000' }
+        { chain: 'Ethereum', percentage: '60.0', amount: '660000000' },
+        { chain: 'BSC', percentage: '40.0', amount: '440000000' }
+      ]
+    },
+    'PAXG': {
+      supply: '274700', // ~274.7k tokens at ~$3644 each = $1.0B market cap
+      marketShare: '0.3', // Corrected: 1.0/290 = 0.3%
+      volume24h: '25000000', // Active precious metals trading
+      growth30d: { percentage: '3.2', direction: 'up' },
+      chainDistribution: [
+        { chain: 'Ethereum', percentage: '100.0', amount: '274700' }
       ]
     },
     'RLUSD': {
-      supply: '729000000', // From reference data
-      marketShare: '0.3',
+      supply: '728000000', // $728M (from reference data)
+      marketShare: '0.3', // Corrected: 0.728/290 = 0.25%
       volume24h: '89500000', // Realistic ~12% daily turnover
       growth30d: { percentage: '18.7', direction: 'up' },
       chainDistribution: [
-        { chain: 'XRP Ledger', percentage: '70.0', amount: '510300000' },
-        { chain: 'Ethereum', percentage: '30.0', amount: '218700000' }
+        { chain: 'XRP Ledger', percentage: '70.0', amount: '509600000' },
+        { chain: 'Ethereum', percentage: '30.0', amount: '218400000' }
       ]
     },
-    'USDY': {
-      supply: '682000000', // From reference data (yield-bearing)
-      marketShare: '0.3',
-      volume24h: '4489000', // Low turnover typical for yield tokens
-      growth30d: { percentage: '22.1', direction: 'up' },
+    'GHO': {
+      supply: '352000000', // $352M (from reference data)
+      marketShare: '0.12', // Corrected: 0.352/290 = 0.12%
+      volume24h: '5130000', // Moderate DeFi activity
+      growth30d: { percentage: '8.5', direction: 'up' },
       chainDistribution: [
-        { chain: 'Ethereum', percentage: '100.0', amount: '682000000' }
+        { chain: 'Ethereum', percentage: '85.0', amount: '299200000' },
+        { chain: 'Arbitrum', percentage: '15.0', amount: '52800000' }
       ]
     }
   };
@@ -520,43 +600,24 @@ function getStablecoinMetrics(stablecoin: string) {
     }
   };
 
-  // Gold-backed tokens - Realistic precious metals pricing
+  // Gold-backed tokens - Corrected with market cap based pricing
   const commodityTokens: Record<string, any> = {
-    'PAXG': {
-      supply: '189000', // ~189k ounces of gold
-      marketShare: '0.076', // Based on total market vs gold market
-      volume24h: '25000000', // Active precious metals trading
-      growth30d: { percentage: '3.2', direction: 'up' },
-      chainDistribution: [
-        { chain: 'Ethereum', percentage: '100.0', amount: '189000' }
-      ]
-    },
-    'XAUT': {
-      supply: '113000', // ~113k ounces of gold
-      marketShare: '0.046',
-      volume24h: '15000000', // Decent precious metals volume
-      growth30d: { percentage: '2.8', direction: 'up' },
-      chainDistribution: [
-        { chain: 'Ethereum', percentage: '70.0', amount: '79100' },
-        { chain: 'TRON', percentage: '30.0', amount: '33900' }
-      ]
-    },
     'KAU': {
-      supply: '177000', // Grams of gold
-      marketShare: '0.007',
+      supply: '1433000', // $169M market cap / $118 per token = ~1.43M tokens (grams of gold)
+      marketShare: '0.058', // Corrected: 0.169/290 = 0.058%
       volume24h: '750000', // Moderate precious metals trading
       growth30d: { percentage: '1.5', direction: 'up' },
       chainDistribution: [
-        { chain: 'Ethereum', percentage: '100.0', amount: '177000' }
+        { chain: 'Ethereum', percentage: '100.0', amount: '1433000' }
       ]
     },
     'KAG': {
-      supply: '333000', // Ounces of silver
-      marketShare: '0.004',
+      supply: '3853000', // $158M market cap / $41 per token = ~3.85M tokens (ounces of silver)
+      marketShare: '0.054', // Corrected: 0.158/290 = 0.054%
       volume24h: '500000', // Lower volume for silver
       growth30d: { percentage: '2.1', direction: 'up' },
       chainDistribution: [
-        { chain: 'Ethereum', percentage: '100.0', amount: '333000' }
+        { chain: 'Ethereum', percentage: '100.0', amount: '3853000' }
       ]
     }
   };
