@@ -360,24 +360,7 @@ function getStablecoinMetrics(stablecoin: string) {
         { chain: 'Avalanche', percentage: '0.5', amount: '22000000' }
       ]
     },
-      chainDistribution: [
-        { chain: 'Ethereum', percentage: '65.2', amount: '47074400000' },
-        { chain: 'Solana', percentage: '15.8', amount: '11407600000' },
-        { chain: 'Polygon', percentage: '8.1', amount: '5848200000' },
-        { chain: 'Arbitrum', percentage: '4.9', amount: '3537800000' },
-        { chain: 'Base', percentage: '3.6', amount: '2599200000' },
-        { chain: 'Avalanche', percentage: '2.4', amount: '1732800000' }
-      ]
-    },
-    'DAI': {
-      supply: '4400000000', // ~$4.4B (from reference data)  
-      marketShare: '1.8',
-      volume24h: '91000000', // Realistic ~2% daily turnover
-      growth30d: { percentage: '0.5', direction: 'down' },
-      chainDistribution: [
-        { chain: 'Ethereum', percentage: '85.4', amount: '3757600000' },
-        { chain: 'Polygon', percentage: '6.8', amount: '299200000' },
-        { chain: 'BSC', percentage: '3.2', amount: '140800000' },
+    'USD1': {
         { chain: 'Arbitrum', percentage: '2.1', amount: '92400000' },
         { chain: 'Optimism', percentage: '1.2', amount: '52800000' },
         { chain: 'Base', percentage: '0.8', amount: '35200000' },
