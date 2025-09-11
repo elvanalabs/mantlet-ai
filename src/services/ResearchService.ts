@@ -34,6 +34,21 @@ export interface ResearchResponse {
       risk_level: string;
     }>;
   };
+  adoptionData?: {
+    stablecoin: string;
+    totalCirculatingSupply: string;
+    marketSharePercent: string;
+    chainDistribution: Array<{
+      chain: string;
+      percentage: string;
+      amount: string;
+    }>;
+    transactionVolume24h: string;
+    growthDecline30d: {
+      percentage: string;
+      direction: 'up' | 'down';
+    };
+  };
 }
 
 export class ResearchService {
@@ -51,6 +66,24 @@ export class ResearchService {
           sources: [],
           newsResults
         };
+      }
+      
+      // Check if this is an adoption tracker query
+      const isAdoptionTracker = this.isAdoptionTrackerQuery(query);
+      
+      if (isAdoptionTracker) {
+        console.log('Adoption tracker query detected');
+        const stablecoinSymbols = this.extractStablecoinSymbols(query);
+        
+        if (stablecoinSymbols.length > 0) {
+          const adoptionData = await this.getAdoptionData(stablecoinSymbols[0]);
+          
+          return {
+            contextData: `Adoption metrics for ${stablecoinSymbols[0]}`,
+            sources: [],
+            adoptionData
+          };
+        }
       }
       
       // Check if this is a comparison query
@@ -108,6 +141,13 @@ export class ResearchService {
   private static isComparisonQuery(query: string): boolean {
     const comparisonKeywords = ['compare', 'vs', 'versus', 'difference between', 'comparison'];
     return comparisonKeywords.some(keyword => 
+      query.toLowerCase().includes(keyword)
+    );
+  }
+
+  private static isAdoptionTrackerQuery(query: string): boolean {
+    const adoptionKeywords = ['adoption tracker', 'adoption metrics', 'adoption data'];
+    return adoptionKeywords.some(keyword => 
       query.toLowerCase().includes(keyword)
     );
   }
@@ -616,5 +656,39 @@ ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
     }
     
     return response;
+  }
+
+  private static async getAdoptionData(stablecoin: string): Promise<{
+    stablecoin: string;
+    totalCirculatingSupply: string;
+    marketSharePercent: string;
+    chainDistribution: Array<{
+      chain: string;
+      percentage: string;
+      amount: string;
+    }>;
+    transactionVolume24h: string;
+    growthDecline30d: {
+      percentage: string;
+      direction: 'up' | 'down';
+    };
+  } | undefined> {
+    try {
+      const { data, error } = await supabase.functions.invoke('dune-adoption-tracker', {
+        body: {
+          stablecoin
+        }
+      });
+
+      if (error || !data?.adoptionData) {
+        console.error('Adoption data error:', error);
+        return undefined;
+      }
+
+      return data.adoptionData;
+    } catch (error) {
+      console.error('Error getting adoption data:', error);
+      return undefined;
+    }
   }
 }

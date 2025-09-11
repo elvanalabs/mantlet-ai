@@ -5,11 +5,12 @@ import { Card } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Send, Loader2, TrendingUp, Database, Globe, Wallet, Settings, GitCompare, HelpCircle, Newspaper, Copy, Download, Check } from 'lucide-react';
+import { Send, Loader2, TrendingUp, Database, Globe, Wallet, Settings, GitCompare, HelpCircle, Newspaper, Copy, Download, Check, BarChart3 } from 'lucide-react';
 import { ResearchService } from '@/services/ResearchService';
 import StablecoinChart from './StablecoinChart';
 import NewsGrid from './NewsGrid';
 import ComparisonTable from './ComparisonTable';
+import AdoptionMetrics from './AdoptionMetrics';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 interface Message {
@@ -49,6 +50,21 @@ interface Message {
       risk_level: string;
     }>;
   };
+  adoptionData?: {
+    stablecoin: string;
+    totalCirculatingSupply: string;
+    marketSharePercent: string;
+    chainDistribution: Array<{
+      chain: string;
+      percentage: string;
+      amount: string;
+    }>;
+    transactionVolume24h: string;
+    growthDecline30d: {
+      percentage: string;
+      direction: 'up' | 'down';
+    };
+  };
 }
 interface DemoInterfaceProps {
   onSetupWallet: () => void;
@@ -67,6 +83,7 @@ export const DemoInterface = ({
   const [compareStablecoin1, setCompareStablecoin1] = useState('');
   const [compareStablecoin2, setCompareStablecoin2] = useState('');
   const [explainStablecoin, setExplainStablecoin] = useState('');
+  const [adoptionStablecoin, setAdoptionStablecoin] = useState('');
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const {
@@ -102,7 +119,8 @@ export const DemoInterface = ({
         sources: response.sources,
         chartData: response.chartData,
         newsResults: response.newsResults,
-        comparisonData: response.comparisonData
+        comparisonData: response.comparisonData,
+        adoptionData: response.adoptionData
       };
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
@@ -136,7 +154,8 @@ export const DemoInterface = ({
         sources: response.sources,
         chartData: response.chartData,
         newsResults: response.newsResults,
-        comparisonData: response.comparisonData
+        comparisonData: response.comparisonData,
+        adoptionData: response.adoptionData
       };
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
@@ -161,6 +180,12 @@ export const DemoInterface = ({
     if (explainStablecoin.trim()) {
       handleQuickAction(`Explain ${explainStablecoin.trim()} stablecoin`);
       setExplainStablecoin('');
+    }
+  };
+  const handleAdoptionSubmit = () => {
+    if (adoptionStablecoin.trim()) {
+      handleQuickAction(`Adoption tracker for ${adoptionStablecoin.trim()}`);
+      setAdoptionStablecoin('');
     }
   };
   const handleLatestNews = () => {
@@ -411,6 +436,9 @@ export const DemoInterface = ({
                 {message.comparisonData && <div className="mt-3">
                     <ComparisonTable comparisonData={message.comparisonData} />
                   </div>}
+                {message.adoptionData && <div className="mt-3">
+                    <AdoptionMetrics adoptionData={message.adoptionData} />
+                  </div>}
                 
                 {/* Copy and Download buttons for assistant messages (except when showing news) */}
                 {message.type === 'assistant' && !message.newsResults && <div className="mt-4 pt-3 border-t border-border flex items-center justify-end gap-2">
@@ -497,6 +525,31 @@ export const DemoInterface = ({
                   <DialogTrigger asChild>
                     <Button onClick={handleExplainSubmit} className="w-full" disabled={!explainStablecoin.trim()}>
                       Explain Stablecoin
+                    </Button>
+                  </DialogTrigger>
+                </div>
+              </DialogContent>
+            </Dialog>
+
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm" className="hover:border-primary">
+                  <BarChart3 className="w-4 h-4 mr-2" />
+                  Adoption Tracker
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Stablecoin Adoption Tracker</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="adoption-stablecoin">Stablecoin Name/Ticker</Label>
+                    <Input id="adoption-stablecoin" placeholder="e.g., USDT, USDC, DAI" value={adoptionStablecoin} onChange={e => setAdoptionStablecoin(e.target.value)} />
+                  </div>
+                  <DialogTrigger asChild>
+                    <Button onClick={handleAdoptionSubmit} className="w-full" disabled={!adoptionStablecoin.trim()}>
+                      Track Adoption Metrics
                     </Button>
                   </DialogTrigger>
                 </div>
