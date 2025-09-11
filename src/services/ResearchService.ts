@@ -586,8 +586,14 @@ ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
     // Set appropriate base prices for different types of stablecoins/tokens
     switch (symbol.toUpperCase()) {
       case 'PAXG':
-      case 'XAUT': // Gold-backed tokens (Tether Gold, PAX Gold)
-        basePrice = 2650.00; // Approximate gold price
+      case 'XAUT': // Gold-backed tokens (PAX Gold, Tether Gold)
+        basePrice = 2650.00; // Approximate gold price per ounce
+        break;
+      case 'KAU': // Kinesis Gold (per gram)
+        basePrice = 85.00; // Approximate gold price per gram
+        break;
+      case 'KAG': // Kinesis Silver (per ounce)
+        basePrice = 30.00; // Approximate silver price per ounce
         break;
       case 'USDT':
         basePrice = 1.0005;
@@ -606,6 +612,21 @@ ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
       case 'EURT': // Euro stablecoins
         basePrice = 1.05; // Approximate EUR/USD rate
         break;
+      case 'XSGD': // Singapore Dollar
+        basePrice = 0.74; // Approximate SGD/USD rate
+        break;
+      case 'GYEN': // Japanese Yen
+        basePrice = 0.0067; // Approximate JPY/USD rate
+        break;
+      case 'IDRT': // Indonesian Rupiah
+        basePrice = 0.000063; // Approximate IDR/USD rate
+        break;
+      case 'ZARP': // South African Rand
+        basePrice = 0.055; // Approximate ZAR/USD rate
+        break;
+      case 'VCHF': // Swiss Franc
+        basePrice = 1.10; // Approximate CHF/USD rate
+        break;
       default:
         basePrice = 0.9998; // Default for other USD stablecoins
     }
@@ -620,9 +641,18 @@ ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
       if (symbol.toUpperCase() === 'PAXG' || symbol.toUpperCase() === 'XAUT') {
         // Gold tokens have larger price movements
         variation = (Math.random() - 0.5) * 100; // ±$50 variation
+      } else if (symbol.toUpperCase() === 'KAU') {
+        // Kinesis Gold (per gram) - smaller movements
+        variation = (Math.random() - 0.5) * 3; // ±$1.5 variation
+      } else if (symbol.toUpperCase() === 'KAG') {
+        // Kinesis Silver - moderate movements
+        variation = (Math.random() - 0.5) * 2; // ±$1 variation
       } else if (symbol.toUpperCase().includes('EUR')) {
         // Euro stablecoins have small variations
         variation = (Math.random() - 0.5) * 0.01; // ±0.005 variation
+      } else if (['XSGD', 'GYEN', 'IDRT', 'ZARP', 'VCHF'].includes(symbol.toUpperCase())) {
+        // Other fiat currencies have small variations
+        variation = (Math.random() - 0.5) * 0.005; // Small fiat variations
       } else {
         // USD stablecoins have very small variations
         variation = (Math.random() - 0.5) * 0.003; // ±0.0015 variation
@@ -633,20 +663,50 @@ ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
       // Set appropriate bounds based on token type
       if (symbol.toUpperCase() === 'PAXG' || symbol.toUpperCase() === 'XAUT') {
         price = Math.max(2500, Math.min(2800, price));
+      } else if (symbol.toUpperCase() === 'KAU') {
+        price = Math.max(80, Math.min(90, price));
+      } else if (symbol.toUpperCase() === 'KAG') {
+        price = Math.max(25, Math.min(35, price));
       } else if (symbol.toUpperCase().includes('EUR')) {
         price = Math.max(1.02, Math.min(1.08, price));
+      } else if (symbol.toUpperCase() === 'XSGD') {
+        price = Math.max(0.72, Math.min(0.76, price));
+      } else if (symbol.toUpperCase() === 'GYEN') {
+        price = Math.max(0.0065, Math.min(0.0069, price));
+      } else if (symbol.toUpperCase() === 'IDRT') {
+        price = Math.max(0.000060, Math.min(0.000066, price));
+      } else if (symbol.toUpperCase() === 'ZARP') {
+        price = Math.max(0.050, Math.min(0.060, price));
+      } else if (symbol.toUpperCase() === 'VCHF') {
+        price = Math.max(1.08, Math.min(1.12, price));
       } else {
         price = Math.max(0.995, Math.min(1.005, price));
       }
       
       data.push({
         date: date.toISOString().split('T')[0],
-        price: Number(price.toFixed(symbol.toUpperCase() === 'PAXG' || symbol.toUpperCase() === 'XAUT' ? 2 : 6)),
+        price: Number(price.toFixed(this.getDecimalPrecision(symbol))),
         volume: Math.floor(Math.random() * 100000000) + 50000000
       });
     }
     
     return data;
+  }
+
+  private static getDecimalPrecision(symbol: string): number {
+    switch (symbol.toUpperCase()) {
+      case 'PAXG':
+      case 'XAUT':
+      case 'KAU':
+      case 'KAG':
+        return 2; // Precious metals - 2 decimal places
+      case 'GYEN':
+        return 4; // Japanese Yen - 4 decimal places
+      case 'IDRT':
+        return 6; // Indonesian Rupiah - 6 decimal places
+      default:
+        return 6; // Default for stablecoins - 6 decimal places
+    }
   }
 
   private static generateComparisonData(symbols: string[]): {
