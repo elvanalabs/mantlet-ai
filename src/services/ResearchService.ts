@@ -462,17 +462,42 @@ export class ResearchService {
     marketData: string
   ): Promise<string> {
     try {
-      // Improve the query format for single words
-      let formattedQuery = query;
-      if (query.trim().split(' ').length === 1) {
-        // If it's a single word (like "USDT"), make it a proper question
-        formattedQuery = `What is ${query}? Please provide comprehensive information.`;
-      }
+      // Check if this is an "explain stablecoin" query
+      const isExplainQuery = query.toLowerCase().includes('explain') && 
+                           (query.toLowerCase().includes('stablecoin') || 
+                            this.extractStablecoinSymbols(query).length > 0);
 
-      // Prepare the prompt for Claude
-      const prompt = `Query: ${formattedQuery}
+      let formattedQuery = query;
+      let prompt = '';
+
+      if (isExplainQuery) {
+        // Extract the stablecoin name from the query
+        const stablecoinSymbols = this.extractStablecoinSymbols(query);
+        const stablecoinName = stablecoinSymbols.length > 0 ? stablecoinSymbols[0] : query.replace(/explain|stablecoin/gi, '').trim();
+        
+        // Create a specific prompt for explain queries that only returns the 4 sections
+        prompt = `Please provide information about the ${stablecoinName} stablecoin in exactly these 4 sections only:
+
+1. Overview
+2. Backing Mechanism 
+3. Usecases
+4. Risks/Criticism
+
+Format your response with clear headings for each section. Do not include any other information outside these 4 sections.
 
 ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
+      } else {
+        // Improve the query format for single words
+        if (query.trim().split(' ').length === 1) {
+          // If it's a single word (like "USDT"), make it a proper question
+          formattedQuery = `What is ${query}? Please provide comprehensive information.`;
+        }
+
+        // Prepare the prompt for Claude
+        prompt = `Query: ${formattedQuery}
+
+${marketData ? `Current Market Data:\n${marketData}` : ''}`;
+      }
 
       console.log('Calling Claude with prompt:', prompt);
 
