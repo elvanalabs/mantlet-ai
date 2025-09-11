@@ -586,7 +586,7 @@ ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
     // Set appropriate base prices for different types of stablecoins/tokens
     switch (symbol.toUpperCase()) {
       case 'PAXG':
-      case 'XAUT': // Gold-backed tokens
+      case 'XAUT': // Gold-backed tokens (Tether Gold, PAX Gold)
         basePrice = 2650.00; // Approximate gold price
         break;
       case 'USDT':
