@@ -146,24 +146,51 @@ async function fetchDefiLlamaChainData(stablecoin: string) {
       return { chainDistribution: null, marketShare: null };
     }
 
-    // Calculate market share
-    const totalStablecoinMcap = data.peggedAssets?.reduce((sum: number, asset: any) => sum + (asset.circulating?.peggedUSD || 0), 0) || 289000000000;
-    const marketShare = ((stablecoinData.circulating?.peggedUSD || 0) / totalStablecoinMcap * 100).toFixed(1);
+    // Helper to estimate an asset's total USD
+    const getAssetTotalUSD = (asset: any) => {
+      const chainsArr = Array.isArray(asset?.chains) ? asset.chains : [];
+      const chainsSum = chainsArr.reduce((sum: number, c: any) => {
+        const v = c?.circulating?.peggedUSD ?? c?.peggedUSD ?? c?.circulating ?? 0;
+        return sum + (typeof v === 'number' ? v : 0);
+      }, 0);
+      return asset?.circulating?.peggedUSD ?? chainsSum;
+    };
 
-    // Format chain distribution
-    const chainDistribution = Object.entries(stablecoinData.chainCirculating || {})
-      .filter(([_, value]) => (value as any)?.peggedUSD > 0)
-      .sort(([_, a], [__, b]) => (b as any).peggedUSD - (a as any).peggedUSD)
-      .slice(0, 6) // Top 6 chains
-      .map(([chain, data]) => {
-        const amount = (data as any).peggedUSD;
-        const percentage = ((amount / (stablecoinData.circulating?.peggedUSD || 1)) * 100).toFixed(1);
-        return {
-          chain: chain.charAt(0).toUpperCase() + chain.slice(1),
-          percentage,
-          amount: amount.toString()
-        };
-      });
+    // Calculate market share using DeFi Llama totals
+    const totalStablecoinMcap = (data.peggedAssets || []).reduce((sum: number, asset: any) => sum + getAssetTotalUSD(asset), 0) || 289000000000;
+    const thisTotalUSD = getAssetTotalUSD(stablecoinData) || 0;
+    const marketShare = ((thisTotalUSD / totalStablecoinMcap) * 100).toFixed(1);
+
+    // Build chain distribution from robust structures
+    let chains: Array<{ chain: string; amount: number }>; 
+
+    if (Array.isArray(stablecoinData.chains) && stablecoinData.chains.length > 0) {
+      chains = stablecoinData.chains.map((c: any) => ({
+        chain: c.chain || c.name || c.blockchain || 'Unknown',
+        amount: (c?.circulating?.peggedUSD ?? c?.peggedUSD ?? c?.circulating ?? 0) as number,
+      })).filter(c => c.amount > 0);
+    } else if (stablecoinData.chainCirculating && typeof stablecoinData.chainCirculating === 'object') {
+      chains = Object.entries(stablecoinData.chainCirculating)
+        .map(([chain, v]: [string, any]) => ({
+          chain,
+          amount: (v?.peggedUSD ?? v?.circulating ?? 0) as number,
+        }))
+        .filter(c => c.amount > 0);
+    } else {
+      chains = [];
+    }
+
+    const totalOnChains = chains.reduce((sum, c) => sum + c.amount, 0);
+    const denom = totalOnChains > 0 ? totalOnChains : (thisTotalUSD || 1);
+
+    const chainDistribution = chains
+      .sort((a, b) => b.amount - a.amount)
+      .slice(0, 6)
+      .map(c => ({
+        chain: c.chain,
+        percentage: ((c.amount / denom) * 100).toFixed(1),
+        amount: Math.round(c.amount).toString(),
+      }));
 
     console.log(`DeFi Llama data for ${stablecoin}: market share ${marketShare}%, ${chainDistribution.length} chains`);
     return { chainDistribution, marketShare };
