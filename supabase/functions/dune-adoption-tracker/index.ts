@@ -6,10 +6,10 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const duneApiKey = Deno.env.get('DUNE_API_KEY');
+const moralisApiKey = Deno.env.get('MORALIS_API_KEY');
 
-if (!duneApiKey) {
-  console.error('DUNE_API_KEY is not configured');
+if (!moralisApiKey) {
+  console.error('MORALIS_API_KEY is not configured');
 }
 
 serve(async (req) => {
@@ -41,243 +41,198 @@ serve(async (req) => {
   }
 });
 
-// Comprehensive adoption data that covers all stablecoins in our reference database
+// Comprehensive adoption data using DeFi Llama, CoinGecko, and Moralis APIs
 async function getComprehensiveAdoptionData(stablecoin: string) {
   console.log(`Generating comprehensive adoption data for ${stablecoin}`);
   
-  // Try Dune first for major stablecoins, fallback for others
-  if (shouldTryDune(stablecoin) && duneApiKey) {
-    try {
-      const duneData = await fetchDuneAdoptionData(stablecoin, duneApiKey);
-      console.log(`Successfully fetched Dune data for ${stablecoin}`);
-      return duneData;
-    } catch (error) {
-      console.log(`Dune failed for ${stablecoin}, using enhanced fallback data`);
-    }
-  }
-  
-  const fallbackData = getEnhancedFallbackData(stablecoin);
-  console.log(`Generated fallback data for ${stablecoin}:`, {
-    supply: fallbackData.totalCirculatingSupply,
-    marketShare: fallbackData.marketSharePercent,
-    volume24h: fallbackData.transactionVolume24h,
-    chainCount: fallbackData.chainDistribution.length
-  });
-  
-  return fallbackData;
-}
-
-// Only try Dune for major stablecoins with known working queries
-function shouldTryDune(stablecoin: string): boolean {
-  const duneSupported = [
-    // Major USD stablecoins with high liquidity and multi-chain presence
-    'USDT', 'USDC', 'DAI', 'USDE', 'USDS', 'PYUSD', 'FDUSD', 'RLUSD',
-    'USDY', 'USD1', 'USDP', 'FRXUSD', 'FRAX', 'DEUSD', 'MIM',
-    // Other significant stablecoins likely to have Dune coverage
-    'RUSD', 'USDA', 'USDF', 'USDO', 'USDL', 'BYUSD', 'USDN',
-    // Euro stablecoins
-    'EURS', 'EURC',
-    // Gold-backed stablecoins
-    'PAXG', 'XAUT'
-  ];
-  return duneSupported.includes(stablecoin.toUpperCase());
-}
-
-// Main function to fetch adoption data from Dune (for major stablecoins only)
-async function fetchDuneAdoptionData(stablecoin: string, apiKey: string) {
-  console.log(`Fetching Dune data for ${stablecoin}`);
-
-  // Define Dune query IDs for different stablecoin metrics
-  // These need to be actual query IDs from your Dune account
-  const queryIds = getQueryIds(stablecoin);
-
   try {
-    // Execute all queries in parallel for efficiency
-    const [
-      supplyResult,
-      marketShareResult, 
-      chainDistResult,
-      volumeResult,
-      growthResult
-    ] = await Promise.all([
-      executeDuneQuery(queryIds.totalSupply, { stablecoin_symbol: stablecoin }, apiKey),
-      executeDuneQuery(queryIds.marketShare, { stablecoin_symbol: stablecoin }, apiKey),
-      executeDuneQuery(queryIds.chainDistribution, { stablecoin_symbol: stablecoin }, apiKey),
-      executeDuneQuery(queryIds.volume24h, { stablecoin_symbol: stablecoin }, apiKey),
-      executeDuneQuery(queryIds.growth30d, { stablecoin_symbol: stablecoin }, apiKey)
+    // Fetch data from multiple APIs in parallel
+    const [coinGeckoData, defiLlamaData, moralisData] = await Promise.all([
+      fetchCoinGeckoSupply(stablecoin),
+      fetchDefiLlamaChainData(stablecoin),
+      fetchMoralisVolume(stablecoin)
     ]);
 
-    // Process and format the results
-    return {
+    // Combine data from all sources
+    const adoptionData = {
       stablecoin,
-      totalCirculatingSupply: formatSupply(supplyResult),
-      marketSharePercent: formatMarketShare(marketShareResult),
-      chainDistribution: formatChainDistribution(chainDistResult),
-      transactionVolume24h: formatVolume(volumeResult),
-      growthDecline30d: formatGrowth(growthResult)
+      totalCirculatingSupply: coinGeckoData.supply || getEnhancedFallbackData(stablecoin).totalCirculatingSupply,
+      marketSharePercent: defiLlamaData.marketShare || calculateMarketShare(coinGeckoData.supply),
+      chainDistribution: defiLlamaData.chainDistribution || getEnhancedFallbackData(stablecoin).chainDistribution,
+      transactionVolume24h: moralisData.volume24h || getEnhancedFallbackData(stablecoin).transactionVolume24h,
+      growthDecline30d: getEnhancedFallbackData(stablecoin).growthDecline30d // Keep fallback for growth data
     };
 
-  } catch (error) {
-    console.error(`Error fetching Dune data for ${stablecoin}:`, error);
-    throw error; // Re-throw to trigger fallback
-  }
-}
-
-// Execute a Dune query with parameters
-async function executeDuneQuery(queryId: string, parameters: any, apiKey: string) {
-  const executeUrl = `https://api.dune.com/api/v1/query/${queryId}/execute`;
-  
-  console.log(`Executing Dune query ${queryId} with parameters:`, parameters);
-
-  // Execute the query
-  const executeResponse = await fetch(executeUrl, {
-    method: 'POST',
-    headers: {
-      'X-Dune-API-Key': apiKey,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      query_parameters: parameters
-    }),
-  });
-
-  if (!executeResponse.ok) {
-    throw new Error(`Failed to execute query ${queryId}: ${executeResponse.statusText}`);
-  }
-
-  const executeResult = await executeResponse.json();
-  const executionId = executeResult.execution_id;
-
-  console.log(`Query ${queryId} executed, execution ID: ${executionId}`);
-
-  // Poll for results
-  let attempts = 0;
-  const maxAttempts = 30; // 30 seconds max wait time
-  
-  while (attempts < maxAttempts) {
-    await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
-    
-    const statusUrl = `https://api.dune.com/api/v1/execution/${executionId}/status`;
-    const statusResponse = await fetch(statusUrl, {
-      headers: {
-        'X-Dune-API-Key': apiKey,
-      },
+    console.log(`Successfully fetched API data for ${stablecoin}:`, {
+      supply: adoptionData.totalCirculatingSupply,
+      marketShare: adoptionData.marketSharePercent,
+      volume24h: adoptionData.transactionVolume24h,
+      chainCount: adoptionData.chainDistribution.length
     });
 
-    if (!statusResponse.ok) {
-      throw new Error(`Failed to check query status: ${statusResponse.statusText}`);
-    }
-
-    const statusResult = await statusResponse.json();
-    console.log(`Query ${queryId} status:`, statusResult.state);
-
-    if (statusResult.state === 'QUERY_STATE_COMPLETED') {
-      // Get the results
-      const resultsUrl = `https://api.dune.com/api/v1/execution/${executionId}/results`;
-      const resultsResponse = await fetch(resultsUrl, {
-        headers: {
-          'X-Dune-API-Key': apiKey,
-        },
-      });
-
-      if (!resultsResponse.ok) {
-        throw new Error(`Failed to fetch results: ${resultsResponse.statusText}`);
-      }
-
-      const results = await resultsResponse.json();
-      console.log(`Query ${queryId} completed successfully`);
-      return results.result.rows;
-    }
-
-    if (statusResult.state === 'QUERY_STATE_FAILED') {
-      throw new Error(`Query ${queryId} failed`);
-    }
-
-    attempts++;
+    return adoptionData;
+  } catch (error) {
+    console.log(`API calls failed for ${stablecoin}, using enhanced fallback data:`, error);
+    return getEnhancedFallbackData(stablecoin);
   }
-
-  throw new Error(`Query ${queryId} timed out after ${maxAttempts} seconds`);
 }
 
-// Get query IDs for different metrics based on stablecoin
-function getQueryIds(stablecoin: string) {
-  // Note: These are placeholder query IDs. In a real implementation, you would need
-  // to create actual Dune queries and replace these with real query IDs from your Dune account
-  console.log(`Using placeholder query IDs for ${stablecoin} - Dune integration requires real query IDs`);
+// Fetch circulating supply from CoinGecko API
+async function fetchCoinGeckoSupply(stablecoin: string) {
+  console.log(`Fetching CoinGecko supply data for ${stablecoin}`);
   
-  const baseQueries = {
-    totalSupply: 'placeholder-supply',
-    marketShare: 'placeholder-marketshare', 
-    chainDistribution: 'placeholder-chains',
-    volume24h: 'placeholder-volume',
-    growth30d: 'placeholder-growth'
+  const coinGeckoIds: Record<string, string> = {
+    'USDT': 'tether',
+    'USDC': 'usd-coin',
+    'DAI': 'dai',
+    'USDE': 'ethena-usde',
+    'USDS': 'sky-dollar-usds',
+    'PYUSD': 'paypal-usd',
+    'FDUSD': 'first-digital-usd',
+    'PAXG': 'pax-gold',
+    'XAUT': 'tether-gold',
+    'EURS': 'stasis-eurs',
+    'EURC': 'euro-coin',
+    'FRAX': 'frax',
+    'MIM': 'magic-internet-money'
   };
 
-  // Since we don't have real Dune queries, always return base queries
-  // This will cause Dune calls to fail and use enhanced fallback data instead
-  return baseQueries;
+  const coinId = coinGeckoIds[stablecoin.toUpperCase()];
+  if (!coinId) {
+    console.log(`No CoinGecko ID found for ${stablecoin}`);
+    return { supply: null };
+  }
+
+  try {
+    const response = await fetch(`https://api.coingecko.com/api/v3/coins/${coinId}?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false`);
+    
+    if (!response.ok) {
+      throw new Error(`CoinGecko API error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const supply = data.market_data?.circulating_supply || data.market_data?.total_supply;
+    
+    console.log(`CoinGecko supply for ${stablecoin}: ${supply}`);
+    return { supply: supply ? supply.toString() : null };
+  } catch (error) {
+    console.error(`Error fetching CoinGecko data for ${stablecoin}:`, error);
+    return { supply: null };
+  }
 }
 
-// Format supply data from Dune response
-function formatSupply(duneResult: any[]): string {
-  if (!duneResult || duneResult.length === 0) {
-    return '0';
-  }
+// Fetch chain distribution and market share from DeFi Llama API
+async function fetchDefiLlamaChainData(stablecoin: string) {
+  console.log(`Fetching DeFi Llama chain data for ${stablecoin}`);
   
-  // Assuming the query returns a row with 'total_supply' column
-  const supply = duneResult[0]?.total_supply || duneResult[0]?.supply || 0;
-  return supply.toString();
+  try {
+    // Get stablecoin data from DeFi Llama
+    const response = await fetch('https://stablecoins.llama.fi/stablecoins?includePrices=true');
+    
+    if (!response.ok) {
+      throw new Error(`DeFi Llama API error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const stablecoinData = data.peggedAssets?.find((asset: any) => 
+      asset.symbol?.toUpperCase() === stablecoin.toUpperCase() ||
+      asset.name?.toUpperCase().includes(stablecoin.toUpperCase())
+    );
+
+    if (!stablecoinData) {
+      console.log(`No DeFi Llama data found for ${stablecoin}`);
+      return { chainDistribution: null, marketShare: null };
+    }
+
+    // Calculate market share
+    const totalStablecoinMcap = data.peggedAssets?.reduce((sum: number, asset: any) => sum + (asset.circulating?.peggedUSD || 0), 0) || 289000000000;
+    const marketShare = ((stablecoinData.circulating?.peggedUSD || 0) / totalStablecoinMcap * 100).toFixed(1);
+
+    // Format chain distribution
+    const chainDistribution = Object.entries(stablecoinData.chainCirculating || {})
+      .filter(([_, value]) => (value as any)?.peggedUSD > 0)
+      .sort(([_, a], [__, b]) => (b as any).peggedUSD - (a as any).peggedUSD)
+      .slice(0, 6) // Top 6 chains
+      .map(([chain, data]) => {
+        const amount = (data as any).peggedUSD;
+        const percentage = ((amount / (stablecoinData.circulating?.peggedUSD || 1)) * 100).toFixed(1);
+        return {
+          chain: chain.charAt(0).toUpperCase() + chain.slice(1),
+          percentage,
+          amount: amount.toString()
+        };
+      });
+
+    console.log(`DeFi Llama data for ${stablecoin}: market share ${marketShare}%, ${chainDistribution.length} chains`);
+    return { chainDistribution, marketShare };
+  } catch (error) {
+    console.error(`Error fetching DeFi Llama data for ${stablecoin}:`, error);
+    return { chainDistribution: null, marketShare: null };
+  }
 }
 
-// Format market share data from Dune response
-function formatMarketShare(duneResult: any[]): string {
-  if (!duneResult || duneResult.length === 0) {
-    return '0';
-  }
+// Fetch 24h transaction volume from Moralis API
+async function fetchMoralisVolume(stablecoin: string) {
+  console.log(`Fetching Moralis volume data for ${stablecoin}`);
   
-  // Assuming the query returns a row with 'market_share_percent' column
-  const marketShare = duneResult[0]?.market_share_percent || duneResult[0]?.share || 0;
-  return marketShare.toString();
+  if (!moralisApiKey) {
+    console.log('MORALIS_API_KEY not configured, skipping Moralis API call');
+    return { volume24h: null };
+  }
+
+  const moralisTokens: Record<string, { address: string, chain: string }> = {
+    'USDT': { address: '0xdac17f958d2ee523a2206206994597c13d831ec7', chain: 'eth' },
+    'USDC': { address: '0xa0b86a33e6e530f34c0a99b3e5c4a1a8f27e0e97', chain: 'eth' },
+    'DAI': { address: '0x6b175474e89094c44da98b954eedeac495271d0f', chain: 'eth' },
+    'USDE': { address: '0x4c9edd5852cd905f086c759e8383e09bff1e68b3', chain: 'eth' },
+    'PYUSD': { address: '0x6c3ea9036406852006290770bedfcaba0e23a0e8', chain: 'eth' },
+    'PAXG': { address: '0x45804880de22913dafe09f4980848ece6ecbaf78', chain: 'eth' }
+  };
+
+  const tokenData = moralisTokens[stablecoin.toUpperCase()];
+  if (!tokenData) {
+    console.log(`No Moralis token data found for ${stablecoin}`);
+    return { volume24h: null };
+  }
+
+  try {
+    const response = await fetch(
+      `https://deep-index.moralis.io/api/v2/erc20/${tokenData.address}/stats?chain=${tokenData.chain}`,
+      {
+        headers: {
+          'X-API-Key': moralisApiKey,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Moralis API error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const volume24h = data.volume_24h || data.transactions_24h || null;
+    
+    console.log(`Moralis volume for ${stablecoin}: ${volume24h}`);
+    return { volume24h: volume24h ? volume24h.toString() : null };
+  } catch (error) {
+    console.error(`Error fetching Moralis data for ${stablecoin}:`, error);
+    return { volume24h: null };
+  }
 }
 
-// Format chain distribution data from Dune response
-function formatChainDistribution(duneResult: any[]): Array<{chain: string, percentage: string, amount: string}> {
-  if (!duneResult || duneResult.length === 0) {
-    return [];
-  }
+// Calculate market share based on supply
+function calculateMarketShare(supply: string | null): string {
+  if (!supply) return '0';
   
-  // Assuming the query returns rows with 'chain', 'percentage', 'amount' columns
-  return duneResult.map(row => ({
-    chain: row.chain || row.blockchain || 'Unknown',
-    percentage: (row.percentage || row.share || 0).toString(),
-    amount: (row.amount || row.supply || 0).toString()
-  }));
+  const totalMarketCap = 289000000000; // Current total stablecoin market cap
+  const stablecoinSupply = parseFloat(supply);
+  const marketShare = (stablecoinSupply / totalMarketCap) * 100;
+  
+  return marketShare.toFixed(1);
 }
 
-// Format volume data from Dune response
-function formatVolume(duneResult: any[]): string {
-  if (!duneResult || duneResult.length === 0) {
-    return '0';
-  }
-  
-  // Assuming the query returns a row with 'volume_24h' column
-  const volume = duneResult[0]?.volume_24h || duneResult[0]?.volume || 0;
-  return volume.toString();
-}
-
-// Format growth data from Dune response  
-function formatGrowth(duneResult: any[]): {percentage: string, direction: 'up' | 'down'} {
-  if (!duneResult || duneResult.length === 0) {
-    return { percentage: '0', direction: 'up' };
-  }
-  
-  // Assuming the query returns a row with 'growth_30d' column (positive/negative number)
-  const growth = duneResult[0]?.growth_30d || duneResult[0]?.growth || 0;
-  const percentage = Math.abs(growth).toString();
-  const direction = growth >= 0 ? 'up' : 'down';
-  
-  return { percentage, direction };
-}
+// Enhanced fallback data that covers ALL stablecoins in our reference database
 
 // Enhanced fallback data that covers ALL stablecoins in our reference database
 function getEnhancedFallbackData(stablecoin: string) {
