@@ -6,6 +6,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { Send, Loader2, TrendingUp, Database, Globe } from 'lucide-react';
 import { ResearchService } from '@/services/ResearchService';
 import { validateStablecoin } from '@/utils/stablecoinValidation';
+import AdoptionMetrics from '@/components/AdoptionMetrics';
 
 interface Message {
   id: string;
@@ -13,6 +14,21 @@ interface Message {
   content: string;
   timestamp: Date;
   sources?: string[];
+  adoptionData?: {
+    stablecoin: string;
+    totalCirculatingSupply: string;
+    marketSharePercent: string;
+    chainDistribution: Array<{
+      chain: string;
+      percentage: string;
+      amount: string;
+    }>;
+    transactionVolume24h: string;
+    growthDecline30d: {
+      percentage: string;
+      direction: 'up' | 'down';
+    };
+  };
 }
 
 export const ResearchInterface = () => {
@@ -95,6 +111,7 @@ export const ResearchInterface = () => {
         content: response.contextData,
         timestamp: new Date(),
         sources: response.sources,
+        adoptionData: response.adoptionData,
       };
 
       setMessages(prev => [...prev, assistantMessage]);
@@ -135,6 +152,11 @@ export const ResearchInterface = () => {
                 <div className="prose prose-sm dark:prose-invert max-w-none">
                   <p className="whitespace-pre-wrap">{message.content}</p>
                 </div>
+                {message.adoptionData && (
+                  <div className="mt-3">
+                    <AdoptionMetrics adoptionData={message.adoptionData} />
+                  </div>
+                )}
                 {message.sources && message.sources.length > 0 && (
                   <div className="mt-3 pt-3 border-t border-border">
                     <p className="text-xs text-muted-foreground mb-2 flex items-center">
