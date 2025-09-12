@@ -58,7 +58,9 @@ async function getComprehensiveAdoptionData(stablecoin: string) {
       stablecoin,
       totalCirculatingSupply: coinGeckoData.supply || getEnhancedFallbackData(stablecoin).totalCirculatingSupply,
       marketSharePercent: defiLlamaData.marketShare || calculateMarketShare(coinGeckoData.supply),
-      chainDistribution: defiLlamaData.chainDistribution || getEnhancedFallbackData(stablecoin).chainDistribution,
+      chainDistribution: (defiLlamaData.chainDistribution && defiLlamaData.chainDistribution.length > 0)
+        ? defiLlamaData.chainDistribution
+        : getEnhancedFallbackData(stablecoin).chainDistribution,
       transactionVolume24h: moralisData.volume24h || getEnhancedFallbackData(stablecoin).transactionVolume24h,
       growthDecline30d: getEnhancedFallbackData(stablecoin).growthDecline30d // Keep fallback for growth data
     };
