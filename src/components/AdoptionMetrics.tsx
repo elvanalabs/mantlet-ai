@@ -270,21 +270,21 @@ const AdoptionMetrics: React.FC<AdoptionMetricsProps> = ({ adoptionData }) => {
                 <p className="text-2xl font-bold text-foreground">
                   {adoptionData.depegEvents.count}
                 </p>
-                {adoptionData.depegEvents.count > 0 && (
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button variant="outline" size="sm" className="text-xs">
-                        View Details
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-2xl">
-                      <DialogHeader>
-                        <DialogTitle className="flex items-center gap-2">
-                          <Clock className="w-4 h-4" />
-                          {adoptionData.stablecoin} Depeg Events (Last 30 Days)
-                        </DialogTitle>
-                      </DialogHeader>
-                      <div className="max-h-96 overflow-y-auto">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="sm" className="text-xs">
+                      View Events
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl">
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-2">
+                        <Clock className="w-4 h-4" />
+                        {adoptionData.stablecoin} Depeg Events (Last 30 Days)
+                      </DialogTitle>
+                    </DialogHeader>
+                    <div className="max-h-96 overflow-y-auto">
+                      {adoptionData.depegEvents.count > 0 ? (
                         <Table>
                           <TableHeader>
                             <TableRow>
@@ -311,10 +311,19 @@ const AdoptionMetrics: React.FC<AdoptionMetricsProps> = ({ adoptionData }) => {
                             ))}
                           </TableBody>
                         </Table>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                )}
+                      ) : (
+                        <div className="text-center py-8">
+                          <p className="text-muted-foreground">
+                            No significant depeg events (&gt;1% deviation) found in the last 30 days.
+                          </p>
+                          <p className="text-sm text-muted-foreground mt-2">
+                            This indicates excellent price stability for {adoptionData.stablecoin}.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
             </CardContent>
           </Card>
