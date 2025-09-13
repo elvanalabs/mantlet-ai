@@ -65,6 +65,15 @@ interface Message {
       percentage: string;
       direction: 'up' | 'down';
     };
+    depegEvents: {
+      count: number;
+      events: Array<{
+        date: string;
+        time: string;
+        deviation: string;
+        price: string;
+      }>;
+    };
   };
 }
 interface DemoInterfaceProps {
@@ -156,7 +165,10 @@ export const DemoInterface = ({
         chartData: response.chartData,
         newsResults: response.newsResults,
         comparisonData: response.comparisonData,
-        adoptionData: response.adoptionData
+        adoptionData: response.adoptionData ? {
+          ...response.adoptionData,
+          depegEvents: (response.adoptionData as any).depegEvents || { count: 0, events: [] }
+        } : undefined
       };
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
@@ -191,7 +203,10 @@ export const DemoInterface = ({
         chartData: response.chartData,
         newsResults: response.newsResults,
         comparisonData: response.comparisonData,
-        adoptionData: response.adoptionData
+        adoptionData: response.adoptionData ? {
+          ...response.adoptionData,
+          depegEvents: (response.adoptionData as any).depegEvents || { count: 0, events: [] }
+        } : undefined
       };
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {

@@ -2,7 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { TrendingUp, TrendingDown, BarChart3, Globe, Coins, Users, Info } from 'lucide-react';
+import { TrendingUp, TrendingDown, BarChart3, Globe, Coins, Users, Info, AlertTriangle, Clock } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+
+interface DepegEvent {
+  date: string;
+  time: string;
+  deviation: string;
+  price: string;
+}
 
 interface AdoptionData {
   stablecoin: string;
@@ -17,6 +27,10 @@ interface AdoptionData {
   growthDecline30d: {
     percentage: string;
     direction: 'up' | 'down';
+  };
+  depegEvents: {
+    count: number;
+    events: DepegEvent[];
   };
 }
 
@@ -232,6 +246,75 @@ const AdoptionMetrics: React.FC<AdoptionMetricsProps> = ({ adoptionData }) => {
                   {adoptionData.growthDecline30d.direction === 'up' ? '+' : '-'}
                   {adoptionData.growthDecline30d.percentage}%
                 </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Depeg Events */}
+          <Card className="glass border border-border/50 hover:border-primary/20 transition-colors">
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                 <div className="flex items-center gap-1">
+                   <CardTitle className="text-sm font-medium text-muted-foreground">
+                     Depeg Events (30D)
+                   </CardTitle>
+                   <MobileTooltip content="Major price deviations from $1.00">
+                     <Info className="w-3 h-3 text-muted-foreground hover:text-primary cursor-help" />
+                   </MobileTooltip>
+                 </div>
+                <AlertTriangle className="w-4 h-4 text-orange-500" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <p className="text-2xl font-bold text-foreground">
+                  {adoptionData.depegEvents.count}
+                </p>
+                {adoptionData.depegEvents.count > 0 && (
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm" className="text-xs">
+                        View Details
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl">
+                      <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                          <Clock className="w-4 h-4" />
+                          {adoptionData.stablecoin} Depeg Events (Last 30 Days)
+                        </DialogTitle>
+                      </DialogHeader>
+                      <div className="max-h-96 overflow-y-auto">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Date</TableHead>
+                              <TableHead>Time (UTC)</TableHead>
+                              <TableHead>Price</TableHead>
+                              <TableHead>Deviation</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {adoptionData.depegEvents.events.map((event, index) => (
+                              <TableRow key={index}>
+                                <TableCell className="font-medium">{event.date}</TableCell>
+                                <TableCell>{event.time}</TableCell>
+                                <TableCell>${event.price}</TableCell>
+                                <TableCell className={`font-medium ${
+                                  parseFloat(event.deviation.replace('%', '')) > 0 
+                                    ? 'text-red-500' 
+                                    : 'text-green-500'
+                                }`}>
+                                  {event.deviation}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                )}
               </div>
             </CardContent>
           </Card>

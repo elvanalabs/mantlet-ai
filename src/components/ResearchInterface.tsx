@@ -28,6 +28,15 @@ interface Message {
       percentage: string;
       direction: 'up' | 'down';
     };
+    depegEvents: {
+      count: number;
+      events: Array<{
+        date: string;
+        time: string;
+        deviation: string;
+        price: string;
+      }>;
+    };
   };
 }
 
@@ -111,7 +120,10 @@ export const ResearchInterface = () => {
         content: response.contextData,
         timestamp: new Date(),
         sources: response.sources,
-        adoptionData: response.adoptionData,
+        adoptionData: response.adoptionData ? {
+          ...response.adoptionData,
+          depegEvents: (response.adoptionData as any).depegEvents || { count: 0, events: [] }
+        } : undefined,
       };
 
       setMessages(prev => [...prev, assistantMessage]);

@@ -47,10 +47,11 @@ async function getComprehensiveAdoptionData(stablecoin: string) {
   
   try {
     // Fetch data from multiple APIs in parallel
-    const [coinGeckoData, defiLlamaData, moralisData] = await Promise.all([
+    const [coinGeckoData, defiLlamaData, moralisData, depegEvents] = await Promise.all([
       fetchCoinGeckoSupply(stablecoin),
       fetchDefiLlamaChainData(stablecoin),
-      fetchMoralisVolume(stablecoin)
+      fetchMoralisVolume(stablecoin),
+      fetchDepegEvents(stablecoin)
     ]);
 
     // Combine data from all sources
@@ -62,7 +63,8 @@ async function getComprehensiveAdoptionData(stablecoin: string) {
         ? defiLlamaData.chainDistribution
         : getEnhancedFallbackData(stablecoin).chainDistribution,
       transactionVolume24h: moralisData.volume24h || getEnhancedFallbackData(stablecoin).transactionVolume24h,
-      growthDecline30d: getEnhancedFallbackData(stablecoin).growthDecline30d // Keep fallback for growth data
+      growthDecline30d: getEnhancedFallbackData(stablecoin).growthDecline30d, // Keep fallback for growth data
+      depegEvents: depegEvents || { count: 0, events: [] }
     };
 
     console.log(`Successfully fetched API data for ${stablecoin}:`, {
@@ -766,4 +768,94 @@ function getDynamicChainDistribution(symbol: string, totalSupply: number) {
   }
 
   return distributions;
+}
+
+// Fetch depeg events from CoinGecko
+async function fetchDepegEvents(stablecoin: string) {
+  try {
+    console.log(`Fetching depeg events for ${stablecoin}`);
+    
+    // Map stablecoin symbols to CoinGecko IDs
+    const coinGeckoIds: { [key: string]: string } = {
+      'USDT': 'tether',
+      'USDC': 'usd-coin',
+      'BUSD': 'binance-usd',
+      'DAI': 'dai',
+      'FRAX': 'frax',
+      'TUSD': 'true-usd',
+      'USDP': 'paxos-standard',
+      'GUSD': 'gemini-dollar',
+      'LUSD': 'liquity-usd',
+      'SUSD': 'nusd',
+      'USDD': 'usdd',
+      'FDUSD': 'first-digital-usd',
+      'PYUSD': 'paypal-usd'
+    };
+
+    const coinGeckoId = coinGeckoIds[stablecoin.toUpperCase()];
+    if (!coinGeckoId) {
+      console.log(`No CoinGecko ID found for ${stablecoin}, returning empty depeg events`);
+      return { count: 0, events: [] };
+    }
+
+    // Fetch 30 days of price data from CoinGecko
+    const thirtyDaysAgo = Math.floor((Date.now() - 30 * 24 * 60 * 60 * 1000) / 1000);
+    const now = Math.floor(Date.now() / 1000);
+    
+    const response = await fetch(
+      `https://api.coingecko.com/api/v3/coins/${coinGeckoId}/market_chart/range?vs_currency=usd&from=${thirtyDaysAgo}&to=${now}`
+    );
+
+    if (!response.ok) {
+      console.log(`CoinGecko API error: ${response.status}`);
+      return { count: 0, events: [] };
+    }
+
+    const data = await response.json();
+    const prices = data.prices || [];
+
+    // Find depeg events (deviation > 1% from $1.00)
+    const depegEvents: Array<{
+      date: string;
+      time: string;
+      deviation: string;
+      price: string;
+    }> = [];
+
+    for (const [timestamp, price] of prices) {
+      const deviation = ((price - 1.0) / 1.0) * 100;
+      
+      // Consider it a depeg if deviation is greater than 1%
+      if (Math.abs(deviation) > 1.0) {
+        const date = new Date(timestamp);
+        depegEvents.push({
+          date: date.toISOString().split('T')[0],
+          time: date.toISOString().split('T')[1].split('.')[0],
+          deviation: `${deviation > 0 ? '+' : ''}${deviation.toFixed(2)}%`,
+          price: price.toFixed(4)
+        });
+      }
+    }
+
+    // Remove consecutive events within 1 hour to avoid spam
+    const filteredEvents = depegEvents.filter((event, index) => {
+      if (index === 0) return true;
+      
+      const currentTime = new Date(`${event.date}T${event.time}`).getTime();
+      const prevTime = new Date(`${depegEvents[index - 1].date}T${depegEvents[index - 1].time}`).getTime();
+      
+      return currentTime - prevTime > 60 * 60 * 1000; // 1 hour difference
+    });
+
+    console.log(`Found ${filteredEvents.length} depeg events for ${stablecoin}`);
+    
+    return {
+      count: filteredEvents.length,
+      events: filteredEvents.slice(0, 20) // Limit to 20 most recent events
+    };
+
+  } catch (error) {
+    console.error(`Error fetching depeg events for ${stablecoin}:`, error);
+    return { count: 0, events: [] };
+  }
 }
