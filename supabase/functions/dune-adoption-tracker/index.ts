@@ -789,7 +789,13 @@ async function fetchDepegEvents(stablecoin: string) {
       'SUSD': 'nusd',
       'USDD': 'usdd',
       'FDUSD': 'first-digital-usd',
-      'PYUSD': 'paypal-usd'
+      'PYUSD': 'paypal-usd',
+      'USDE': 'ethena-usde',
+      'USDS': 'sky-dollar-usds',
+      'EURS': 'stasis-eurs',
+      'EURC': 'euro-coin',
+      'MIM': 'magic-internet-money',
+      'USTC': 'terrausd'
     };
 
     const coinGeckoId = coinGeckoIds[stablecoin.toUpperCase()];
@@ -798,23 +804,34 @@ async function fetchDepegEvents(stablecoin: string) {
       return { count: 0, events: [] };
     }
 
-    // Fetch 30 days of price data from CoinGecko
+    // Fetch 30 days of hourly price data from CoinGecko
     const thirtyDaysAgo = Math.floor((Date.now() - 30 * 24 * 60 * 60 * 1000) / 1000);
     const now = Math.floor(Date.now() / 1000);
     
     const response = await fetch(
-      `https://api.coingecko.com/api/v3/coins/${coinGeckoId}/market_chart/range?vs_currency=usd&from=${thirtyDaysAgo}&to=${now}`
+      `https://api.coingecko.com/api/v3/coins/${coinGeckoId}/market_chart/range?vs_currency=usd&from=${thirtyDaysAgo}&to=${now}`,
+      {
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'StablecoinTracker/1.0'
+        }
+      }
     );
 
     if (!response.ok) {
-      console.log(`CoinGecko API error: ${response.status}`);
+      console.log(`CoinGecko API error: ${response.status} ${response.statusText}`);
       return { count: 0, events: [] };
     }
 
     const data = await response.json();
     const prices = data.prices || [];
 
-    // Find depeg events (deviation > 1% from $1.00)
+    if (!prices.length) {
+      console.log(`No price data available for ${stablecoin}`);
+      return { count: 0, events: [] };
+    }
+
+    // Analyze price data for depeg events
     const depegEvents: Array<{
       date: string;
       time: string;
@@ -822,36 +839,40 @@ async function fetchDepegEvents(stablecoin: string) {
       price: string;
     }> = [];
 
+    let lastEventTime = 0;
+    const MIN_TIME_BETWEEN_EVENTS = 2 * 60 * 60 * 1000; // 2 hours in milliseconds
+
     for (const [timestamp, price] of prices) {
       const deviation = ((price - 1.0) / 1.0) * 100;
+      const absDeviation = Math.abs(deviation);
       
-      // Consider it a depeg if deviation is greater than 1%
-      if (Math.abs(deviation) > 1.0) {
+      // Track both >1% and >3% deviations as significant depeg events
+      if (absDeviation > 1.0 && timestamp - lastEventTime > MIN_TIME_BETWEEN_EVENTS) {
         const date = new Date(timestamp);
         depegEvents.push({
           date: date.toISOString().split('T')[0],
-          time: date.toISOString().split('T')[1].split('.')[0],
+          time: date.toTimeString().split(' ')[0], // HH:MM:SS format
           deviation: `${deviation > 0 ? '+' : ''}${deviation.toFixed(2)}%`,
           price: price.toFixed(4)
         });
+        lastEventTime = timestamp;
       }
     }
 
-    // Remove consecutive events within 1 hour to avoid spam
-    const filteredEvents = depegEvents.filter((event, index) => {
-      if (index === 0) return true;
-      
-      const currentTime = new Date(`${event.date}T${event.time}`).getTime();
-      const prevTime = new Date(`${depegEvents[index - 1].date}T${depegEvents[index - 1].time}`).getTime();
-      
-      return currentTime - prevTime > 60 * 60 * 1000; // 1 hour difference
-    });
+    // Sort by most recent first
+    const sortedEvents = depegEvents
+      .sort((a, b) => {
+        const dateA = new Date(`${a.date}T${a.time}`).getTime();
+        const dateB = new Date(`${b.date}T${b.time}`).getTime();
+        return dateB - dateA;
+      })
+      .slice(0, 25); // Limit to 25 most recent events
 
-    console.log(`Found ${filteredEvents.length} depeg events for ${stablecoin}`);
+    console.log(`Found ${sortedEvents.length} significant depeg events for ${stablecoin}`);
     
     return {
-      count: filteredEvents.length,
-      events: filteredEvents.slice(0, 20) // Limit to 20 most recent events
+      count: sortedEvents.length,
+      events: sortedEvents
     };
 
   } catch (error) {
