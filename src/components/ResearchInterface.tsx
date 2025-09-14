@@ -157,11 +157,9 @@ export const ResearchInterface = () => {
       'MXNT': 'https://tether.to/en/transparency/?tab=mxnt'
     };
 
-    // Check if content contains any stablecoin mention and if it's an explanation
+    // Check if content contains any stablecoin mention - show button for any stablecoin explanation
     for (const [coin, url] of Object.entries(transparencyReports)) {
-      if (content.toLowerCase().includes(coin.toLowerCase()) && 
-          (content.includes('Overview') || content.includes('Backing Mechanism') || 
-           content.includes('**Overview**') || content.includes('**Backing Mechanism**'))) {
+      if (content.toLowerCase().includes(coin.toLowerCase()) && content.length > 200) {
         return url;
       }
     }
