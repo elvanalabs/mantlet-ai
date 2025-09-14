@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { TrendingUp, TrendingDown, BarChart3, Globe, Coins, Users, Info, AlertTriangle, Clock } from 'lucide-react';
+import { TrendingUp, TrendingDown, BarChart3, Globe, Coins, Users, Info, AlertTriangle, Clock, ExternalLink, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -103,6 +103,26 @@ const AdoptionMetrics: React.FC<AdoptionMetricsProps> = ({ adoptionData }) => {
     if (num >= 1e3) return `$${(num / 1e3).toFixed(2)}K`;
     return `$${num.toFixed(2)}`;
   };
+
+  // Transparency report URLs for specific stablecoins
+  const transparencyReports: { [key: string]: string } = {
+    'USDC': 'https://www.circle.com/transparency',
+    'USDT': 'https://tether.to/transparency/',
+    'USDP': 'https://www.paxos.com/usdp-transparency',
+    'TUSD': 'https://tusd.io/transparency',
+    'PYUSD': 'https://www.paypal.com/us/digital-wallet/manage-money/crypto/pyusd',
+    'GUSD': 'https://www.gemini.com/dollar',
+    'LUSD': 'https://www.liquity.org/',
+    'FRAX': 'https://frax.com/transparency',
+    'USDG': 'https://www.paxos.com/usdg-transparency',
+    'USDL': 'https://liftdollar.com/transparency',
+    'PAXG': 'https://www.paxos.com/paxg-transparency',
+    'EURT': 'https://tether.to/en/transparency/',
+    'CNHT': 'https://tether.to/en/transparency/',
+    'MXNT': 'https://tether.to/en/transparency/'
+  };
+
+  const hasTransparencyReport = transparencyReports[adoptionData.stablecoin];
 
   const getChainLogo = (chainName: string): string | null => {
     const chainLogos: { [key: string]: string } = {
@@ -327,6 +347,41 @@ const AdoptionMetrics: React.FC<AdoptionMetricsProps> = ({ adoptionData }) => {
               </div>
             </CardContent>
           </Card>
+
+          {/* Transparency */}
+          {hasTransparencyReport && (
+            <Card className="glass border border-border/50 hover:border-primary/20 transition-colors">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">
+                      Transparency
+                    </CardTitle>
+                    <MobileTooltip content="Official reserve and audit reports">
+                      <Info className="w-3 h-3 text-muted-foreground hover:text-primary cursor-help" />
+                    </MobileTooltip>
+                  </div>
+                  <FileText className="w-4 h-4 text-primary" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col gap-2">
+                  <p className="text-sm text-muted-foreground">
+                    View official attestations and reserve reports
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => window.open(hasTransparencyReport, '_blank')}
+                    className="w-full flex items-center gap-2"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    View Reports
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Chain Distribution */}
           <Card className="glass border border-border/50 hover:border-primary/20 transition-colors md:col-span-2">
