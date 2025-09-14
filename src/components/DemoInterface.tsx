@@ -556,20 +556,27 @@ export const DemoInterface = ({
   return <div className="h-screen flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between px-2 sm:px-4 glass border-b h-16 overflow-visible">
-        <div className="flex items-center space-x-2 sm:space-x-3">
-          <img src="/lovable-uploads/33de17b2-37de-44c9-994a-e297e6beede9.png" alt="Logo" className="w-16 h-16 sm:w-24 sm:h-24 object-contain" />
+        <div className="flex items-center space-x-3">
+          <img src="/lovable-uploads/33de17b2-37de-44c9-994a-e297e6beede9.png" alt="Logo" className="w-24 h-24 object-contain" />
         </div>
-        <div className="flex items-center gap-1 sm:gap-3">
-          <div className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
-            <span className="hidden sm:inline">Demo: </span>
-            <span className="sm:hidden">{queryCount}/2</span>
-            <span className="hidden sm:inline">{queryCount}/2 queries used</span>
+        <div className="flex items-center gap-3">
+          <div className="hidden sm:block text-sm text-muted-foreground">
+            Demo: {queryCount}/2 queries used
           </div>
-          <Button onClick={onSetupWallet} variant="outline" size="sm" className="text-xs sm:text-sm">
-            <Wallet className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
-            <span className="hidden sm:inline ml-1">Connect Wallet</span>
+          <Button onClick={onSetupWallet} variant="outline" size="sm">
+            <Wallet className="w-4 h-4 mr-1" />
+            <span className="hidden sm:inline">Connect Wallet</span>
             <span className="sm:hidden">Connect</span>
           </Button>
+        </div>
+      </div>
+
+      {/* Mobile Demo Counter */}
+      <div className="sm:hidden px-4 py-2 glass border-b">
+        <div className="flex items-center justify-center">
+          <div className="text-sm text-muted-foreground">
+            Demo mode: {queryCount}/2 queries used
+          </div>
         </div>
       </div>
 
