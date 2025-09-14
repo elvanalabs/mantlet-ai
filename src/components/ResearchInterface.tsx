@@ -229,7 +229,7 @@ export const ResearchInterface = () => {
                           href={part}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-primary hover:text-primary/80 underline font-medium break-all transition-colors duration-200 cursor-pointer"
+                          className="not-prose text-primary hover:text-primary/80 underline font-medium break-all transition-colors duration-200 cursor-pointer !text-primary hover:!text-primary/80"
                           onClick={(e) => {
                             e.stopPropagation();
                             window.open(part, '_blank');
