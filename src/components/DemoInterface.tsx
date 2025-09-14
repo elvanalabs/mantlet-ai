@@ -90,6 +90,7 @@ export const DemoInterface = ({
   }]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [queryCount, setQueryCount] = useState(0);
   const [compareStablecoin1, setCompareStablecoin1] = useState('');
   const [compareStablecoin2, setCompareStablecoin2] = useState('');
   const [explainStablecoin, setExplainStablecoin] = useState('');
@@ -135,6 +136,20 @@ export const DemoInterface = ({
     e.preventDefault();
     if (!input.trim() || isLoading) return;
     
+    // Check query limit in demo mode
+    if (queryCount >= 2) {
+      toast({
+        title: "Demo Limit Reached", 
+        description: "You've used your 2 free queries! Please authenticate with Privy to continue asking questions.",
+        variant: "destructive"
+      });
+      // Show authentication modal after a short delay
+      setTimeout(() => {
+        onSetupWallet();
+      }, 1500);
+      return;
+    }
+    
     // Validate if query is stablecoin-related
     if (!validateQuery(input.trim())) {
       toast({
@@ -154,6 +169,10 @@ export const DemoInterface = ({
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
+    
+    // Increment query count
+    setQueryCount(prev => prev + 1);
+    
     try {
       const response = await ResearchService.processQuery(input.trim());
       const assistantMessage: Message = {
@@ -184,6 +203,21 @@ export const DemoInterface = ({
   };
   const handleQuickAction = async (query: string) => {
     if (isLoading) return;
+    
+    // Check query limit in demo mode
+    if (queryCount >= 2) {
+      toast({
+        title: "Demo Limit Reached", 
+        description: "You've used your 2 free queries! Please authenticate with Privy to continue asking questions.",
+        variant: "destructive"
+      });
+      // Show authentication modal after a short delay
+      setTimeout(() => {
+        onSetupWallet();
+      }, 1500);
+      return;
+    }
+    
     const userMessage: Message = {
       id: Date.now().toString(),
       type: 'user',
@@ -192,6 +226,10 @@ export const DemoInterface = ({
     };
     setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
+    
+    // Increment query count
+    setQueryCount(prev => prev + 1);
+    
     try {
       const response = await ResearchService.processQuery(query);
       const assistantMessage: Message = {
@@ -521,10 +559,15 @@ export const DemoInterface = ({
         <div className="flex items-center space-x-3">
           <img src="/lovable-uploads/33de17b2-37de-44c9-994a-e297e6beede9.png" alt="Logo" className="w-24 h-24 object-contain" />
         </div>
-        <Button onClick={onSetupWallet} variant="outline" size="sm">
-          <Wallet className="w-4 h-4 mr-1" />
-          Connect Wallet
-        </Button>
+        <div className="flex items-center gap-3">
+          <div className="text-sm text-muted-foreground">
+            Demo: {queryCount}/2 queries used
+          </div>
+          <Button onClick={onSetupWallet} variant="outline" size="sm">
+            <Wallet className="w-4 h-4 mr-1" />
+            Connect Wallet
+          </Button>
+        </div>
       </div>
 
       {/* Messages */}
@@ -594,6 +637,18 @@ export const DemoInterface = ({
           </div>}
         <div ref={messagesEndRef} />
       </div>
+
+      {/* Demo Notice */}
+      {queryCount > 0 && queryCount < 2 && (
+        <div className="px-4 py-2">
+          <Card className="p-3 bg-accent/50 border-accent">
+            <div className="flex items-center gap-2 text-sm">
+              <Wallet className="w-4 h-4" />
+              <span>Demo mode: {2 - queryCount} {2 - queryCount === 1 ? 'query' : 'queries'} remaining. Connect wallet for unlimited access!</span>
+            </div>
+          </Card>
+        </div>
+      )}
 
       {/* Input */}
       <div className="border-t border-border glass">
