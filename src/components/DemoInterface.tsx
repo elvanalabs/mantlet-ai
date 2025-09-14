@@ -657,7 +657,7 @@ export const DemoInterface = ({
               <DialogTrigger asChild>
                 <Button variant="outline" size="sm">
                   <BarChart3 className="w-4 h-4 mr-2" />
-                  Adoption Tracker
+                  Onchain Metrics
                 </Button>
               </DialogTrigger>
               <DialogContent>
