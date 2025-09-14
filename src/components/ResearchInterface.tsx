@@ -160,7 +160,8 @@ export const ResearchInterface = () => {
     // Check if content contains any stablecoin mention and if it's an explanation
     for (const [coin, url] of Object.entries(transparencyReports)) {
       if (content.toLowerCase().includes(coin.toLowerCase()) && 
-          (content.includes('**Overview**') || content.includes('**Backing Mechanism**'))) {
+          (content.includes('Overview') || content.includes('Backing Mechanism') || 
+           content.includes('**Overview**') || content.includes('**Backing Mechanism**'))) {
         return url;
       }
     }
