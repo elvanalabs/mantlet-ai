@@ -220,7 +220,7 @@ export const ResearchInterface = () => {
             {getMessageIcon(message.type)}
             <div className="flex-1 min-w-0">
               <Card className={`p-4 ${message.type === 'user' ? 'bg-secondary' : 'glass'}`}>
-                <div className="prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap">
+                <div className="max-w-none whitespace-pre-wrap text-sm leading-relaxed">
                   {message.content.split(/(https?:\/\/[^\s\)\]>,]+)/g).map((part, index) => {
                     if (part.match(/^https?:\/\//)) {
                       return (
@@ -229,9 +229,10 @@ export const ResearchInterface = () => {
                           href={part}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="not-prose text-primary hover:text-primary/80 underline font-medium break-all transition-colors duration-200 cursor-pointer !text-primary hover:!text-primary/80"
+                          className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 underline font-medium break-all transition-colors duration-200 cursor-pointer inline-block"
                           onClick={(e) => {
                             e.stopPropagation();
+                            console.log('Link clicked:', part);
                             window.open(part, '_blank');
                           }}
                         >
@@ -239,7 +240,7 @@ export const ResearchInterface = () => {
                         </a>
                       );
                     }
-                    return part;
+                    return <span key={index}>{part}</span>;
                   })}
                 </div>
                 {message.adoptionData && (
