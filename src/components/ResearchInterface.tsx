@@ -221,27 +221,59 @@ export const ResearchInterface = () => {
             <div className="flex-1 min-w-0">
               <Card className={`p-4 ${message.type === 'user' ? 'bg-secondary' : 'glass'}`}>
                 <div className="max-w-none whitespace-pre-wrap text-sm leading-relaxed">
-                  {message.content.split(/(https?:\/\/[^\s\)\]>,]+)/g).map((part, index) => {
-                    if (part.match(/^https?:\/\//)) {
-                      return (
-                        <a
-                          key={index}
-                          href={part}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 underline font-medium break-all transition-colors duration-200 cursor-pointer inline-block"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            console.log('Link clicked:', part);
-                            window.open(part, '_blank');
-                          }}
-                        >
-                          {part} ↗
-                        </a>
-                      );
-                    }
-                    return <span key={index}>{part}</span>;
-                  })}
+                  {(() => {
+                    const parts = message.content.split(/(\[([^\]]+)\]\(([^)]+)\)|https?:\/\/[^\s\)\]>,\n]+)/g);
+                    console.log('Message content:', message.content);
+                    console.log('Split parts:', parts);
+                    
+                    return parts.map((part, index) => {
+                      // Handle markdown links [text](url)
+                      const markdownMatch = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+                      if (markdownMatch) {
+                        const [, linkText, url] = markdownMatch;
+                        console.log('Found markdown link:', linkText, url);
+                        return (
+                          <a
+                            key={index}
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 underline font-medium break-all transition-colors duration-200 cursor-pointer inline-block"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              console.log('Markdown link clicked:', url);
+                              window.open(url, '_blank');
+                            }}
+                          >
+                            {linkText} ↗
+                          </a>
+                        );
+                      }
+                      
+                      // Handle plain URLs
+                      if (part.match(/^https?:\/\//)) {
+                        console.log('Found plain URL:', part);
+                        return (
+                          <a
+                            key={index}
+                            href={part}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 underline font-medium break-all transition-colors duration-200 cursor-pointer inline-block"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              console.log('Plain URL clicked:', part);
+                              window.open(part, '_blank');
+                            }}
+                          >
+                            {part} ↗
+                          </a>
+                        );
+                      }
+                      
+                      return <span key={index}>{part}</span>;
+                    });
+                  })()}
                 </div>
                 {message.adoptionData && (
                   <div className="mt-3">
