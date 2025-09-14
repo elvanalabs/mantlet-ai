@@ -475,26 +475,7 @@ Reference Data for ${referenceData.name} (${referenceData.symbol}):
 - Description: ${referenceData.description}`;
         }
         
-        // Get transparency report URL for the stablecoin
-        const transparencyReports: { [key: string]: string } = {
-          'USDC': 'https://www.circle.com/transparency',
-          'USDT': 'https://tether.to/transparency/',
-          'USDP': 'https://www.paxos.com/usdp-transparency',
-          'TUSD': 'https://tusd.io/transparency',
-          'PYUSD': 'https://www.paypal.com/us/digital-wallet/manage-money/crypto/pyusd',
-          'GUSD': 'https://www.gemini.com/dollar',
-          'LUSD': 'https://www.liquity.org/',
-          'FRAX': 'https://frax.com/transparency',
-          'USDG': 'https://www.paxos.com/usdg-transparency',
-          'USDL': 'https://liftdollar.com/transparency',
-          'PAXG': 'https://www.paxos.com/paxg-transparency',
-          'EURT': 'https://tether.to/en/transparency/?tab=eurt',
-          'CNHT': 'https://tether.to/en/transparency/?tab=cnht',
-          'MXNT': 'https://tether.to/en/transparency/?tab=mxnt'
-        };
-        
-        const transparencyUrl = transparencyReports[stablecoinName.toUpperCase()];
-        const transparencyInfo = transparencyUrl ? `\n\nTransparency Report: ${transparencyUrl}` : '';
+        // Skip transparency report URLs as requested
 
         // Create a specific prompt for explain queries that only returns the 4 sections
         prompt = `Please provide information about the ${stablecoinName} stablecoin in exactly these 4 sections only:
@@ -511,7 +492,6 @@ IMPORTANT FORMATTING RULES:
 4. Each bullet point should be on a separate line
 5. Content under each section should be in regular text (not bold)
 6. Do not include any other information outside these 4 sections
-7. At the end of the response, if there is a transparency report available, include it as: "**Transparency Report:** [URL]"
 
 Example format:
 **Overview**
@@ -522,7 +502,7 @@ Content here...
 - Point 2
 - Point 3
 
-${referenceInfo}${transparencyInfo}
+${referenceInfo}
 
 ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
       } else {
@@ -569,7 +549,17 @@ ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
     }>;
   } | undefined> {
     try {
-      // Generate mock historical data for now (can be replaced with real API later)
+      // First try to fetch real historical data from CoinGecko
+      const realData = await this.fetchRealChartData(symbol);
+      if (realData && realData.length > 0) {
+        return {
+          symbol,
+          data: realData
+        };
+      }
+      
+      // Fallback to mock data if API fails
+      console.log(`Falling back to mock data for ${symbol}`);
       const mockData = this.generateMockChartData(symbol);
       
       return {
@@ -579,6 +569,95 @@ ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
     } catch (error) {
       console.error('Error getting chart data:', error);
       return undefined;
+    }
+  }
+
+  private static async fetchRealChartData(symbol: string): Promise<Array<{
+    date: string;
+    price: number;
+    volume?: number;
+  }> | null> {
+    try {
+      // Map stablecoin symbols to CoinGecko IDs
+      const coinGeckoIds: { [key: string]: string } = {
+        'USDT': 'tether',
+        'USDC': 'usd-coin',
+        'BUSD': 'binance-usd',
+        'DAI': 'dai',
+        'FRAX': 'frax',
+        'TUSD': 'true-usd',
+        'USDP': 'paxos-standard',
+        'GUSD': 'gemini-dollar',
+        'LUSD': 'liquity-usd',
+        'SUSD': 'nusd',
+        'USDD': 'usdd',
+        'FDUSD': 'first-digital-usd',
+        'PYUSD': 'paypal-usd',
+        'USDE': 'ethena-usde',
+        'USDS': 'sky-dollar-usds',
+        'EURS': 'stasis-eurs',
+        'EURC': 'euro-coin',
+        'MIM': 'magic-internet-money',
+        'USTC': 'terrausd',
+        'PAXG': 'pax-gold',
+        'XAUT': 'tether-gold'
+      };
+
+      const coinGeckoId = coinGeckoIds[symbol.toUpperCase()];
+      if (!coinGeckoId) {
+        console.log(`No CoinGecko ID found for ${symbol}, using mock data`);
+        return null;
+      }
+
+      // Fetch 30 days of daily price data
+      const thirtyDaysAgo = Math.floor((Date.now() - 30 * 24 * 60 * 60 * 1000) / 1000);
+      const now = Math.floor(Date.now() / 1000);
+      
+      const response = await fetch(
+        `https://api.coingecko.com/api/v3/coins/${coinGeckoId}/market_chart/range?vs_currency=usd&from=${thirtyDaysAgo}&to=${now}`,
+        {
+          headers: {
+            'Accept': 'application/json',
+            'User-Agent': 'StablecoinTracker/1.0'
+          }
+        }
+      );
+
+      if (!response.ok) {
+        console.log(`CoinGecko API error: ${response.status} ${response.statusText}`);
+        return null;
+      }
+
+      const data = await response.json();
+      const prices = data.prices || [];
+      const volumes = data.total_volumes || [];
+
+      if (!prices.length) {
+        console.log(`No price data available for ${symbol}`);
+        return null;
+      }
+
+      // Convert CoinGecko data to our format, sampling every few hours to avoid too many data points
+      const chartData = [];
+      const sampleEvery = Math.max(1, Math.floor(prices.length / 30)); // Sample to get around 30 data points
+      
+      for (let i = 0; i < prices.length; i += sampleEvery) {
+        const [timestamp, price] = prices[i];
+        const volume = volumes[i] ? volumes[i][1] : undefined;
+        
+        chartData.push({
+          date: new Date(timestamp).toISOString().split('T')[0],
+          price: Number(Number(price).toFixed(6)),
+          volume: volume ? Math.floor(volume) : undefined
+        });
+      }
+
+      console.log(`Fetched ${chartData.length} real data points for ${symbol}`);
+      return chartData;
+
+    } catch (error) {
+      console.error(`Error fetching real chart data for ${symbol}:`, error);
+      return null;
     }
   }
 
