@@ -41,7 +41,7 @@ export const CoinGeckoWidget = () => {
   }, []);
 
   return (
-    <div className="w-full">
+    <div className="w-full bg-background border-b min-h-[60px] flex items-center">
       <gecko-coin-price-marquee-widget
         locale="en"
         dark-mode="true"
