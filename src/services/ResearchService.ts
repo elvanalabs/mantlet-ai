@@ -475,26 +475,7 @@ Reference Data for ${referenceData.name} (${referenceData.symbol}):
 - Description: ${referenceData.description}`;
         }
         
-        // Get transparency report URL for specific stablecoins only
-        const transparencyReports: { [key: string]: string } = {
-          'USDC': 'https://www.circle.com/transparency',
-          'USDT': 'https://tether.to/transparency/',
-          'USDP': 'https://www.paxos.com/usdp-transparency',
-          'TUSD': 'https://tusd.io/transparency',
-          'PYUSD': 'https://www.paypal.com/us/digital-wallet/manage-money/crypto/pyusd',
-          'GUSD': 'https://www.gemini.com/dollar',
-          'LUSD': 'https://www.liquity.org/',
-          'FRAX': 'https://frax.com/transparency',
-          'USDG': 'https://www.paxos.com/usdg-transparency',
-          'USDL': 'https://liftdollar.com/transparency',
-          'PAXG': 'https://www.paxos.com/paxg-transparency',
-          'EURT': 'https://tether.to/en/transparency/',
-          'CNHT': 'https://tether.to/en/transparency/',
-          'MXNT': 'https://tether.to/en/transparency/'
-        };
-        
-        const transparencyUrl = transparencyReports[stablecoinName.toUpperCase()];
-        const transparencyInfo = transparencyUrl ? `\n\n**Transparency Report:** [${transparencyUrl}](${transparencyUrl})` : '';
+        // No transparency reports included
 
         // Create a specific prompt for explain queries that only returns the 4 sections
         prompt = `Please provide information about the ${stablecoinName} stablecoin in exactly these 4 sections only:
@@ -511,7 +492,6 @@ IMPORTANT FORMATTING RULES:
 4. Each bullet point should be on a separate line
 5. Content under each section should be in regular text (not bold)
 6. Do not include any other information outside these 4 sections
-7. If a transparency report is available for this stablecoin, add it at the end as: "**Transparency Report:** [URL](URL)"
 
 Example format:
 **Overview**
@@ -522,7 +502,7 @@ Content here...
 - Point 2
 - Point 3
 
-${referenceInfo}${transparencyInfo}
+${referenceInfo}
 
 ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
       } else {

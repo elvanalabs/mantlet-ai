@@ -40,7 +40,7 @@ Tether has faced regulatory scrutiny but maintains operations globally. The comp
 ✓ Established track record since 2014
 
 **Considerations:**
-⚠️ Historical transparency concerns
+⚠️ Historical regulatory concerns
 ⚠️ Regulatory uncertainties
 ⚠️ Centralized control`,
     adoptionData: {
@@ -63,18 +63,18 @@ Tether has faced regulatory scrutiny but maintains operations globally. The comp
         }
       ]
     },
-    sources: ['Tether Transparency', 'CoinGecko', 'DeFiLlama', 'Messari']
+    sources: ['Tether', 'CoinGecko', 'DeFiLlama', 'Messari']
   },
 
   'USDC': {
     symbol: 'USDC',
     name: 'USD Coin',
-    explanation: `**USD Coin (USDC)** is a fully regulated, US dollar-backed stablecoin issued by Circle, known for its transparency and regulatory compliance.
+    explanation: `**USD Coin (USDC)** is a fully regulated, US dollar-backed stablecoin issued by Circle, known for its regulatory compliance.
 
 **Key Features:**
 • **Backing**: 100% backed by US dollar cash and short-term US Treasury securities
 • **Regulation**: Regulated under US state money transmission laws
-• **Transparency**: Monthly attestations by Grant Thornton LLP
+• **Attestations**: Monthly attestations by Grant Thornton LLP
 • **Multi-chain**: Native on 15+ blockchains including Ethereum, Polygon, Arbitrum
 
 **Regulatory Compliance:**
@@ -118,7 +118,7 @@ USDC operates under strict regulatory oversight with full reserve backing and re
         }
       ]
     },
-    sources: ['Circle Transparency', 'Centre.io', 'CoinGecko', 'DeFiLlama']
+    sources: ['Circle', 'Centre.io', 'CoinGecko', 'DeFiLlama']
   },
 
   'DAI': {
@@ -248,7 +248,7 @@ In February 2023, Paxos received a Wells notice from the SEC and stopped minting
   'TUSD': {
     symbol: 'TUSD',
     name: 'TrueUSD',
-    explanation: `**TrueUSD (TUSD)** is a USD-backed stablecoin that emphasizes transparency and regulatory compliance through independent verification and regular attestations.
+    explanation: `**TrueUSD (TUSD)** is a USD-backed stablecoin that emphasizes regulatory compliance through independent verification and regular attestations.
 
 **Key Features:**
 • **Full backing**: 100% backed by USD in segregated accounts
@@ -256,7 +256,7 @@ In February 2023, Paxos received a Wells notice from the SEC and stopped minting
 • **Legal protection**: Funds held in escrow accounts with legal protections
 • **Multi-chain**: Available on Ethereum, BSC, TRON, and other networks
 
-**Trust & Transparency:**
+**Trust Structure:**
 TUSD uses a unique trust structure where USD reserves are held in escrow accounts at multiple banks, with regular attestations by independent accounting firms.
 
 **Advantages:**
