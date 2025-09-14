@@ -321,24 +321,28 @@ export const ResearchInterface = () => {
                  )}
                   {message.type === 'assistant' && (() => {
                     const transparencyUrl = getTransparencyReport(message.content);
-                    console.log('Checking transparency for message:', { 
-                      content: message.content.substring(0, 100), 
-                      transparencyUrl 
-                    });
-                    return transparencyUrl;
-                  })() && (
-                    <div className="mt-3 pt-3 border-t border-border">
-                       <Button
-                         variant="default"
-                         size="sm"
-                         className="text-xs h-9 px-4 gap-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground shadow-md hover:shadow-lg transition-all duration-200 font-medium"
-                         onClick={() => window.open(getTransparencyReport(message.content)!, '_blank')}
-                       >
-                         View Transparency Report
-                         <ArrowUpRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                       </Button>
-                     </div>
-                  )}
+                    console.log('=== TRANSPARENCY DEBUG ===');
+                    console.log('Message content:', message.content);
+                    console.log('Detected transparency URL:', transparencyUrl);
+                    console.log('========================');
+                    
+                    if (transparencyUrl) {
+                      return (
+                        <div className="mt-3 pt-3 border-t border-border">
+                          <Button
+                            variant="default"
+                            size="sm"
+                            className="text-xs h-9 px-4 gap-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground shadow-md hover:shadow-lg transition-all duration-200 font-medium group"
+                            onClick={() => window.open(transparencyUrl, '_blank')}
+                          >
+                            View Transparency Report
+                            <ArrowUpRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                          </Button>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
                </Card>
                <p className="text-xs text-muted-foreground mt-1">
                  {message.timestamp.toLocaleTimeString()}
