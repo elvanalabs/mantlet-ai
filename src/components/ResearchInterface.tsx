@@ -221,7 +221,7 @@ export const ResearchInterface = () => {
             <div className="flex-1 min-w-0">
               <Card className={`p-4 ${message.type === 'user' ? 'bg-secondary' : 'glass'}`}>
                 <div className="prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap">
-                  {message.content.split(/(https?:\/\/[^\s\)]+)/g).map((part, index) => {
+                  {message.content.split(/(https?:\/\/[^\s\)\]>,]+)/g).map((part, index) => {
                     if (part.match(/^https?:\/\//)) {
                       return (
                         <a
@@ -229,13 +229,13 @@ export const ResearchInterface = () => {
                           href={part}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-blue-500 hover:text-blue-600 underline font-medium break-all"
+                          className="text-primary hover:text-primary/80 underline font-medium break-all transition-colors duration-200 cursor-pointer"
                           onClick={(e) => {
                             e.stopPropagation();
                             window.open(part, '_blank');
                           }}
                         >
-                          {part}
+                          {part} ↗
                         </a>
                       );
                     }
