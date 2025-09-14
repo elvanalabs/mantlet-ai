@@ -42,9 +42,7 @@ Tether has faced regulatory scrutiny but maintains operations globally. The comp
 **Considerations:**
 ⚠️ Historical transparency concerns
 ⚠️ Regulatory uncertainties
-⚠️ Centralized control
-
-Transparency Report: https://tether.to/en/transparency/`,
+⚠️ Centralized control`,
     adoptionData: {
       circulatingSupply: '120.2B USDT',
       marketShare: '68.5%',
@@ -98,9 +96,7 @@ USDC operates under strict regulatory oversight with full reserve backing and re
 
 **Considerations:**
 ⚠️ Smaller market share than USDT
-⚠️ Potential regulatory changes
-
-Transparency Report: https://www.centre.io/usdc-transparency`,
+⚠️ Potential regulatory changes`,
     adoptionData: {
       circulatingSupply: '36.8B USDC',
       marketShare: '21.0%',
@@ -155,9 +151,7 @@ Users deposit crypto collateral (150%+ ratio) into Maker Vaults to generate DAI.
 **Considerations:**
 ⚠️ Complex liquidation mechanisms
 ⚠️ Collateral volatility risk
-⚠️ Lower liquidity than USDT/USDC
-
-Transparency Report: https://makerburn.com/#/transparency`,
+⚠️ Lower liquidity than USDT/USDC`,
     adoptionData: {
       circulatingSupply: '4.9B DAI',
       marketShare: '2.8%',
@@ -211,9 +205,7 @@ USDe is backed by ETH and stETH, with short positions in ETH perpetual futures t
 ⚠️ Funding rate risk
 ⚠️ Liquidation cascade potential
 ⚠️ Relatively new and untested
-⚠️ Counterparty risk with derivatives exchanges
-
-Transparency Report: https://app.ethena.fi/transparency`,
+⚠️ Counterparty risk with derivatives exchanges`,
     adoptionData: {
       circulatingSupply: '3.2B USDe',
       marketShare: '1.8%',
@@ -249,9 +241,7 @@ In February 2023, Paxos received a Wells notice from the SEC and stopped minting
 **Lessons Learned:**
 ⚠️ Regulatory uncertainty can impact stablecoin operations
 ⚠️ Importance of diversifying stablecoin holdings
-⚠️ Even well-backed stablecoins face regulatory risks
-
-Transparency Report: https://paxos.com/busd-transparency/`,
+⚠️ Even well-backed stablecoins face regulatory risks`,
     sources: ['Paxos', 'Binance', 'SEC filings', 'CoinDesk']
   },
 
@@ -283,9 +273,7 @@ TUSD uses a unique trust structure where USD reserves are held in escrow account
 
 **Considerations:**
 ⚠️ Smaller market share and liquidity
-⚠️ Limited exchange listings compared to USDT/USDC
-
-Transparency Report: https://real-time-attest.trusttoken.com/trueusd`,
+⚠️ Limited exchange listings compared to USDT/USDC`,
     adoptionData: {
       circulatingSupply: '500M TUSD',
       marketShare: '0.3%',
@@ -330,9 +318,7 @@ PYUSD is designed to integrate seamlessly with PayPal's existing financial servi
 **Considerations:**
 ⚠️ Relatively new entrant (launched 2023)
 ⚠️ Limited DeFi ecosystem integration
-⚠️ Centralized control by PayPal
-
-Transparency Report: https://paxos.com/pyusd-transparency/`,
+⚠️ Centralized control by PayPal`,
     adoptionData: {
       circulatingSupply: '750M PYUSD',
       marketShare: '0.4%',
