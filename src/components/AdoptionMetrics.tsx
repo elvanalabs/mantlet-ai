@@ -506,7 +506,7 @@ const AdoptionMetrics: React.FC<AdoptionMetricsProps> = ({ adoptionData }) => {
                       </Badge>
                     </div>
                     <div className="pt-2 border-t border-border/20">
-                      <p className="text-sm font-medium text-muted-foreground">Largest Holder % of Supply</p>
+                      <p className="text-sm font-medium text-muted-foreground">Largest Holder holds</p>
                       <p className="text-lg font-semibold">{concentrationData.largestHolderPercentage}%</p>
                     </div>
                   </div>
