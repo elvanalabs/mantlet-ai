@@ -296,7 +296,7 @@ export const ResearchInterface = () => {
             {getMessageIcon(message.type)}
             <div className="flex-1 min-w-0">
               <Card className={`p-4 ${message.type === 'user' ? 'bg-secondary' : 'glass'}`}>
-                <div className="prose prose-sm dark:prose-invert max-w-none">
+                <div className="prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap">
                   {message.content.split(/(https?:\/\/[^\s\)]+)/g).map((part, index) => {
                     if (part.match(/^https?:\/\//)) {
                       return (
@@ -305,13 +305,17 @@ export const ResearchInterface = () => {
                           href={part}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-blue-500 hover:text-blue-600 underline font-medium"
+                          className="text-blue-500 hover:text-blue-600 underline font-medium break-all"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            window.open(part, '_blank');
+                          }}
                         >
                           {part}
                         </a>
                       );
                     }
-                    return <span key={index}>{part}</span>;
+                    return part;
                   })}
                 </div>
                 {message.adoptionData && (
