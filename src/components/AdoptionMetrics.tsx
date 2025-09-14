@@ -490,7 +490,7 @@ const AdoptionMetrics: React.FC<AdoptionMetricsProps> = ({ adoptionData }) => {
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium">Top 10 Holders % of Supply</p>
+                        <p className="text-sm font-medium">Top 10 Holders hold</p>
                         <p className="text-2xl font-bold">{concentrationData.top10Percentage}%</p>
                       </div>
                       <Badge 
