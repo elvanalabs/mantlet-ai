@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
-import { Send, Loader2, TrendingUp, Database, Globe } from 'lucide-react';
+import { Send, Loader2, TrendingUp, Database, Globe, ExternalLink } from 'lucide-react';
 import { ResearchService } from '@/services/ResearchService';
 import { validateStablecoin } from '@/utils/stablecoinValidation';
 import AdoptionMetrics from '@/components/AdoptionMetrics';
@@ -139,6 +139,34 @@ export const ResearchInterface = () => {
     }
   };
 
+  const getTransparencyReport = (content: string): string | null => {
+    const transparencyReports: { [key: string]: string } = {
+      'USDC': 'https://www.circle.com/transparency',
+      'USDT': 'https://tether.to/transparency/',
+      'USDP': 'https://www.paxos.com/usdp-transparency',
+      'TUSD': 'https://tusd.io/transparency',
+      'PYUSD': 'https://www.paypal.com/us/digital-wallet/manage-money/crypto/pyusd',
+      'GUSD': 'https://www.gemini.com/dollar',
+      'LUSD': 'https://www.liquity.org/',
+      'FRAX': 'https://frax.com/transparency',
+      'USDG': 'https://www.paxos.com/usdg-transparency',
+      'USDL': 'https://liftdollar.com/transparency',
+      'PAXG': 'https://www.paxos.com/paxg-transparency',
+      'EURT': 'https://tether.to/en/transparency/?tab=eurt',
+      'CNHT': 'https://tether.to/en/transparency/?tab=cnht',
+      'MXNT': 'https://tether.to/en/transparency/?tab=mxnt'
+    };
+
+    // Check if content contains any stablecoin mention and if it's an explanation
+    for (const [coin, url] of Object.entries(transparencyReports)) {
+      if (content.toLowerCase().includes(coin.toLowerCase()) && 
+          (content.includes('**Overview**') || content.includes('**Backing Mechanism**'))) {
+        return url;
+      }
+    }
+    return null;
+  };
+
   const getMessageIcon = (type: string) => {
     switch (type) {
       case 'user':
@@ -169,31 +197,44 @@ export const ResearchInterface = () => {
                     <AdoptionMetrics adoptionData={message.adoptionData} />
                   </div>
                 )}
-                {message.sources && message.sources.length > 0 && (
-                  <div className="mt-3 pt-3 border-t border-border">
-                    <p className="text-xs text-muted-foreground mb-2 flex items-center">
-                      <Globe className="w-3 h-3 mr-1" />
-                      Sources:
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {message.sources.map((source, index) => (
-                        <span key={index} className="text-xs px-2 py-1 bg-muted rounded-md">
-                          {source}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </Card>
-              <p className="text-xs text-muted-foreground mt-1">
-                {message.timestamp.toLocaleTimeString()}
-              </p>
-            </div>
-          </div>
-        ))}
-        {isLoading && (
-          <div className="flex space-x-3">
-            <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center">
+                 {message.sources && message.sources.length > 0 && (
+                   <div className="mt-3 pt-3 border-t border-border">
+                     <p className="text-xs text-muted-foreground mb-2 flex items-center">
+                       <Globe className="w-3 h-3 mr-1" />
+                       Sources:
+                     </p>
+                     <div className="flex flex-wrap gap-2">
+                       {message.sources.map((source, index) => (
+                         <span key={index} className="text-xs px-2 py-1 bg-muted rounded-md">
+                           {source}
+                         </span>
+                       ))}
+                     </div>
+                   </div>
+                 )}
+                 {message.type === 'assistant' && getTransparencyReport(message.content) && (
+                   <div className="mt-3 pt-3 border-t border-border">
+                     <Button
+                       variant="outline"
+                       size="sm"
+                       className="text-xs h-8 px-3 gap-2"
+                       onClick={() => window.open(getTransparencyReport(message.content)!, '_blank')}
+                     >
+                       <ExternalLink className="w-3 h-3" />
+                       View Transparency Report
+                     </Button>
+                   </div>
+                 )}
+               </Card>
+               <p className="text-xs text-muted-foreground mt-1">
+                 {message.timestamp.toLocaleTimeString()}
+               </p>
+             </div>
+           </div>
+         ))}
+         {isLoading && (
+           <div className="flex space-x-3">
+             <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center">
               <Loader2 className="w-4 h-4 text-accent-foreground animate-spin" />
             </div>
             <div className="flex-1">
