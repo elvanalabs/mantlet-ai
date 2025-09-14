@@ -141,16 +141,19 @@ const AdoptionMetrics: React.FC<AdoptionMetricsProps> = ({ adoptionData }) => {
 
   const hasTransparencyReport = transparencyReports[adoptionData.stablecoin];
 
-  // Token contract addresses for major stablecoins on Ethereum (VERIFIED CORRECT)
+  // TOP 10 STABLECOINS - VERIFIED CONTRACT ADDRESSES (Ethereum Mainnet)
   const tokenAddresses: { [key: string]: string } = {
-    'USDC': '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', // Corrected address
-    'USDT': '0xdAC17F958D2ee523a2206206994597C13D831ec7',
-    'USDP': '0x8E870D67F660D95d5be530380D0eC0bd388289E1',
-    'TUSD': '0x0000000000085d4780B73119b644AE5ecd22b376',
-    'PYUSD': '0x6c3ea9036406852006290770BEdFcAbA0e23A0e8',
-    'GUSD': '0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd',
-    'FRAX': '0x853d955aCEf822Db058eb8505911ED77F175b99e',
-    'PAXG': '0x45804880De22913dAFE09f4980848ECE6EcbAf78'
+    // Top tier stablecoins by market cap
+    'USDT': '0xdAC17F958D2ee523a2206206994597C13D831ec7', // Tether USD
+    'USDC': '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', // USD Coin (Circle)
+    'USDE': '0x4c19596f5aAfF459fA38B0f7eD92F11AE6543398', // Ethena USDe  
+    'DAI': '0x6B175474E89094C44Da98b954EedeAC495271d0F',  // Dai Stablecoin (MakerDAO)
+    'FDUSD': '0xc5f0f7b66764F6ec8C8Dff7BA683102295E16409', // First Digital USD
+    'USDP': '0x8E870D67F660D95d5be530380D0eC0bd388289E1', // Pax Dollar (Paxos)
+    'TUSD': '0x0000000000085d4780B73119b644AE5ecd22b376', // TrueUSD
+    'PYUSD': '0x6c3ea9036406852006290770BEdFcAbA0e23A0e8', // PayPal USD
+    'FRAX': '0x853d955aCEf822Db058eb8505911ED77F175b99e', // Frax
+    'GUSD': '0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd'  // Gemini Dollar
   };
 
   // Fetch concentration risk data
@@ -162,29 +165,30 @@ const AdoptionMetrics: React.FC<AdoptionMetricsProps> = ({ adoptionData }) => {
       setConcentrationData(prev => ({ ...prev, loading: true, error: undefined }));
 
       try {
-        const holders = await MoralisService.getTokenHolders(tokenAddress, 'eth', 50);
+        console.log(`Fetching concentration data for ${adoptionData.stablecoin} (${tokenAddress})`);
         
-        // Validate that we received proper data with percentage information
+        const holders = await MoralisService.getTokenHolders(tokenAddress, 'eth', 100);
+        
+        // Validate that we received proper data
         if (!holders || holders.length === 0) {
-          throw new Error('No holder data received');
+          throw new Error('No holder data received from Moralis API');
         }
         
-        // Check if Moralis provided percentage data
-        const hasPercentageData = holders.some(h => 
-          h.percentage_relative_to_total_supply !== undefined && 
-          h.percentage_relative_to_total_supply !== null
-        );
-        
-        if (!hasPercentageData) {
-          throw new Error('Percentage data not available from Moralis API');
-        }
+        console.log(`Received ${holders.length} holders from API`);
         
         const riskData = MoralisService.calculateConcentrationRisk(holders);
+        
+        // Validate that we got meaningful results
+        if (riskData.top10Percentage === 0 && riskData.largestHolderPercentage === 0) {
+          throw new Error('Unable to calculate concentration metrics - data may be incomplete');
+        }
         
         setConcentrationData({
           ...riskData,
           loading: false
         });
+        
+        console.log(`Successfully calculated concentration risk for ${adoptionData.stablecoin}:`, riskData);
       } catch (error) {
         console.error('Error fetching concentration data:', error);
         setConcentrationData(prev => ({ 

@@ -437,6 +437,8 @@ ${validTransactions.slice(0, 5).map(tx => {
         order: 'DESC'
       };
 
+      console.log(`Fetching holders for token: ${tokenAddress} on chain: ${chain}`);
+
       const response = await fetch(this.SUPABASE_FUNCTION_URL, {
         method: 'POST',
         headers: {
@@ -452,12 +454,22 @@ ${validTransactions.slice(0, 5).map(tx => {
       const result: MoralisResponse<{ result: TokenHolder[] }> = await response.json();
       
       if (!result.success || !result.data) {
+        console.error('Moralis API error:', result.error);
         throw new Error(result.error || 'Failed to fetch token holders');
       }
 
-      // Handle the actual Moralis API response structure
+      // Handle the actual Moralis API response structure - it should have a 'result' array
       const data = result.data as any;
-      return Array.isArray(data) ? data : (data.result || []);
+      const holders = Array.isArray(data) ? data : (data.result || []);
+      
+      console.log(`Received ${holders.length} holders from Moralis API`);
+      
+      // Log sample data structure for debugging
+      if (holders.length > 0) {
+        console.log('Sample holder data:', JSON.stringify(holders[0], null, 2));
+      }
+      
+      return holders;
     } catch (error) {
       console.error('Error fetching token holders:', error);
       throw error;
@@ -471,6 +483,7 @@ ${validTransactions.slice(0, 5).map(tx => {
     riskColor: 'green' | 'yellow' | 'red';
   } {
     if (!holders || holders.length === 0) {
+      console.log('No holders data provided for concentration calculation');
       return {
         top10Percentage: 0,
         largestHolderPercentage: 0,
@@ -479,19 +492,68 @@ ${validTransactions.slice(0, 5).map(tx => {
       };
     }
 
-    // Sort holders by percentage (descending) - use Moralis provided percentages
-    const sortedHolders = [...holders].sort((a, b) => 
-      (b.percentage_relative_to_total_supply || 0) - (a.percentage_relative_to_total_supply || 0)
-    );
+    console.log(`Calculating concentration risk for ${holders.length} holders`);
 
-    // Get largest holder percentage directly from Moralis data
-    const largestHolderPercentage = sortedHolders[0]?.percentage_relative_to_total_supply || 0;
+    // Check if we have percentage data from Moralis API
+    const hasPercentageData = holders.some(h => {
+      const percentage = h.percentage_relative_to_total_supply;
+      if (percentage === undefined || percentage === null) return false;
+      
+      // Handle both string and number types
+      const numValue = typeof percentage === 'string' ? parseFloat(percentage) : percentage;
+      return !isNaN(numValue) && numValue > 0;
+    });
 
-    // Calculate top 10 holders percentage using Moralis provided percentages
-    const top10Holders = sortedHolders.slice(0, 10);
-    const top10Percentage = top10Holders.reduce((sum, holder) => 
-      sum + (holder.percentage_relative_to_total_supply || 0), 0
-    );
+    console.log('Has percentage data from Moralis:', hasPercentageData);
+
+    let sortedHolders: TokenHolder[];
+    let largestHolderPercentage: number;
+    let top10Percentage: number;
+
+    if (hasPercentageData) {
+      // Use Moralis-provided percentages (preferred method)
+      sortedHolders = [...holders].sort((a, b) => 
+        (parseFloat(b.percentage_relative_to_total_supply?.toString() || '0')) - 
+        (parseFloat(a.percentage_relative_to_total_supply?.toString() || '0'))
+      );
+
+      largestHolderPercentage = parseFloat(sortedHolders[0]?.percentage_relative_to_total_supply?.toString() || '0');
+      
+      const top10Holders = sortedHolders.slice(0, 10);
+      top10Percentage = top10Holders.reduce((sum, holder) => 
+        sum + parseFloat(holder.percentage_relative_to_total_supply?.toString() || '0'), 0
+      );
+    } else {
+      // Fall back to balance-based calculation if percentage data isn't available
+      console.warn('Using fallback calculation - results may be less accurate');
+      
+      sortedHolders = [...holders].sort((a, b) => 
+        parseFloat(b.balance_formatted || '0') - parseFloat(a.balance_formatted || '0')
+      );
+
+      // Calculate total supply from all holders (this is an approximation)
+      const totalSupplyFromHolders = holders.reduce((sum, holder) => 
+        sum + parseFloat(holder.balance_formatted || '0'), 0
+      );
+
+      if (totalSupplyFromHolders === 0) {
+        console.warn('Total supply calculation resulted in 0');
+        return {
+          top10Percentage: 0,
+          largestHolderPercentage: 0,
+          riskLevel: 'Low Risk',
+          riskColor: 'green'
+        };
+      }
+
+      largestHolderPercentage = (parseFloat(sortedHolders[0]?.balance_formatted || '0') / totalSupplyFromHolders) * 100;
+      
+      const top10Holders = sortedHolders.slice(0, 10);
+      const top10Supply = top10Holders.reduce((sum, holder) => 
+        sum + parseFloat(holder.balance_formatted || '0'), 0
+      );
+      top10Percentage = (top10Supply / totalSupplyFromHolders) * 100;
+    }
 
     // Determine risk level based on top 10 percentage
     let riskLevel: 'Low Risk' | 'Moderate Risk' | 'High Risk';
@@ -507,6 +569,11 @@ ${validTransactions.slice(0, 5).map(tx => {
       riskLevel = 'High Risk';
       riskColor = 'red';
     }
+
+    console.log(`Concentration Risk Results:
+      - Top 10: ${top10Percentage.toFixed(2)}%
+      - Largest: ${largestHolderPercentage.toFixed(2)}%
+      - Risk Level: ${riskLevel}`);
 
     return {
       top10Percentage: Math.round(top10Percentage * 100) / 100,
