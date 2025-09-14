@@ -370,10 +370,10 @@ const AdoptionMetrics: React.FC<AdoptionMetricsProps> = ({ adoptionData }) => {
                     View official attestations and reserve reports
                   </p>
                   <Button
-                    variant="outline"
+                    variant="default"
                     size="sm"
                     onClick={() => window.open(hasTransparencyReport, '_blank')}
-                    className="w-full flex items-center gap-2"
+                    className="w-full flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white"
                   >
                     <ExternalLink className="w-4 h-4" />
                     View Reports
