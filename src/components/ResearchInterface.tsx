@@ -297,15 +297,22 @@ export const ResearchInterface = () => {
             <div className="flex-1 min-w-0">
               <Card className={`p-4 ${message.type === 'user' ? 'bg-secondary' : 'glass'}`}>
                 <div className="prose prose-sm dark:prose-invert max-w-none">
-                  <div 
-                    className="whitespace-pre-wrap"
-                    dangerouslySetInnerHTML={{
-                      __html: message.content.replace(
-                        /(https?:\/\/[^\s\)]+)/g,
-                        '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-primary hover:text-primary/80 underline font-medium transition-colors">$1</a>'
-                      )
-                    }}
-                  />
+                  {message.content.split(/(https?:\/\/[^\s\)]+)/g).map((part, index) => {
+                    if (part.match(/^https?:\/\//)) {
+                      return (
+                        <a
+                          key={index}
+                          href={part}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-500 hover:text-blue-600 underline font-medium"
+                        >
+                          {part}
+                        </a>
+                      );
+                    }
+                    return <span key={index}>{part}</span>;
+                  })}
                 </div>
                 {message.adoptionData && (
                   <div className="mt-3">
