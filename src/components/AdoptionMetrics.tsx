@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { TrendingUp, TrendingDown, BarChart3, Globe, Coins, Users, Info, AlertTriangle, Clock, ExternalLink, FileText } from 'lucide-react';
+import { TrendingUp, TrendingDown, BarChart3, Globe, Coins, Users, Info, AlertTriangle, Clock, ExternalLink, FileText, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { MoralisService, TokenHolder } from '@/services/MoralisService';
 
 interface DepegEvent {
   date: string;
@@ -32,6 +33,7 @@ interface AdoptionData {
     count: number;
     events: DepegEvent[];
   };
+  tokenAddress?: string; // Added for Moralis API calls
 }
 
 interface AdoptionMetricsProps {
@@ -96,6 +98,21 @@ const MobileTooltip: React.FC<{
 };
 
 const AdoptionMetrics: React.FC<AdoptionMetricsProps> = ({ adoptionData }) => {
+  const [concentrationData, setConcentrationData] = useState<{
+    top10Percentage: number;
+    largestHolderPercentage: number;
+    riskLevel: 'Low Risk' | 'Moderate Risk' | 'High Risk';
+    riskColor: 'green' | 'yellow' | 'red';
+    loading: boolean;
+    error?: string;
+  }>({
+    top10Percentage: 0,
+    largestHolderPercentage: 0,
+    riskLevel: 'Low Risk',
+    riskColor: 'green',
+    loading: false
+  });
+
   const formatNumber = (value: string): string => {
     const num = parseFloat(value.replace(/[^\d.-]/g, ''));
     if (num >= 1e9) return `$${(num / 1e9).toFixed(2)}B`;
@@ -123,6 +140,47 @@ const AdoptionMetrics: React.FC<AdoptionMetricsProps> = ({ adoptionData }) => {
   };
 
   const hasTransparencyReport = transparencyReports[adoptionData.stablecoin];
+
+  // Token contract addresses for major stablecoins on Ethereum
+  const tokenAddresses: { [key: string]: string } = {
+    'USDC': '0xA0b86a33E6441b8a35b91ECD57e5506b6e4d6a6b',
+    'USDT': '0xdAC17F958D2ee523a2206206994597C13D831ec7',
+    'USDP': '0x8E870D67F660D95d5be530380D0eC0bd388289E1',
+    'TUSD': '0x0000000000085d4780B73119b644AE5ecd22b376',
+    'PYUSD': '0x6c3ea9036406852006290770BEdFcAbA0e23A0e8',
+    'GUSD': '0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd',
+    'FRAX': '0x853d955aCEf822Db058eb8505911ED77F175b99e',
+    'PAXG': '0x45804880De22913dAFE09f4980848ECE6EcbAf78'
+  };
+
+  // Fetch concentration risk data
+  useEffect(() => {
+    const fetchConcentrationData = async () => {
+      const tokenAddress = tokenAddresses[adoptionData.stablecoin];
+      if (!tokenAddress) return;
+
+      setConcentrationData(prev => ({ ...prev, loading: true, error: undefined }));
+
+      try {
+        const holders = await MoralisService.getTokenHolders(tokenAddress, 'eth', 100);
+        const riskData = MoralisService.calculateConcentrationRisk(holders);
+        
+        setConcentrationData({
+          ...riskData,
+          loading: false
+        });
+      } catch (error) {
+        console.error('Error fetching concentration data:', error);
+        setConcentrationData(prev => ({ 
+          ...prev, 
+          loading: false, 
+          error: 'Failed to load concentration data' 
+        }));
+      }
+    };
+
+    fetchConcentrationData();
+  }, [adoptionData.stablecoin]);
 
   const getChainLogo = (chainName: string): string | null => {
     const chainLogos: { [key: string]: string } = {
@@ -379,6 +437,59 @@ const AdoptionMetrics: React.FC<AdoptionMetricsProps> = ({ adoptionData }) => {
                     View Reports
                   </Button>
                 </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Concentration Risk */}
+          {tokenAddresses[adoptionData.stablecoin] && (
+            <Card className="glass border border-border/50 hover:border-primary/20 transition-colors md:col-span-2">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">
+                      Concentration Risk
+                    </CardTitle>
+                    <MobileTooltip content="Distribution of token ownership among holders">
+                      <Info className="w-3 h-3 text-muted-foreground hover:text-primary cursor-help" />
+                    </MobileTooltip>
+                  </div>
+                  <Shield className="w-4 h-4 text-primary" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                {concentrationData.loading ? (
+                  <div className="flex items-center justify-center py-6">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                  </div>
+                ) : concentrationData.error ? (
+                  <div className="text-sm text-muted-foreground py-4 text-center">
+                    {concentrationData.error}
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium">Top 10 Holders % of Supply</p>
+                        <p className="text-2xl font-bold">{concentrationData.top10Percentage}%</p>
+                      </div>
+                      <Badge 
+                        variant="outline" 
+                        className={`${
+                          concentrationData.riskColor === 'green' ? 'bg-green-100 text-green-800 border-green-300' :
+                          concentrationData.riskColor === 'yellow' ? 'bg-yellow-100 text-yellow-800 border-yellow-300' :
+                          'bg-red-100 text-red-800 border-red-300'
+                        }`}
+                      >
+                        {concentrationData.riskLevel}
+                      </Badge>
+                    </div>
+                    <div className="pt-2 border-t border-border/20">
+                      <p className="text-sm font-medium text-muted-foreground">Largest Holder % of Supply</p>
+                      <p className="text-lg font-semibold">{concentrationData.largestHolderPercentage}%</p>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           )}

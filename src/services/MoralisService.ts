@@ -56,6 +56,17 @@ export interface WalletTransaction {
   category: string;
 }
 
+export interface TokenHolder {
+  owner_address: string;
+  owner_address_label?: string;
+  balance: string;
+  balance_formatted: string;
+  is_contract: boolean;
+  owner_type: 'contract' | 'wallet';
+  usd_value?: number;
+  percentage_relative_to_total_supply?: number;
+}
+
 export interface MoralisResponse<T> {
   success: boolean;
   data?: T;
@@ -411,5 +422,105 @@ ${validTransactions.slice(0, 5).map(tx => {
     if (this.isValidEthereumAddress(address)) return 'eth';
     if (this.isValidSolanaAddress(address)) return 'solana';
     return 'eth'; // default
+  }
+
+  static async getTokenHolders(
+    tokenAddress: string,
+    chain: string = 'eth',
+    limit: number = 100
+  ): Promise<TokenHolder[]> {
+    try {
+      const endpoint = `/erc20/${tokenAddress}/owners`;
+      const params = {
+        chain,
+        limit: limit.toString(),
+        order: 'DESC'
+      };
+
+      const response = await fetch(this.SUPABASE_FUNCTION_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          endpoint,
+          params,
+          isSolana: false // Token holders API is only available for EVM chains
+        }),
+      });
+
+      const result: MoralisResponse<{ result: TokenHolder[] }> = await response.json();
+      
+      if (!result.success || !result.data) {
+        throw new Error(result.error || 'Failed to fetch token holders');
+      }
+
+      // Handle the actual Moralis API response structure
+      const data = result.data as any;
+      return Array.isArray(data) ? data : (data.result || []);
+    } catch (error) {
+      console.error('Error fetching token holders:', error);
+      throw error;
+    }
+  }
+
+  static calculateConcentrationRisk(holders: TokenHolder[]): {
+    top10Percentage: number;
+    largestHolderPercentage: number;
+    riskLevel: 'Low Risk' | 'Moderate Risk' | 'High Risk';
+    riskColor: 'green' | 'yellow' | 'red';
+  } {
+    if (!holders || holders.length === 0) {
+      return {
+        top10Percentage: 0,
+        largestHolderPercentage: 0,
+        riskLevel: 'Low Risk',
+        riskColor: 'green'
+      };
+    }
+
+    // Sort holders by balance (descending)
+    const sortedHolders = [...holders].sort((a, b) => 
+      parseFloat(b.balance_formatted) - parseFloat(a.balance_formatted)
+    );
+
+    // Calculate total supply from all holders
+    const totalSupply = holders.reduce((sum, holder) => 
+      sum + parseFloat(holder.balance_formatted || '0'), 0
+    );
+
+    // Calculate largest holder percentage
+    const largestHolderPercentage = totalSupply > 0 
+      ? (parseFloat(sortedHolders[0]?.balance_formatted || '0') / totalSupply) * 100 
+      : 0;
+
+    // Calculate top 10 holders percentage
+    const top10Holders = sortedHolders.slice(0, 10);
+    const top10Supply = top10Holders.reduce((sum, holder) => 
+      sum + parseFloat(holder.balance_formatted || '0'), 0
+    );
+    const top10Percentage = totalSupply > 0 ? (top10Supply / totalSupply) * 100 : 0;
+
+    // Determine risk level based on top 10 percentage
+    let riskLevel: 'Low Risk' | 'Moderate Risk' | 'High Risk';
+    let riskColor: 'green' | 'yellow' | 'red';
+
+    if (top10Percentage < 25) {
+      riskLevel = 'Low Risk';
+      riskColor = 'green';
+    } else if (top10Percentage <= 50) {
+      riskLevel = 'Moderate Risk';
+      riskColor = 'yellow';
+    } else {
+      riskLevel = 'High Risk';
+      riskColor = 'red';
+    }
+
+    return {
+      top10Percentage: Math.round(top10Percentage * 100) / 100,
+      largestHolderPercentage: Math.round(largestHolderPercentage * 100) / 100,
+      riskLevel,
+      riskColor
+    };
   }
 }
