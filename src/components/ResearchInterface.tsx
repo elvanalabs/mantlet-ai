@@ -157,34 +157,49 @@ export const ResearchInterface = () => {
       'MXNT': 'https://tether.to/en/transparency/?tab=mxnt'
     };
 
-    // Enhanced matching - include common name variations
-    const stablecoinVariations: { [key: string]: string[] } = {
-      'USDC': ['usdc', 'usd coin', 'circle'],
-      'USDT': ['usdt', 'tether', 'tether usd'],
-      'USDP': ['usdp', 'pax dollar', 'paxos'],
-      'TUSD': ['tusd', 'trueusd', 'true usd'],
-      'PYUSD': ['pyusd', 'paypal usd', 'paypal'],
-      'GUSD': ['gusd', 'gemini dollar', 'gemini'],
-      'LUSD': ['lusd', 'liquity'],
-      'FRAX': ['frax'],
-      'USDG': ['usdg'],
-      'USDL': ['usdl'],
-      'PAXG': ['paxg', 'pax gold'],
-      'EURT': ['eurt', 'tether euro'],
-      'CNHT': ['cnht', 'tether cnh'],
-      'MXNT': ['mxnt', 'tether mxn']
-    };
-
     const lowerContent = content.toLowerCase();
     
-    // Check for any stablecoin mention using variations
-    for (const [coin, url] of Object.entries(transparencyReports)) {
-      const variations = stablecoinVariations[coin] || [coin.toLowerCase()];
-      
-      for (const variation of variations) {
-        if (lowerContent.includes(variation)) {
-          return url;
+    // Simple and reliable detection - check for any stablecoin keywords
+    const stablecoinKeywords = [
+      'usdc', 'usd coin', 'circle', 'centre',
+      'usdt', 'tether', 'tether usd',
+      'usdp', 'pax dollar', 'paxos standard',
+      'tusd', 'trueusd', 'true usd',
+      'pyusd', 'paypal usd',
+      'gusd', 'gemini dollar',
+      'lusd', 'liquity usd',
+      'frax', 'frax share',
+      'paxg', 'pax gold',
+      'eurt', 'tether euro',
+      'cnht', 'tether cnh',
+      'mxnt', 'tether mxn',
+      'stablecoin', 'stable coin'
+    ];
+    
+    // If content mentions any stablecoin, return the most appropriate transparency report
+    for (const keyword of stablecoinKeywords) {
+      if (lowerContent.includes(keyword)) {
+        // Return specific report based on detected stablecoin
+        if (lowerContent.includes('usdc') || lowerContent.includes('usd coin') || lowerContent.includes('circle')) {
+          return transparencyReports['USDC'];
         }
+        if (lowerContent.includes('usdt') || lowerContent.includes('tether')) {
+          return transparencyReports['USDT'];
+        }
+        if (lowerContent.includes('usdp') || lowerContent.includes('paxos')) {
+          return transparencyReports['USDP'];
+        }
+        if (lowerContent.includes('tusd') || lowerContent.includes('trueusd')) {
+          return transparencyReports['TUSD'];
+        }
+        if (lowerContent.includes('pyusd') || lowerContent.includes('paypal')) {
+          return transparencyReports['PYUSD'];
+        }
+        if (lowerContent.includes('gusd') || lowerContent.includes('gemini')) {
+          return transparencyReports['GUSD'];
+        }
+        // Default to USDC transparency for general stablecoin mentions
+        return transparencyReports['USDC'];
       }
     }
     
@@ -236,19 +251,26 @@ export const ResearchInterface = () => {
                      </div>
                    </div>
                  )}
-                 {message.type === 'assistant' && getTransparencyReport(message.content) && (
-                   <div className="mt-3 pt-3 border-t border-border">
-                     <Button
-                       variant="outline"
-                       size="sm"
-                       className="text-xs h-8 px-3 gap-2"
-                       onClick={() => window.open(getTransparencyReport(message.content)!, '_blank')}
-                     >
-                       <ExternalLink className="w-3 h-3" />
-                       View Transparency Report
-                     </Button>
-                   </div>
-                 )}
+                  {message.type === 'assistant' && (() => {
+                    const transparencyUrl = getTransparencyReport(message.content);
+                    console.log('Checking transparency for message:', { 
+                      content: message.content.substring(0, 100), 
+                      transparencyUrl 
+                    });
+                    return transparencyUrl;
+                  })() && (
+                    <div className="mt-3 pt-3 border-t border-border">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-xs h-8 px-3 gap-2"
+                        onClick={() => window.open(getTransparencyReport(message.content)!, '_blank')}
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        View Transparency Report
+                      </Button>
+                    </div>
+                  )}
                </Card>
                <p className="text-xs text-muted-foreground mt-1">
                  {message.timestamp.toLocaleTimeString()}
