@@ -133,7 +133,7 @@ export const ResearchInterface = () => {
           const assistantMessage: Message = {
             id: (Date.now() + 1).toString(),
             type: 'assistant',
-            content: cachedExplanation.explanation,
+            content: cachedExplanation.explanation.replace(/https?:\/\/[^\s\)\]>,]+/g, '').replace(/\s+/g, ' ').trim(),
             timestamp: new Date(),
             sources: cachedExplanation.sources,
             adoptionData: cachedExplanation.adoptionData ? {
