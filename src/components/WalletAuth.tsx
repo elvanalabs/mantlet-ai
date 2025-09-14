@@ -28,7 +28,7 @@ export const WalletAuth = () => {
             <img src="/lovable-uploads/b8ec2af1-41ea-4718-ad31-c8f47484c004.png" alt="Web3 Research Agent" className="w-20 h-20 mx-auto mb-4 object-contain" />
             <h1 className="text-2xl font-bold mb-2">Mantlet Research</h1>
             <p className="text-muted-foreground">
-              Connect your wallet to access AI-powered Web3 research tools
+              Connect your Web3 wallet or signup using Mail ID
             </p>
           </div>
           <Button onClick={login} className="w-full bg-gradient-primary transition-all duration-300 glow-primary mb-3" size="lg">
