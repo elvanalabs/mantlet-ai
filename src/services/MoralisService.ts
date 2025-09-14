@@ -479,27 +479,19 @@ ${validTransactions.slice(0, 5).map(tx => {
       };
     }
 
-    // Sort holders by balance (descending)
+    // Sort holders by percentage (descending) - use Moralis provided percentages
     const sortedHolders = [...holders].sort((a, b) => 
-      parseFloat(b.balance_formatted) - parseFloat(a.balance_formatted)
+      (b.percentage_relative_to_total_supply || 0) - (a.percentage_relative_to_total_supply || 0)
     );
 
-    // Calculate total supply from all holders
-    const totalSupply = holders.reduce((sum, holder) => 
-      sum + parseFloat(holder.balance_formatted || '0'), 0
-    );
+    // Get largest holder percentage directly from Moralis data
+    const largestHolderPercentage = sortedHolders[0]?.percentage_relative_to_total_supply || 0;
 
-    // Calculate largest holder percentage
-    const largestHolderPercentage = totalSupply > 0 
-      ? (parseFloat(sortedHolders[0]?.balance_formatted || '0') / totalSupply) * 100 
-      : 0;
-
-    // Calculate top 10 holders percentage
+    // Calculate top 10 holders percentage using Moralis provided percentages
     const top10Holders = sortedHolders.slice(0, 10);
-    const top10Supply = top10Holders.reduce((sum, holder) => 
-      sum + parseFloat(holder.balance_formatted || '0'), 0
+    const top10Percentage = top10Holders.reduce((sum, holder) => 
+      sum + (holder.percentage_relative_to_total_supply || 0), 0
     );
-    const top10Percentage = totalSupply > 0 ? (top10Supply / totalSupply) * 100 : 0;
 
     // Determine risk level based on top 10 percentage
     let riskLevel: 'Low Risk' | 'Moderate Risk' | 'High Risk';

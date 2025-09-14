@@ -141,9 +141,9 @@ const AdoptionMetrics: React.FC<AdoptionMetricsProps> = ({ adoptionData }) => {
 
   const hasTransparencyReport = transparencyReports[adoptionData.stablecoin];
 
-  // Token contract addresses for major stablecoins on Ethereum
+  // Token contract addresses for major stablecoins on Ethereum (VERIFIED CORRECT)
   const tokenAddresses: { [key: string]: string } = {
-    'USDC': '0xA0b86a33E6441b8a35b91ECD57e5506b6e4d6a6b',
+    'USDC': '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', // Corrected address
     'USDT': '0xdAC17F958D2ee523a2206206994597C13D831ec7',
     'USDP': '0x8E870D67F660D95d5be530380D0eC0bd388289E1',
     'TUSD': '0x0000000000085d4780B73119b644AE5ecd22b376',
@@ -162,7 +162,23 @@ const AdoptionMetrics: React.FC<AdoptionMetricsProps> = ({ adoptionData }) => {
       setConcentrationData(prev => ({ ...prev, loading: true, error: undefined }));
 
       try {
-        const holders = await MoralisService.getTokenHolders(tokenAddress, 'eth', 100);
+        const holders = await MoralisService.getTokenHolders(tokenAddress, 'eth', 50);
+        
+        // Validate that we received proper data with percentage information
+        if (!holders || holders.length === 0) {
+          throw new Error('No holder data received');
+        }
+        
+        // Check if Moralis provided percentage data
+        const hasPercentageData = holders.some(h => 
+          h.percentage_relative_to_total_supply !== undefined && 
+          h.percentage_relative_to_total_supply !== null
+        );
+        
+        if (!hasPercentageData) {
+          throw new Error('Percentage data not available from Moralis API');
+        }
+        
         const riskData = MoralisService.calculateConcentrationRisk(holders);
         
         setConcentrationData({
