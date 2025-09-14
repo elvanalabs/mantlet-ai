@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
-import { Send, Loader2, TrendingUp, Database, Globe, ExternalLink } from 'lucide-react';
+import { Send, Loader2, TrendingUp, Database, Globe, ExternalLink, ArrowUpRight } from 'lucide-react';
 import { ResearchService } from '@/services/ResearchService';
 import { validateStablecoin } from '@/utils/stablecoinValidation';
 import AdoptionMetrics from '@/components/AdoptionMetrics';
@@ -318,16 +318,16 @@ export const ResearchInterface = () => {
                     return transparencyUrl;
                   })() && (
                     <div className="mt-3 pt-3 border-t border-border">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="text-xs h-8 px-3 gap-2"
-                        onClick={() => window.open(getTransparencyReport(message.content)!, '_blank')}
-                      >
-                        <ExternalLink className="w-3 h-3" />
-                        View Transparency Report
-                      </Button>
-                    </div>
+                       <Button
+                         variant="default"
+                         size="sm"
+                         className="text-xs h-9 px-4 gap-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground shadow-md hover:shadow-lg transition-all duration-200 font-medium"
+                         onClick={() => window.open(getTransparencyReport(message.content)!, '_blank')}
+                       >
+                         View Transparency Report
+                         <ArrowUpRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                       </Button>
+                     </div>
                   )}
                </Card>
                <p className="text-xs text-muted-foreground mt-1">
