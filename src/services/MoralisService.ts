@@ -517,12 +517,59 @@ ${validTransactions.slice(0, 5).map(tx => {
         (parseFloat(a.percentage_relative_to_total_supply?.toString() || '0'))
       );
 
-      largestHolderPercentage = parseFloat(sortedHolders[0]?.percentage_relative_to_total_supply?.toString() || '0');
+      // Get raw percentage values and normalize them
+      let rawLargestPercentage = parseFloat(sortedHolders[0]?.percentage_relative_to_total_supply?.toString() || '0');
       
+      // Log first few holders to debug data format
+      console.log('Sample holder percentages:', sortedHolders.slice(0, 3).map(h => ({
+        address: h.owner_address?.slice(0, 8) + '...',
+        percentage: h.percentage_relative_to_total_supply,
+        balance: h.balance_formatted
+      })));
+
+      // Check if percentages are in decimal format (0.1 = 10%) or percentage format (10 = 10%)
+      // If largest holder has >100%, the data is likely in basis points or needs division
+      if (rawLargestPercentage > 100) {
+        console.warn(`Raw percentage ${rawLargestPercentage}% > 100%, attempting to normalize`);
+        
+        // Try dividing by 100 first (common case: 1000 = 10%)
+        if (rawLargestPercentage > 1000) {
+          // Likely basis points: divide by 10000
+          largestHolderPercentage = rawLargestPercentage / 10000 * 100;
+          console.log(`Treating as basis points, normalized to: ${largestHolderPercentage}%`);
+        } else {
+          // Likely percentage * 100: divide by 100
+          largestHolderPercentage = rawLargestPercentage / 100;
+          console.log(`Treating as percentage*100, normalized to: ${largestHolderPercentage}%`);
+        }
+      } else if (rawLargestPercentage < 1) {
+        // Likely decimal format (0.1 = 10%)
+        largestHolderPercentage = rawLargestPercentage * 100;
+        console.log(`Treating as decimal, normalized to: ${largestHolderPercentage}%`);
+      } else {
+        // Appears to be correct percentage format
+        largestHolderPercentage = rawLargestPercentage;
+      }
+
+      // Apply same normalization to top 10 calculation
       const top10Holders = sortedHolders.slice(0, 10);
-      top10Percentage = top10Holders.reduce((sum, holder) => 
+      let rawTop10Sum = top10Holders.reduce((sum, holder) => 
         sum + parseFloat(holder.percentage_relative_to_total_supply?.toString() || '0'), 0
       );
+
+      // Apply same normalization logic
+      if (rawLargestPercentage > 100) {
+        if (rawLargestPercentage > 1000) {
+          top10Percentage = rawTop10Sum / 10000 * 100;
+        } else {
+          top10Percentage = rawTop10Sum / 100;
+        }
+      } else if (rawLargestPercentage < 1) {
+        top10Percentage = rawTop10Sum * 100;
+      } else {
+        top10Percentage = rawTop10Sum;
+      }
+
     } else {
       // Fall back to balance-based calculation if percentage data isn't available
       console.warn('Using fallback calculation - results may be less accurate');
@@ -554,6 +601,10 @@ ${validTransactions.slice(0, 5).map(tx => {
       );
       top10Percentage = (top10Supply / totalSupplyFromHolders) * 100;
     }
+
+    // Final validation - cap at 100% if somehow still over
+    largestHolderPercentage = Math.min(largestHolderPercentage, 100);
+    top10Percentage = Math.min(top10Percentage, 100);
 
     // Determine risk level based on top 10 percentage
     let riskLevel: 'Low Risk' | 'Moderate Risk' | 'High Risk';
