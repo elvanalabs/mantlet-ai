@@ -297,7 +297,15 @@ export const ResearchInterface = () => {
             <div className="flex-1 min-w-0">
               <Card className={`p-4 ${message.type === 'user' ? 'bg-secondary' : 'glass'}`}>
                 <div className="prose prose-sm dark:prose-invert max-w-none">
-                  <p className="whitespace-pre-wrap">{message.content}</p>
+                  <div 
+                    className="whitespace-pre-wrap"
+                    dangerouslySetInnerHTML={{
+                      __html: message.content.replace(
+                        /(https?:\/\/[^\s\)]+)/g,
+                        '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-primary hover:text-primary/80 underline font-medium transition-colors">$1</a>'
+                      )
+                    }}
+                  />
                 </div>
                 {message.adoptionData && (
                   <div className="mt-3">
@@ -318,32 +326,8 @@ export const ResearchInterface = () => {
                        ))}
                      </div>
                    </div>
-                 )}
-                  {message.type === 'assistant' && (() => {
-                    const transparencyUrl = getTransparencyReport(message.content);
-                    console.log('=== TRANSPARENCY DEBUG ===');
-                    console.log('Message content:', message.content);
-                    console.log('Detected transparency URL:', transparencyUrl);
-                    console.log('========================');
-                    
-                    if (transparencyUrl) {
-                      return (
-                        <div className="mt-3 pt-3 border-t border-border">
-                          <Button
-                            variant="default"
-                            size="sm"
-                            className="text-xs h-9 px-4 gap-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground shadow-md hover:shadow-lg transition-all duration-200 font-medium group"
-                            onClick={() => window.open(transparencyUrl, '_blank')}
-                          >
-                            View Transparency Report
-                            <ArrowUpRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                          </Button>
-                        </div>
-                      );
-                    }
-                    return null;
-                  })()}
-               </Card>
+                  )}
+                </Card>
                <p className="text-xs text-muted-foreground mt-1">
                  {message.timestamp.toLocaleTimeString()}
                </p>
