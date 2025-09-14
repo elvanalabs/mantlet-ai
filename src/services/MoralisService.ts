@@ -479,15 +479,15 @@ ${validTransactions.slice(0, 5).map(tx => {
   static calculateConcentrationRisk(holders: TokenHolder[]): {
     top10Percentage: number;
     largestHolderPercentage: number;
-    riskLevel: 'Low Risk' | 'Moderate Risk' | 'High Risk';
-    riskColor: 'green' | 'yellow' | 'red';
+    riskLevel: 'Decentralized' | 'Semi-Decentralized' | 'Centralized' | 'Highly Centralized';
+    riskColor: 'green' | 'yellow' | 'orange' | 'red';
   } {
     if (!holders || holders.length === 0) {
       console.log('No holders data provided for concentration calculation');
       return {
         top10Percentage: 0,
         largestHolderPercentage: 0,
-        riskLevel: 'Low Risk',
+        riskLevel: 'Decentralized',
         riskColor: 'green'
       };
     }
@@ -588,7 +588,7 @@ ${validTransactions.slice(0, 5).map(tx => {
         return {
           top10Percentage: 0,
           largestHolderPercentage: 0,
-          riskLevel: 'Low Risk',
+          riskLevel: 'Decentralized',
           riskColor: 'green'
         };
       }
@@ -606,18 +606,21 @@ ${validTransactions.slice(0, 5).map(tx => {
     largestHolderPercentage = Math.min(largestHolderPercentage, 100);
     top10Percentage = Math.min(top10Percentage, 100);
 
-    // Determine risk level based on top 10 percentage
-    let riskLevel: 'Low Risk' | 'Moderate Risk' | 'High Risk';
-    let riskColor: 'green' | 'yellow' | 'red';
+    // Determine risk level based on top 10 percentage - NEW 4-TIER SYSTEM
+    let riskLevel: 'Decentralized' | 'Semi-Decentralized' | 'Centralized' | 'Highly Centralized';
+    let riskColor: 'green' | 'yellow' | 'orange' | 'red';
 
     if (top10Percentage < 25) {
-      riskLevel = 'Low Risk';
+      riskLevel = 'Decentralized';
       riskColor = 'green';
-    } else if (top10Percentage <= 50) {
-      riskLevel = 'Moderate Risk';
+    } else if (top10Percentage < 50) {
+      riskLevel = 'Semi-Decentralized';
       riskColor = 'yellow';
+    } else if (top10Percentage < 75) {
+      riskLevel = 'Centralized';
+      riskColor = 'orange';
     } else {
-      riskLevel = 'High Risk';
+      riskLevel = 'Highly Centralized';
       riskColor = 'red';
     }
 
