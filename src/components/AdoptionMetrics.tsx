@@ -301,7 +301,7 @@ const AdoptionMetrics: React.FC<AdoptionMetricsProps> = ({ adoptionData }) => {
                                 <TableCell>{event.time}</TableCell>
                                 <TableCell>${event.price}</TableCell>
                                 <TableCell className={`font-medium ${
-                                  parseFloat(event.deviation.replace('%', '')) > 0 
+                                  parseFloat(event.deviation.replace('%', '')) < 0 
                                     ? 'text-red-500' 
                                     : 'text-green-500'
                                 }`}>
