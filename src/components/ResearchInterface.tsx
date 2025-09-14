@@ -157,12 +157,37 @@ export const ResearchInterface = () => {
       'MXNT': 'https://tether.to/en/transparency/?tab=mxnt'
     };
 
-    // Check if content contains any stablecoin mention - show button for any stablecoin explanation
+    // Enhanced matching - include common name variations
+    const stablecoinVariations: { [key: string]: string[] } = {
+      'USDC': ['usdc', 'usd coin', 'circle'],
+      'USDT': ['usdt', 'tether', 'tether usd'],
+      'USDP': ['usdp', 'pax dollar', 'paxos'],
+      'TUSD': ['tusd', 'trueusd', 'true usd'],
+      'PYUSD': ['pyusd', 'paypal usd', 'paypal'],
+      'GUSD': ['gusd', 'gemini dollar', 'gemini'],
+      'LUSD': ['lusd', 'liquity'],
+      'FRAX': ['frax'],
+      'USDG': ['usdg'],
+      'USDL': ['usdl'],
+      'PAXG': ['paxg', 'pax gold'],
+      'EURT': ['eurt', 'tether euro'],
+      'CNHT': ['cnht', 'tether cnh'],
+      'MXNT': ['mxnt', 'tether mxn']
+    };
+
+    const lowerContent = content.toLowerCase();
+    
+    // Check for any stablecoin mention using variations
     for (const [coin, url] of Object.entries(transparencyReports)) {
-      if (content.toLowerCase().includes(coin.toLowerCase()) && content.length > 200) {
-        return url;
+      const variations = stablecoinVariations[coin] || [coin.toLowerCase()];
+      
+      for (const variation of variations) {
+        if (lowerContent.includes(variation)) {
+          return url;
+        }
       }
     }
+    
     return null;
   };
 
