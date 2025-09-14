@@ -12,8 +12,8 @@ const Index = () => {
 
   return (
     <div className="h-screen flex flex-col">
-      <WalletAuth />
       <CoinGeckoWidget />
+      <WalletAuth />
       <main className="flex-1 flex flex-col">
         <ResearchInterface />
       </main>
