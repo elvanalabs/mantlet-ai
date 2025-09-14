@@ -198,6 +198,16 @@ export const ResearchInterface = () => {
   };
 
   const getTransparencyReport = (content: string): string | null => {
+    // First, check if the content contains a direct transparency report URL
+    const transparencyRegex = /(?:transparency\s+report|transparency):\s*(https?:\/\/[^\s\)]+)/i;
+    const match = content.match(transparencyRegex);
+    
+    if (match && match[1]) {
+      console.log('Found transparency URL in content:', match[1]);
+      return match[1];
+    }
+    
+    // Fallback to predefined transparency reports
     const transparencyReports: { [key: string]: string } = {
       'USDC': 'https://www.circle.com/transparency',
       'USDT': 'https://tether.to/transparency/',
