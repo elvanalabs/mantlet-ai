@@ -7,6 +7,7 @@ import { Send, Loader2, TrendingUp, Database, Globe, ExternalLink } from 'lucide
 import { ResearchService } from '@/services/ResearchService';
 import { validateStablecoin } from '@/utils/stablecoinValidation';
 import AdoptionMetrics from '@/components/AdoptionMetrics';
+import { getStablecoinExplanation, isBasicStablecoinQuery, type StablecoinExplanation } from '@/data/stablecoinExplanations';
 
 interface Message {
   id: string;
@@ -108,11 +109,68 @@ export const ResearchInterface = () => {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const query = input.trim();
     setInput('');
     setIsLoading(true);
 
     try {
-      const response = await ResearchService.processQuery(input.trim());
+      // Check if this is a basic stablecoin query that we have cached
+      if (isBasicStablecoinQuery(query)) {
+        const cachedExplanation = getStablecoinExplanation(query);
+        
+        if (cachedExplanation) {
+          console.log('Using cached explanation for:', cachedExplanation.symbol);
+          
+          // Convert chainDistribution from object to array format
+          const chainDistributionArray = cachedExplanation.adoptionData?.chainDistribution 
+            ? Object.entries(cachedExplanation.adoptionData.chainDistribution).map(([chain, percentage]) => ({
+                chain,
+                percentage,
+                amount: `${Math.round(parseFloat(percentage) * parseFloat(cachedExplanation.adoptionData!.circulatingSupply) / 100)} tokens`
+              }))
+            : [];
+          
+          const assistantMessage: Message = {
+            id: (Date.now() + 1).toString(),
+            type: 'assistant',
+            content: cachedExplanation.explanation,
+            timestamp: new Date(),
+            sources: cachedExplanation.sources,
+            adoptionData: cachedExplanation.adoptionData ? {
+              stablecoin: cachedExplanation.symbol,
+              totalCirculatingSupply: cachedExplanation.adoptionData.circulatingSupply,
+              marketSharePercent: cachedExplanation.adoptionData.marketShare,
+              chainDistribution: chainDistributionArray,
+              transactionVolume24h: cachedExplanation.adoptionData.volume24h,
+              growthDecline30d: {
+                percentage: '2.1%',
+                direction: 'up' as const
+              },
+              depegEvents: {
+                count: cachedExplanation.adoptionData.depegEvents.length,
+                events: cachedExplanation.adoptionData.depegEvents.map(event => ({
+                  date: event.date,
+                  time: '00:00',
+                  deviation: event.severity,
+                  price: '$0.95'
+                }))
+              }
+            } : undefined,
+          };
+
+          setMessages(prev => [...prev, assistantMessage]);
+          toast({
+            title: "Response Served from Cache",
+            description: `Retrieved ${cachedExplanation.symbol} information instantly from our knowledge base.`,
+          });
+          setIsLoading(false);
+          return;
+        }
+      }
+      
+      // Fall back to API call for complex queries or unknown stablecoins
+      console.log('Using API for query:', query);
+      const response = await ResearchService.processQuery(query);
       
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
