@@ -1,7 +1,8 @@
 import { useLogin, useLogout, usePrivy } from '@privy-io/react-auth';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Wallet, LogOut } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Wallet, LogOut, User } from 'lucide-react';
 export const WalletAuth = () => {
   const {
     login
@@ -41,27 +42,38 @@ export const WalletAuth = () => {
         </Card>
       </div>;
   }
-  return <div className="glass border-b px-4 py-2">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <div className="w-6 h-6 bg-gradient-primary rounded-full flex items-center justify-center">
-            <Wallet className="w-3 h-3 text-primary-foreground" />
-          </div>
-          <div>
-            <p className="text-xs text-muted-foreground">
-              {user?.wallet?.address ? `${user.wallet.address.slice(0, 6)}...${user.wallet.address.slice(-4)}` : 'Connected'}
-            </p>
-          </div>
-        </div>
-        <Button 
-          onClick={logout} 
-          variant="outline" 
-          size="sm"
-          className="border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground h-7 text-xs"
-        >
-          <LogOut className="w-3 h-3 mr-1" />
-          Disconnect
-        </Button>
+  return <div className="flex items-center justify-between px-2 sm:px-4 glass border-b h-16 overflow-visible">
+      <div className="flex items-center space-x-3">
+        <img src="/lovable-uploads/33de17b2-37de-44c9-994a-e297e6beede9.png" alt="Logo" className="w-24 h-24 object-contain" />
+      </div>
+      <div className="flex items-center gap-3">
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="sm">
+              <User className="w-4 h-4 mr-1" />
+              <span className="hidden sm:inline">Profile</span>
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-64" align="end">
+            <div className="space-y-3">
+              <div>
+                <p className="text-sm font-medium">Wallet Address</p>
+                <p className="text-sm text-muted-foreground break-all">
+                  {user?.wallet?.address || 'Connected'}
+                </p>
+              </div>
+              <Button 
+                onClick={logout} 
+                variant="outline" 
+                size="sm"
+                className="w-full border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Disconnect
+              </Button>
+            </div>
+          </PopoverContent>
+        </Popover>
       </div>
     </div>;
 };
