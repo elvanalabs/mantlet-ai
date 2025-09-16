@@ -3,13 +3,18 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
-import { Send, Loader2, TrendingUp, Database, Globe, ExternalLink, ArrowUpRight, GitCompare, HelpCircle, BarChart3, Newspaper, Info } from 'lucide-react';
+import { Send, Loader2, TrendingUp, Database, Globe, ExternalLink, ArrowUpRight, GitCompare, HelpCircle, BarChart3, Newspaper, Info, Copy, Download, Check } from 'lucide-react';
 import { ResearchService } from '@/services/ResearchService';
 import { validateStablecoin, validateStablecoinComparison } from '@/utils/stablecoinValidation';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
+import StablecoinChart from '@/components/StablecoinChart';
+import NewsGrid from '@/components/NewsGrid';
+import ComparisonTable from '@/components/ComparisonTable';
 import AdoptionMetrics from '@/components/AdoptionMetrics';
 import { getStablecoinExplanation, isBasicStablecoinQuery, type StablecoinExplanation } from '@/data/stablecoinExplanations';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 interface Message {
   id: string;
@@ -17,6 +22,37 @@ interface Message {
   content: string;
   timestamp: Date;
   sources?: string[];
+  chartData?: {
+    symbol: string;
+    data: Array<{
+      date: string;
+      price: number;
+      volume?: number;
+    }>;
+  };
+  newsResults?: Array<{
+    title: string;
+    link: string;
+    snippet: string;
+    date: string;
+    source: string;
+    thumbnail?: string;
+    position: number;
+  }>;
+  comparisonData?: {
+    coins: Array<{
+      symbol: string;
+      name: string;
+      backing: string;
+      marketCap: string;
+      chain: string;
+      yield: string;
+      issuer: string;
+      regulation: string;
+      use_case: string;
+      risk_level: string;
+    }>;
+  };
   adoptionData?: {
     stablecoin: string;
     totalCirculatingSupply: string;
@@ -57,6 +93,7 @@ export const ResearchInterface = () => {
   const [compareStablecoin2, setCompareStablecoin2] = useState('');
   const [explainStablecoin, setExplainStablecoin] = useState('');
   const [adoptionStablecoin, setAdoptionStablecoin] = useState('');
+  const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -167,9 +204,12 @@ export const ResearchInterface = () => {
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'assistant',
-        content: response.contextData,
+        content: response.contextData || 'Here are the latest results:',
         timestamp: new Date(),
         sources: response.sources,
+        chartData: response.chartData,
+        newsResults: response.newsResults,
+        comparisonData: response.comparisonData,
         adoptionData: response.adoptionData ? {
           ...response.adoptionData,
           depegEvents: (response.adoptionData as any).depegEvents || { count: 0, events: [] }
@@ -271,6 +311,101 @@ export const ResearchInterface = () => {
     handleQuickAction('Latest news about stablecoins');
   };
 
+  const handleCopyMessage = async (message: Message) => {
+    try {
+      await navigator.clipboard.writeText(message.content);
+      setCopiedMessageId(message.id);
+      toast({
+        title: "Copied!",
+        description: "Response copied to clipboard successfully."
+      });
+      setTimeout(() => setCopiedMessageId(null), 2000);
+    } catch (error) {
+      toast({
+        title: "Copy Failed",
+        description: "Unable to copy to clipboard. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleDownloadPDF = async (message: Message) => {
+    try {
+      const messageElement = document.getElementById(`message-${message.id}`);
+      if (!messageElement) {
+        toast({
+          title: "Download Failed",
+          description: "Unable to find message content for PDF generation.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Create a temporary container for clean PDF rendering
+      const tempContainer = document.createElement('div');
+      tempContainer.style.position = 'absolute';
+      tempContainer.style.left = '-9999px';
+      tempContainer.style.width = '800px';
+      tempContainer.style.padding = '20px';
+      tempContainer.style.backgroundColor = 'white';
+      document.body.appendChild(tempContainer);
+
+      // Clone the message content and clean up styling
+      const clonedContent = messageElement.cloneNode(true) as HTMLElement;
+      const elementsToClean = clonedContent.querySelectorAll('*');
+      elementsToClean.forEach(el => {
+        const element = el as HTMLElement;
+        element.style.background = 'white';
+        element.style.color = 'black';
+        element.style.border = 'none';
+        element.style.boxShadow = 'none';
+      });
+      tempContainer.appendChild(clonedContent);
+
+      // Generate PDF
+      const canvas = await html2canvas(tempContainer, {
+        backgroundColor: '#ffffff',
+        scale: 2,
+        useCORS: true,
+        allowTaint: true
+      });
+      document.body.removeChild(tempContainer);
+
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgData = canvas.toDataURL('image/png');
+      const imgWidth = 190;
+      const pageHeight = 297;
+      const imgHeight = canvas.height * imgWidth / canvas.width;
+      let heightLeft = imgHeight;
+      let position = 10;
+
+      pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight + 10;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+      pdf.save(`mantlet-research-${timestamp}.pdf`);
+      
+      toast({
+        title: "PDF Downloaded",
+        description: "Research response saved as PDF successfully."
+      });
+    } catch (error) {
+      console.error('PDF generation error:', error);
+      toast({
+        title: "Download Failed",
+        description: "Unable to generate PDF. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
 
   const getMessageIcon = (type: string) => {
     switch (type) {
@@ -293,7 +428,7 @@ export const ResearchInterface = () => {
           <div key={message.id} className="flex space-x-3">
             {getMessageIcon(message.type)}
             <div className="flex-1 min-w-0">
-              <Card className={`p-4 ${message.type === 'user' ? 'bg-secondary' : 'glass'}`}>
+              <Card className={`p-4 ${message.type === 'user' ? 'bg-secondary' : 'glass'}`} id={`message-${message.id}`}>
                 <div className="max-w-none whitespace-pre-wrap text-sm leading-relaxed">
                   {(() => {
                     const parts = message.content.split(/(\[([^\]]+)\]\(([^)]+)\)|https?:\/\/[^\s\)\]>,\n]+)/g);
@@ -353,7 +488,38 @@ export const ResearchInterface = () => {
                   <div className="mt-3">
                     <AdoptionMetrics adoptionData={message.adoptionData} />
                   </div>
-                )}
+                 )}
+                 {message.chartData && (
+                   <div className="mt-3">
+                     <StablecoinChart 
+                       chartData={message.chartData} 
+                     />
+                   </div>
+                 )}
+                 {message.newsResults && (
+                   <div className="mt-3">
+                     <NewsGrid newsResults={message.newsResults} />
+                   </div>
+                 )}
+                 {message.comparisonData && (
+                   <div className="mt-3">
+                     <ComparisonTable comparisonData={message.comparisonData} />
+                   </div>
+                 )}
+                 
+                 {/* Copy and Download buttons for assistant messages (except when showing news or adoption metrics) */}
+                 {message.type === 'assistant' && !message.newsResults && !message.adoptionData && (
+                   <div className="mt-4 pt-3 border-t border-border flex items-center justify-end gap-2">
+                     <Button variant="ghost" size="sm" onClick={() => handleCopyMessage(message)} className="text-muted-foreground hover:text-foreground">
+                       {copiedMessageId === message.id ? <Check className="w-4 h-4 mr-1 text-green-500" /> : <Copy className="w-4 h-4 mr-1" />}
+                       {copiedMessageId === message.id ? 'Copied!' : 'Copy'}
+                     </Button>
+                     <Button variant="ghost" size="sm" onClick={() => handleDownloadPDF(message)} className="text-muted-foreground hover:text-foreground">
+                       <Download className="w-4 h-4 mr-1" />
+                       PDF
+                     </Button>
+                   </div>
+                 )}
                  {message.sources && message.sources.length > 0 && (
                    <div className="mt-3 pt-3 border-t border-border">
                      <p className="text-xs text-muted-foreground mb-2 flex items-center">
