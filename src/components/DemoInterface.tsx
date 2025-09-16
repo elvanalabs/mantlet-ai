@@ -560,6 +560,9 @@ export const DemoInterface = ({
           <img src="/lovable-uploads/33de17b2-37de-44c9-994a-e297e6beede9.png" alt="Logo" className="w-24 h-24 object-contain" />
         </div>
         <div className="flex items-center gap-3">
+          <div className="hidden sm:block text-sm text-muted-foreground">
+            Demo: {queryCount}/2 queries used
+          </div>
           <Button onClick={onSetupWallet} variant="outline" size="sm">
             <Wallet className="w-4 h-4 mr-1" />
             <span className="hidden sm:inline">Connect Wallet</span>
