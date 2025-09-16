@@ -12,6 +12,7 @@ import StablecoinChart from './StablecoinChart';
 import NewsGrid from './NewsGrid';
 import ComparisonTable from './ComparisonTable';
 import AdoptionMetrics from './AdoptionMetrics';
+import { CoinGeckoWidget } from './CoinGeckoWidget';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 interface Message {
@@ -532,6 +533,7 @@ export const DemoInterface = ({
     }
   };
   return <div className="h-screen flex flex-col">
+      <CoinGeckoWidget />
       {/* Header */}
       <div className="flex items-center justify-between px-2 sm:px-4 glass border-b h-16 overflow-visible">
         <div className="flex items-center space-x-3">
