@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Send, Loader2, TrendingUp, Database, Globe, Wallet, Settings, GitCompare, HelpCircle, Newspaper, Copy, Download, Check, BarChart3 } from 'lucide-react';
+import { Send, Loader2, TrendingUp, Database, Globe, Wallet, Settings, GitCompare, HelpCircle, Newspaper, Copy, Download, Check, BarChart3, Info } from 'lucide-react';
 import { ResearchService } from '@/services/ResearchService';
 import { validateStablecoin, validateStablecoinComparison } from '@/utils/stablecoinValidation';
 import StablecoinChart from './StablecoinChart';
@@ -733,6 +733,10 @@ export const DemoInterface = ({
                   <div className="space-y-2">
                     <Label htmlFor="adoption-stablecoin">Stablecoin Name/Ticker</Label>
                     <Input id="adoption-stablecoin" placeholder="e.g., USDT, USDC, DAI" value={adoptionStablecoin} onChange={e => setAdoptionStablecoin(e.target.value)} />
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <Info className="w-3 h-3" />
+                      <span>Data is most precise for widely-used stablecoins</span>
+                    </div>
                   </div>
                   <DialogTrigger asChild>
                     <Button onClick={handleAdoptionSubmit} className="w-full" disabled={!adoptionStablecoin.trim()}>
