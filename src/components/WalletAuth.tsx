@@ -41,18 +41,27 @@ export const WalletAuth = () => {
         </Card>
       </div>;
   }
-  return <div className="flex items-center justify-between py-1 px-4 glass border-b">
-      <div className="flex items-center space-x-3">
-        <img src="/lovable-uploads/33de17b2-37de-44c9-994a-e297e6beede9.png" alt="Logo" className="w-24 h-24 object-contain" />
-        <div>
-          <p className="text-sm font-medium">
-            {user?.wallet?.address ? `${user.wallet.address.slice(0, 6)}...${user.wallet.address.slice(-4)}` : 'Connected'}
-          </p>
+  return <div className="glass border-b px-4 py-2">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <div className="w-6 h-6 bg-gradient-primary rounded-full flex items-center justify-center">
+            <Wallet className="w-3 h-3 text-primary-foreground" />
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">
+              {user?.wallet?.address ? `${user.wallet.address.slice(0, 6)}...${user.wallet.address.slice(-4)}` : 'Connected'}
+            </p>
+          </div>
         </div>
+        <Button 
+          onClick={logout} 
+          variant="outline" 
+          size="sm"
+          className="border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground h-7 text-xs"
+        >
+          <LogOut className="w-3 h-3 mr-1" />
+          Disconnect
+        </Button>
       </div>
-      <Button onClick={logout} variant="outline" size="sm">
-        <LogOut className="w-4 h-4 mr-1" />
-        Disconnect
-      </Button>
     </div>;
 };

@@ -3,9 +3,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
-import { Send, Loader2, TrendingUp, Database, Globe, ExternalLink, ArrowUpRight } from 'lucide-react';
+import { Send, Loader2, TrendingUp, Database, Globe, ExternalLink, ArrowUpRight, GitCompare, HelpCircle, BarChart3, Newspaper, Info } from 'lucide-react';
 import { ResearchService } from '@/services/ResearchService';
-import { validateStablecoin } from '@/utils/stablecoinValidation';
+import { validateStablecoin, validateStablecoinComparison } from '@/utils/stablecoinValidation';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
 import AdoptionMetrics from '@/components/AdoptionMetrics';
 import { getStablecoinExplanation, isBasicStablecoinQuery, type StablecoinExplanation } from '@/data/stablecoinExplanations';
 
@@ -50,8 +52,11 @@ export const ResearchInterface = () => {
       timestamp: new Date(),
     }
   ]);
-  const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [compareStablecoin1, setCompareStablecoin1] = useState('');
+  const [compareStablecoin2, setCompareStablecoin2] = useState('');
+  const [explainStablecoin, setExplainStablecoin] = useState('');
+  const [adoptionStablecoin, setAdoptionStablecoin] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -87,30 +92,17 @@ export const ResearchInterface = () => {
     return hasStablecoinTerms || mentionsStablecoin;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
-
-    // Validate if query is stablecoin-related
-    if (!validateQuery(input.trim())) {
-      toast({
-        title: "Invalid Query",
-        description: "I can only provide information about stablecoins. Please ask about stablecoin prices, mechanisms, comparisons, or other stablecoin-related topics.",
-        variant: "destructive"
-      });
-      return;
-    }
+  const handleQuickAction = async (query: string) => {
+    if (isLoading) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
       type: 'user',
-      content: input.trim(),
+      content: query,
       timestamp: new Date(),
     };
 
     setMessages(prev => [...prev, userMessage]);
-    const query = input.trim();
-    setInput('');
     setIsLoading(true);
 
     try {
@@ -168,7 +160,7 @@ export const ResearchInterface = () => {
         }
       }
       
-      // Fall back to API call for complex queries or unknown stablecoins
+      // API call for queries
       console.log('Using API for query:', query);
       const response = await ResearchService.processQuery(query);
       
@@ -195,6 +187,88 @@ export const ResearchInterface = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleCompareSubmit = () => {
+    const input1 = compareStablecoin1.trim();
+    const input2 = compareStablecoin2.trim();
+    if (!input1 || !input2) {
+      toast({
+        title: "Input Required",
+        description: "Please enter both stablecoins to compare.",
+        variant: "destructive"
+      });
+      return;
+    }
+    const validation = validateStablecoinComparison(input1, input2);
+    if (!validation.isValid) {
+      toast({
+        title: "Invalid Stablecoin",
+        description: validation.errorMessage || "Please enter valid stablecoin symbols or names.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const symbol1 = validation.stablecoin1.matchedSymbol;
+    const symbol2 = validation.stablecoin2.matchedSymbol;
+    handleQuickAction(`Compare ${symbol1} and ${symbol2} stablecoins`);
+    setCompareStablecoin1('');
+    setCompareStablecoin2('');
+  };
+
+  const handleExplainSubmit = () => {
+    const input = explainStablecoin.trim();
+    if (!input) {
+      toast({
+        title: "Input Required",
+        description: "Please enter a stablecoin to explain.",
+        variant: "destructive"
+      });
+      return;
+    }
+    const validation = validateStablecoin(input);
+    if (!validation.isValid) {
+      toast({
+        title: "Invalid Stablecoin",
+        description: validation.errorMessage || "Please enter a valid stablecoin symbol or name.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const symbol = validation.matchedSymbol;
+    handleQuickAction(`Explain ${symbol} stablecoin`);
+    setExplainStablecoin('');
+  };
+
+  const handleAdoptionSubmit = () => {
+    const input = adoptionStablecoin.trim();
+    if (!input) {
+      toast({
+        title: "Input Required",
+        description: "Please enter a stablecoin for adoption tracking.",
+        variant: "destructive"
+      });
+      return;
+    }
+    const validation = validateStablecoin(input);
+    if (!validation.isValid) {
+      toast({
+        title: "Invalid Stablecoin",
+        description: validation.errorMessage || "Please enter a valid stablecoin symbol or name.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const symbol = validation.matchedSymbol;
+    handleQuickAction(`Adoption tracker for ${symbol}`);
+    setAdoptionStablecoin('');
+  };
+
+  const handleLatestNews = () => {
+    handleQuickAction('Latest news about stablecoins');
   };
 
 
@@ -320,24 +394,131 @@ export const ResearchInterface = () => {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
-      <div className="p-4 border-t border-border glass">
-        <form onSubmit={handleSubmit} className="flex space-x-2">
-          <Input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask about stablecoin market caps, yields, mechanisms, USDT vs USDC, or any stablecoin analysis..."
-            className="flex-1 bg-input/50 backdrop-blur-sm"
-            disabled={isLoading}
-          />
-          <Button 
-            type="submit" 
-            disabled={isLoading || !input.trim()}
-            className="bg-gradient-primary hover:opacity-90 glow-primary"
-          >
-            <Send className="w-4 h-4" />
-          </Button>
-        </form>
+      {/* Quick Actions */}
+      <div className="border-t border-border glass">
+        <div className="p-4">
+          <div className="flex gap-2 flex-wrap">
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <GitCompare className="w-4 h-4 mr-2" />
+                  Compare Stablecoins
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Compare Stablecoins</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="stablecoin1">First Stablecoin</Label>
+                    <Input 
+                      id="stablecoin1" 
+                      placeholder="e.g., USDT" 
+                      value={compareStablecoin1} 
+                      onChange={e => setCompareStablecoin1(e.target.value)} 
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="stablecoin2">Second Stablecoin</Label>
+                    <Input 
+                      id="stablecoin2" 
+                      placeholder="e.g., USDC" 
+                      value={compareStablecoin2} 
+                      onChange={e => setCompareStablecoin2(e.target.value)} 
+                    />
+                  </div>
+                  <DialogTrigger asChild>
+                    <Button 
+                      onClick={handleCompareSubmit} 
+                      className="w-full" 
+                      disabled={!compareStablecoin1.trim() || !compareStablecoin2.trim()}
+                    >
+                      Compare Stablecoins
+                    </Button>
+                  </DialogTrigger>
+                </div>
+              </DialogContent>
+            </Dialog>
+
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <HelpCircle className="w-4 h-4 mr-2" />
+                  Explain Stablecoin
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Explain a Stablecoin</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="explain-stablecoin">Stablecoin Name/Ticker</Label>
+                    <Input 
+                      id="explain-stablecoin" 
+                      placeholder="e.g., DAI, USDC, USDT" 
+                      value={explainStablecoin} 
+                      onChange={e => setExplainStablecoin(e.target.value)} 
+                    />
+                  </div>
+                  <DialogTrigger asChild>
+                    <Button 
+                      onClick={handleExplainSubmit} 
+                      className="w-full" 
+                      disabled={!explainStablecoin.trim()}
+                    >
+                      Explain Stablecoin
+                    </Button>
+                  </DialogTrigger>
+                </div>
+              </DialogContent>
+            </Dialog>
+
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <BarChart3 className="w-4 h-4 mr-2" />
+                  Onchain Metrics
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Stablecoin Adoption Tracker</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="adoption-stablecoin">Stablecoin Name/Ticker</Label>
+                    <Input 
+                      id="adoption-stablecoin" 
+                      placeholder="e.g., USDT, USDC, DAI" 
+                      value={adoptionStablecoin} 
+                      onChange={e => setAdoptionStablecoin(e.target.value)} 
+                    />
+                    <div className="flex items-center gap-1 text-xs text-orange-500">
+                      <Info className="w-3 h-3" />
+                      <span>Data is precise only for widely-used stablecoins</span>
+                    </div>
+                  </div>
+                  <DialogTrigger asChild>
+                    <Button 
+                      onClick={handleAdoptionSubmit} 
+                      className="w-full" 
+                      disabled={!adoptionStablecoin.trim()}
+                    >
+                      Track Adoption Metrics
+                    </Button>
+                  </DialogTrigger>
+                </div>
+              </DialogContent>
+            </Dialog>
+
+            <Button variant="outline" size="sm" onClick={handleLatestNews} disabled={isLoading}>
+              <Newspaper className="w-4 h-4 mr-2" />
+              Latest News
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );
