@@ -711,7 +711,7 @@ export const DemoInterface = ({
                     <Input id="adoption-stablecoin" placeholder="e.g., USDT, USDC, DAI" value={adoptionStablecoin} onChange={e => setAdoptionStablecoin(e.target.value)} />
                     <div className="flex items-center gap-1 text-xs text-orange-500">
                       <Info className="w-3 h-3" />
-                      <span>Still in Development phase! Data may not be 100% accurate</span>
+                      <span>Still in Development! Data may not be 100% accurate</span>
                     </div>
                   </div>
                   <DialogTrigger asChild>
