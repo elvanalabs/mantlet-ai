@@ -733,7 +733,7 @@ export const DemoInterface = ({
                   <div className="space-y-2">
                     <Label htmlFor="adoption-stablecoin">Stablecoin Name/Ticker</Label>
                     <Input id="adoption-stablecoin" placeholder="e.g., USDT, USDC, DAI" value={adoptionStablecoin} onChange={e => setAdoptionStablecoin(e.target.value)} />
-                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <div className="flex items-center gap-1 text-xs text-orange-500">
                       <Info className="w-3 h-3" />
                       <span>Data is most precise for widely-used stablecoins</span>
                     </div>
