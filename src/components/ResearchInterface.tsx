@@ -421,9 +421,9 @@ export const ResearchInterface = () => {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full max-w-full overflow-hidden">
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-4 min-h-0">
         {messages.map((message) => (
           <div key={message.id} className="flex space-x-3">
             {getMessageIcon(message.type)}
@@ -561,9 +561,9 @@ export const ResearchInterface = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="border-t border-border glass">
-        <div className="p-4">
-          <div className="flex gap-2 flex-wrap">
+      <div className="border-t border-border glass flex-shrink-0">
+        <div className="p-2 sm:p-4">
+          <div className="flex gap-1 sm:gap-2 flex-wrap">
             <Dialog>
               <DialogTrigger asChild>
                 <Button variant="outline" size="sm">

@@ -42,11 +42,11 @@ export const WalletAuth = () => {
         </Card>
       </div>;
   }
-  return <div className="flex items-center justify-between px-2 sm:px-4 glass border-b h-16 overflow-visible">
-      <div className="flex items-center space-x-3">
-        <img src="/lovable-uploads/33de17b2-37de-44c9-994a-e297e6beede9.png" alt="Logo" className="w-24 h-24 object-contain" />
+  return <div className="flex items-center justify-between px-2 sm:px-4 glass border-b h-16 flex-shrink-0">
+      <div className="flex items-center space-x-2 min-w-0">
+        <img src="/lovable-uploads/33de17b2-37de-44c9-994a-e297e6beede9.png" alt="Logo" className="w-16 h-16 sm:w-20 sm:h-20 object-contain flex-shrink-0" />
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" size="sm">

@@ -11,10 +11,10 @@ const Index = () => {
   }
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className="h-screen flex flex-col max-w-full overflow-hidden">
       <CoinGeckoWidget />
       <WalletAuth />
-      <main className="flex-1 flex flex-col">
+      <main className="flex-1 flex flex-col min-h-0">
         <ResearchInterface />
       </main>
     </div>
