@@ -84,7 +84,7 @@ export const ResearchInterface = () => {
     {
       id: '1',
       type: 'system',
-      content: 'Welcome to your Stablecoin Research Agent. I am your specialized AI assistant for everything stablecoin-related. Ask me about stablecoin market caps, prices, mechanisms, stability, yields, protocols, or any stablecoin analysis you need.',
+      content: 'Hello! I am Mantlet, your AI assistant specialized in stablecoins. Start with the below given quick start options',
       timestamp: new Date(),
     }
   ]);
