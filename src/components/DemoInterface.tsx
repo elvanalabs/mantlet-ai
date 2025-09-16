@@ -110,36 +110,24 @@ export const DemoInterface = ({
   }, [messages]);
   const validateQuery = (query: string): boolean => {
     // Allow common stablecoin-related keywords
-    const stablecoinKeywords = [
-      'stablecoin', 'usdt', 'usdc', 'dai', 'tether', 'circle', 'maker', 
-      'price', 'market', 'adoption', 'compare', 'explain', 'news',
-      'backing', 'collateral', 'mechanism', 'yield', 'protocol',
-      'ethena', 'usde', 'pyusd', 'paypal', 'fdusd', 'paxg', 'xaut',
-      'eurs', 'eurc', 'frax', 'mim', 'gho', 'aave', 'curve', 'crvusd',
-      'treasury', 'reserves', 'defi', 'celsius', 'terra', 'anchor'
-    ];
-
+    const stablecoinKeywords = ['stablecoin', 'usdt', 'usdc', 'dai', 'tether', 'circle', 'maker', 'price', 'market', 'adoption', 'compare', 'explain', 'news', 'backing', 'collateral', 'mechanism', 'yield', 'protocol', 'ethena', 'usde', 'pyusd', 'paypal', 'fdusd', 'paxg', 'xaut', 'eurs', 'eurc', 'frax', 'mim', 'gho', 'aave', 'curve', 'crvusd', 'treasury', 'reserves', 'defi', 'celsius', 'terra', 'anchor'];
     const lowerQuery = query.toLowerCase();
-    
+
     // Check if query contains stablecoin-related terms
-    const hasStablecoinTerms = stablecoinKeywords.some(keyword => 
-      lowerQuery.includes(keyword)
-    );
-    
+    const hasStablecoinTerms = stablecoinKeywords.some(keyword => lowerQuery.includes(keyword));
+
     // Check if query mentions specific stablecoin symbols/names
     const mentionsStablecoin = validateStablecoin(query).isValid;
-    
     return hasStablecoinTerms || mentionsStablecoin;
   };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
-    
+
     // Check query limit in demo mode
     if (queryCount >= 2) {
       toast({
-        title: "Demo Limit Reached", 
+        title: "Demo Limit Reached",
         description: "You've used your 2 free queries! Please authenticate with Privy to continue asking questions.",
         variant: "destructive"
       });
@@ -149,17 +137,16 @@ export const DemoInterface = ({
       }, 1500);
       return;
     }
-    
+
     // Validate if query is stablecoin-related
     if (!validateQuery(input.trim())) {
       toast({
-        title: "Invalid Query", 
+        title: "Invalid Query",
         description: "I can only provide information about stablecoins. Please ask about stablecoin prices, mechanisms, comparisons, or other stablecoin-related topics.",
         variant: "destructive"
       });
       return;
     }
-
     const userMessage: Message = {
       id: Date.now().toString(),
       type: 'user',
@@ -169,10 +156,9 @@ export const DemoInterface = ({
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
-    
+
     // Increment query count
     setQueryCount(prev => prev + 1);
-    
     try {
       const response = await ResearchService.processQuery(input.trim());
       const assistantMessage: Message = {
@@ -186,7 +172,10 @@ export const DemoInterface = ({
         comparisonData: response.comparisonData,
         adoptionData: response.adoptionData ? {
           ...response.adoptionData,
-          depegEvents: (response.adoptionData as any).depegEvents || { count: 0, events: [] }
+          depegEvents: (response.adoptionData as any).depegEvents || {
+            count: 0,
+            events: []
+          }
         } : undefined
       };
       setMessages(prev => [...prev, assistantMessage]);
@@ -203,11 +192,11 @@ export const DemoInterface = ({
   };
   const handleQuickAction = async (query: string) => {
     if (isLoading) return;
-    
+
     // Check query limit in demo mode
     if (queryCount >= 2) {
       toast({
-        title: "Demo Limit Reached", 
+        title: "Demo Limit Reached",
         description: "You've used your 2 free queries! Please authenticate with Privy to continue asking questions.",
         variant: "destructive"
       });
@@ -217,7 +206,6 @@ export const DemoInterface = ({
       }, 1500);
       return;
     }
-    
     const userMessage: Message = {
       id: Date.now().toString(),
       type: 'user',
@@ -226,10 +214,9 @@ export const DemoInterface = ({
     };
     setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
-    
+
     // Increment query count
     setQueryCount(prev => prev + 1);
-    
     try {
       const response = await ResearchService.processQuery(query);
       const assistantMessage: Message = {
@@ -243,7 +230,10 @@ export const DemoInterface = ({
         comparisonData: response.comparisonData,
         adoptionData: response.adoptionData ? {
           ...response.adoptionData,
-          depegEvents: (response.adoptionData as any).depegEvents || { count: 0, events: [] }
+          depegEvents: (response.adoptionData as any).depegEvents || {
+            count: 0,
+            events: []
+          }
         } : undefined
       };
       setMessages(prev => [...prev, assistantMessage]);
@@ -261,7 +251,6 @@ export const DemoInterface = ({
   const handleCompareSubmit = () => {
     const input1 = compareStablecoin1.trim();
     const input2 = compareStablecoin2.trim();
-    
     if (!input1 || !input2) {
       toast({
         title: "Input Required",
@@ -270,9 +259,7 @@ export const DemoInterface = ({
       });
       return;
     }
-
     const validation = validateStablecoinComparison(input1, input2);
-    
     if (!validation.isValid) {
       toast({
         title: "Invalid Stablecoin",
@@ -285,14 +272,12 @@ export const DemoInterface = ({
     // Use the validated symbols
     const symbol1 = validation.stablecoin1.matchedSymbol;
     const symbol2 = validation.stablecoin2.matchedSymbol;
-    
     handleQuickAction(`Compare ${symbol1} and ${symbol2} stablecoins`);
     setCompareStablecoin1('');
     setCompareStablecoin2('');
   };
   const handleExplainSubmit = () => {
     const input = explainStablecoin.trim();
-    
     if (!input) {
       toast({
         title: "Input Required",
@@ -301,9 +286,7 @@ export const DemoInterface = ({
       });
       return;
     }
-
     const validation = validateStablecoin(input);
-    
     if (!validation.isValid) {
       toast({
         title: "Invalid Stablecoin",
@@ -315,13 +298,11 @@ export const DemoInterface = ({
 
     // Use the validated symbol
     const symbol = validation.matchedSymbol;
-    
     handleQuickAction(`Explain ${symbol} stablecoin`);
     setExplainStablecoin('');
   };
   const handleAdoptionSubmit = () => {
     const input = adoptionStablecoin.trim();
-    
     if (!input) {
       toast({
         title: "Input Required",
@@ -330,9 +311,7 @@ export const DemoInterface = ({
       });
       return;
     }
-
     const validation = validateStablecoin(input);
-    
     if (!validation.isValid) {
       toast({
         title: "Invalid Stablecoin",
@@ -344,7 +323,6 @@ export const DemoInterface = ({
 
     // Use the validated symbol
     const symbol = validation.matchedSymbol;
-    
     handleQuickAction(`Adoption tracker for ${symbol}`);
     setAdoptionStablecoin('');
   };
@@ -649,16 +627,14 @@ export const DemoInterface = ({
       </div>
 
       {/* Demo Notice */}
-      {queryCount > 0 && queryCount < 2 && (
-        <div className="px-4 py-2">
+      {queryCount > 0 && queryCount < 2 && <div className="px-4 py-2">
           <Card className="p-3 bg-accent/50 border-accent">
             <div className="flex items-center gap-2 text-sm">
               <Wallet className="w-4 h-4" />
               <span>Demo mode: {2 - queryCount} {2 - queryCount === 1 ? 'query' : 'queries'} remaining. Connect wallet for unlimited access!</span>
             </div>
           </Card>
-        </div>
-      )}
+        </div>}
 
       {/* Input */}
       <div className="border-t border-border glass">
@@ -735,7 +711,7 @@ export const DemoInterface = ({
                     <Input id="adoption-stablecoin" placeholder="e.g., USDT, USDC, DAI" value={adoptionStablecoin} onChange={e => setAdoptionStablecoin(e.target.value)} />
                     <div className="flex items-center gap-1 text-xs text-orange-500">
                       <Info className="w-3 h-3" />
-                      <span>Data is most precise for widely-used stablecoins</span>
+                      <span>Still in Development phase! Data may not be 100% accurate</span>
                     </div>
                   </div>
                   <DialogTrigger asChild>
