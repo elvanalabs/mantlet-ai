@@ -85,7 +85,7 @@ export const DemoInterface = ({
   const [messages, setMessages] = useState<Message[]>([{
     id: '1',
     type: 'system',
-    content: 'Hello! I am Mantlet, your AI assistant specialized in stablecoins. I can help you with everything related to stablecoins - comparisons, explanations, market analysis, news, and more!',
+    content: 'Hello! I am Mantlet, your AI assistant specialized in stablecoins. Start with the below given quick start options',
     timestamp: new Date()
   }]);
   const [input, setInput] = useState('');
