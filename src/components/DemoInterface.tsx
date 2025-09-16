@@ -537,7 +537,7 @@ export const DemoInterface = ({
       {/* Header */}
       <div className="flex items-center justify-between px-2 sm:px-4 glass border-b h-16 flex-shrink-0">
         <div className="flex items-center space-x-2 min-w-0">
-          <img src="/lovable-uploads/33de17b2-37de-44c9-994a-e297e6beede9.png" alt="Logo" className="w-16 h-16 sm:w-20 sm:h-20 object-contain flex-shrink-0" />
+          <img src="/lovable-uploads/33de17b2-37de-44c9-994a-e297e6beede9.png" alt="Logo" className="w-24 h-24 sm:w-28 sm:h-28 object-contain flex-shrink-0" />
         </div>
         <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
           <div className="hidden sm:block text-sm text-muted-foreground whitespace-nowrap">
