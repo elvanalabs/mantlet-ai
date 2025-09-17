@@ -87,13 +87,14 @@ export class ResearchService {
         }
       }
       
-      // PRIORITY 1: STABLECOINS - Always check stablecoins first and give them absolute priority
+      // Check if this is an explain stablecoin query
+      const isExplainQuery = query.toLowerCase().includes('explain') && 
+                           (query.toLowerCase().includes('stablecoin') || 
+                            this.extractStablecoinSymbols(query).length > 0);
       const stablecoinSymbols = this.extractStablecoinSymbols(query);
-      const isStablecoinQuery = query.toLowerCase().includes('explain') && 
-                               (query.toLowerCase().includes('stablecoin') || stablecoinSymbols.length > 0);
       
-      if (isStablecoinQuery && stablecoinSymbols.length > 0) {
-        console.log('STABLECOIN PRIORITY: Explain stablecoin query detected for:', stablecoinSymbols[0]);
+      if (isExplainQuery && stablecoinSymbols.length > 0) {
+        console.log('Explain stablecoin query detected for:', stablecoinSymbols[0]);
         const contextData = await this.generateResponse(query, '');
         const chartData = await this.getChartData(stablecoinSymbols[0]);
         
@@ -101,38 +102,6 @@ export class ResearchService {
           contextData,
           sources: [],
           chartData
-        };
-      }
-
-      // PRIORITY 2: BLOCKCHAIN CHAINS - Only if it's definitely NOT a stablecoin query
-      const lowerQuery = query.toLowerCase();
-      const isBlockchainExplainQuery = !isStablecoinQuery && 
-                                     lowerQuery.includes('explain') && 
-                                     (lowerQuery.includes('tempo blockchain') || 
-                                      lowerQuery.includes('tempo chain') ||
-                                      lowerQuery.includes('arc network') ||
-                                      lowerQuery.includes('arc blockchain') ||
-                                      lowerQuery.includes('plasma blockchain') ||
-                                      lowerQuery.includes('plasma chain') ||
-                                      lowerQuery.includes('stable blockchain') ||
-                                      lowerQuery.includes('stable chain') ||
-                                      lowerQuery.includes('codex blockchain') ||
-                                      lowerQuery.includes('codex chain') ||
-                                      (lowerQuery.includes('tempo') && lowerQuery.includes('stablechain')) ||
-                                      (lowerQuery.includes('arc') && lowerQuery.includes('stablechain')) ||
-                                      (lowerQuery.includes('plasma') && lowerQuery.includes('stablechain')) ||
-                                      (lowerQuery.includes('codex') && lowerQuery.includes('stablechain')) ||
-                                      // Only match 'stable' for blockchain if it's very specific
-                                      (lowerQuery.includes('stable') && lowerQuery.includes('stablechain') && !lowerQuery.includes('stablecoin')));
-      
-      if (isBlockchainExplainQuery) {
-        console.log('Blockchain query detected (after stablecoin priority check)');
-        const contextData = await this.generateResponse(query, '');
-        
-        return {
-          contextData,
-          sources: []
-          // Note: No chartData for blockchain explanations
         };
       }
       
@@ -476,7 +445,7 @@ export class ResearchService {
     marketData: string
   ): Promise<string> {
     try {
-      // Check if this is an "explain stablecoin" query first (highest priority)
+      // Check if this is an "explain stablecoin" query
       const isExplainQuery = query.toLowerCase().includes('explain') && 
                            (query.toLowerCase().includes('stablecoin') || 
                             this.extractStablecoinSymbols(query).length > 0);
@@ -552,123 +521,16 @@ ${referenceInfo}
 
 ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
       } else {
-        // Check if this is a blockchain explanation query
-        const lowerQueryGen = query.toLowerCase();
-        const isBlockchainExplainQuery = lowerQueryGen.includes('explain') && 
-                                       (lowerQueryGen.includes('tempo blockchain') || 
-                                        lowerQueryGen.includes('tempo chain') ||
-                                        lowerQueryGen.includes('arc network') ||
-                                        lowerQueryGen.includes('arc blockchain') ||
-                                        lowerQueryGen.includes('plasma blockchain') ||
-                                        lowerQueryGen.includes('plasma chain') ||
-                                        lowerQueryGen.includes('stable blockchain') ||
-                                        lowerQueryGen.includes('stable chain') ||
-                                        lowerQueryGen.includes('codex blockchain') ||
-                                        lowerQueryGen.includes('codex chain') ||
-                                        (lowerQueryGen.includes('tempo') && lowerQueryGen.includes('stablechain')) ||
-                                        (lowerQueryGen.includes('arc') && lowerQueryGen.includes('stablechain')) ||
-                                        (lowerQueryGen.includes('plasma') && lowerQueryGen.includes('stablechain')) ||
-                                        (lowerQueryGen.includes('stable') && lowerQueryGen.includes('stablechain')) ||
-                                        (lowerQueryGen.includes('codex') && lowerQueryGen.includes('stablechain')));
+        // Improve the query format for single words
+        if (query.trim().split(' ').length === 1) {
+          // If it's a single word (like "USDT"), make it a proper question
+          formattedQuery = `What is ${query}? Please provide comprehensive information.`;
+        }
 
-        if (isBlockchainExplainQuery) {
-          // Extract blockchain name from query for proper formatting
-          const blockchainName = lowerQueryGen.includes('tempo') ? 'Tempo' :
-                               lowerQueryGen.includes('arc') ? 'Arc' :
-                               lowerQueryGen.includes('plasma') ? 'Plasma' :
-                               lowerQueryGen.includes('stable') ? 'Stable' :
-                               lowerQueryGen.includes('codex') ? 'Codex' : 'Unknown';
-        
-          // Create a specific prompt for blockchain explain queries
-          prompt = `You are explaining the ${blockchainName} Stablechain. Please provide information using the exact format below. Use the training data provided to answer accurately.
-
-**TRAINING DATA FOR STABLECOIN BLOCKCHAINS:**
-
-**TEMPO:**
-- Layer 1 blockchain designed for payments, developed by Stripe and Paradigm
-- Purpose-built for stablecoins with support for all major stablecoins  
-- Partners: Anthropic, Coupang, Deutsche Bank, DoorDash, Lead Bank, Mercury, Nubank, OpenAI, Revolut, Shopify, Standard Chartered, Visa
-- Optimized for real-world payment flows with embedded payment features, memo fields, batch transfers
-- High-throughput, low-cost global transactions
-- Currently in development/upcoming launch
-
-**ARC NETWORK:**
-- Open Layer-1 blockchain purpose-built for stablecoin finance by Circle
-- Designed for performance, reliability, and liquidity to meet global financial demands
-- Native support for USDC and other stablecoins
-- Addresses enterprise concerns: predictable fees, no volatile gas tokens, private payment data
-- Institutional-grade infrastructure with regulatory alignment
-- Currently in testnet phase
-
-**PLASMA:**  
-- High-performance Layer 1 blockchain purpose-built for stablecoins
-- Near instant, fee-free payments with institutional-grade security
-- Native support for USDT and additional support for multiple stablecoins including: sNUSD, AUSD, USD.ai, USDS, USDtb
-- Sub-second finality with zero-fee USD₮ transfers
-- Custom gas tokens and support for confidential payments
-- Currently live/mainnet
-- Key Backers: Founders: Paul Faecks (CEO), Christian Angermayer; Major Investors: Framework Ventures (lead), Bitfinex/USDT₀, DRW/Cumberland, Bybit, Flow Traders, Nomura, Karatage, IMC, 6th Man Ventures; Key Partners/Advisors: Paolo Ardoino (CTO of Bitfinex/Tether), Peter Thiel, Cobie, Zaheer Ebtikar
-
-**STABLE:**
-- Institutional grade blockchain built specifically for USDT
-- High-throughput Layer 1 with sub-second finality designed as asset issuance and settlement layer
-- USDT as native gas token enabling gas-free transactions
-- Backed by Franklin Templeton and Bybit/Mirana Ventures
-- Addresses unpredictable costs, enterprise gaps, and UX issues
-- Currently in development
-
-**CODEX:**
-- EVM-equivalent Layer 2 blockchain purpose-built for stablecoin-native payments, FX, and settlement
-- Native USDC integration with programmable onchain ramping, compliance, identity, FX
-- Optimized for stablecoin liquidity, custody, and atomic settlement on Ethereum
-- Currently live with native USDC
-- Key Backers: Founders: Haonan Li, Victor Yaw, Momo Ong; Major Investors: Dragonfly Capital (lead, $15.8M seed round), Coinbase Ventures, Circle Ventures, Cumberland Labs, Wintermute, Selini Capital, Fabric Ventures, Mirana Ventures, Hustle Fund; Key Partners/Advisors: Circle (through Circle Ventures involvement)
-
-CRITICAL FORMATTING REQUIREMENTS:
-1. DO NOT include any introduction lines like "Here is the information about..." 
-2. Start directly with the first section header in bold: **Overview**
-3. Each section title MUST be in bold using **title** format
-4. Add exactly two blank lines between each section
-5. Content should be formatted as bullet points using "- " when appropriate
-6. Structure the Key Backers section with clear organization
-7. Only include these 5 sections, nothing else
-
-**REQUIRED OUTPUT FORMAT:**
-**Overview**
-What the chain is and its main purpose.
-
-
-**Native Stablecoin** 
-Which stablecoin(s) it's built around, and if used as gas.
-
-
-**Launch Status**
-Mainnet / Testnet / Upcoming.
-
-
-**Key Backers**
-Structure with clear organization:
-- Founders: [list founders/founding team]
-- Major Investors: [list key investors and VCs]  
-- Key Partners: [list strategic partners and institutions]
-
-
-**Unique Edge**
-What makes this chain different from others.
-
-Explain ${blockchainName} Stablechain`;
-        } else {
-          // Improve the query format for single words
-          if (query.trim().split(' ').length === 1) {
-            // If it's a single word (like "USDT"), make it a proper question
-            formattedQuery = `What is ${query}? Please provide comprehensive information.`;
-          }
-
-          // Prepare the prompt for Claude
-          prompt = `Query: ${formattedQuery}
+        // Prepare the prompt for Claude
+        prompt = `Query: ${formattedQuery}
 
 ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
-        }
       }
 
       console.log('Calling Claude with prompt:', prompt);
