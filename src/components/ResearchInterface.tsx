@@ -348,6 +348,11 @@ export const ResearchInterface = () => {
                 console.log('Message content:', message.content);
                 console.log('Split parts:', parts);
                 return parts.map((part, index) => {
+                  // Skip undefined or null parts
+                  if (!part || typeof part !== 'string') {
+                    return null;
+                  }
+                  
                   // Handle bold text **text**
                   const boldMatch = part.match(/^\*\*([^*]+)\*\*$/);
                   if (boldMatch) {
