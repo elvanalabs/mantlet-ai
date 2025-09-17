@@ -236,14 +236,7 @@ USDe is backed by ETH and stETH, with short positions in ETH perpetual futures t
 **Use Cases:**
 • Yield-bearing stablecoin alternative
 • DeFi protocols seeking yield
-• Sophisticated trading strategies
-
-**Risks:**
-⚠️ Complex mechanism with multiple failure points
-⚠️ Funding rate risk
-⚠️ Liquidation cascade potential
-⚠️ Relatively new and untested
-⚠️ Counterparty risk with derivatives exchanges`,
+• Sophisticated trading strategies`,
     adoptionData: {
       circulatingSupply: '3.2B USDe',
       marketShare: '1.8%',
