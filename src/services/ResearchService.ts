@@ -483,7 +483,7 @@ Reference Data for ${referenceData.name} (${referenceData.symbol}):
 **Overview**
 **Backing Mechanism**
 **Usecases** 
-**Risks/Criticism**
+**Associated Institutions**
 
 IMPORTANT FORMATTING RULES:
 1. Each section title must be in bold using **title** format
@@ -501,6 +501,13 @@ Content here...
 - Point 1
 - Point 2
 - Point 3
+
+**Associated Institutions**
+- Issuer: Company name
+- Custodian: Bank/Institution name
+- Auditor: Auditing firm name
+- Key Partners: List of major partners
+- Major Exchanges: List of exchanges
 
 ${referenceInfo}
 
