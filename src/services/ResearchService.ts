@@ -516,7 +516,7 @@ export class ResearchService {
 **PLASMA:**  
 - High-performance Layer 1 blockchain purpose-built for stablecoins
 - Near instant, fee-free payments with institutional-grade security
-- Native support for USDT and multiple stablecoins including sNUSD, AUSD, USD.ai, USDS, USDtb
+- Native support for USDT and additional support for multiple stablecoins including: sNUSD, AUSD, USD.ai, USDS, USDtb
 - Sub-second finality with zero-fee USD₮ transfers
 - Custom gas tokens and support for confidential payments
 - Currently live/mainnet
