@@ -520,6 +520,9 @@ export class ResearchService {
 - Sub-second finality with zero-fee USD₮ transfers
 - Custom gas tokens and support for confidential payments
 - Currently live/mainnet
+- Founders: Paul Faecks (CEO, previously co-founded fintech projects like Alloy) and Christian Angermayer
+- Major Investors: Framework Ventures (lead), Bitfinex/USDT₀, DRW/Cumberland, Bybit, Flow Traders, Nomura, Karatage, IMC, 6th Man Ventures
+- Key Partners/Advisors: Paolo Ardoino (CTO of Bitfinex/Tether), Peter Thiel, Cobie, Zaheer Ebtikar
 
 **STABLE:**
 - Institutional grade blockchain built specifically for USDT
