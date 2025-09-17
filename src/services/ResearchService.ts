@@ -87,6 +87,27 @@ export class ResearchService {
         }
       }
       
+      // Check if this is an explain blockchain query
+      const isBlockchainExplainQuery = query.toLowerCase().includes('explain') && 
+                                     (query.toLowerCase().includes('blockchain') || 
+                                      query.toLowerCase().includes('chain') ||
+                                      query.toLowerCase().includes('tempo') ||
+                                      query.toLowerCase().includes('arc network') ||
+                                      query.toLowerCase().includes('plasma') ||
+                                      query.toLowerCase().includes('stable') ||
+                                      query.toLowerCase().includes('codex'));
+      
+      if (isBlockchainExplainQuery) {
+        console.log('Explain blockchain query detected');
+        const contextData = await this.generateResponse(query, '');
+        
+        return {
+          contextData,
+          sources: []
+          // Note: No chartData for blockchain explanations
+        };
+      }
+      
       // Check if this is an explain stablecoin query
       const isExplainQuery = query.toLowerCase().includes('explain') && 
                            (query.toLowerCase().includes('stablecoin') || 
@@ -445,6 +466,16 @@ export class ResearchService {
     marketData: string
   ): Promise<string> {
     try {
+      // Check if this is an "explain stablecoin blockchain" query
+      const isBlockchainExplainQuery = query.toLowerCase().includes('explain') && 
+                                     (query.toLowerCase().includes('blockchain') || 
+                                      query.toLowerCase().includes('chain') ||
+                                      query.toLowerCase().includes('tempo') ||
+                                      query.toLowerCase().includes('arc network') ||
+                                      query.toLowerCase().includes('plasma') ||
+                                      query.toLowerCase().includes('stable') ||
+                                      query.toLowerCase().includes('codex'));
+
       // Check if this is an "explain stablecoin" query
       const isExplainQuery = query.toLowerCase().includes('explain') && 
                            (query.toLowerCase().includes('stablecoin') || 
@@ -453,7 +484,75 @@ export class ResearchService {
       let formattedQuery = query;
       let prompt = '';
 
-      if (isExplainQuery) {
+      if (isBlockchainExplainQuery) {
+        // Create a specific prompt for blockchain explain queries
+        prompt = `Please provide information about the requested stablecoin blockchain using the exact format below. Use the training data provided to answer accurately:
+
+**TRAINING DATA FOR STABLECOIN BLOCKCHAINS:**
+
+**TEMPO:**
+- Layer 1 blockchain designed for payments, developed by Stripe and Paradigm
+- Purpose-built for stablecoins with support for all major stablecoins  
+- Partners: Anthropic, Coupang, Deutsche Bank, DoorDash, Lead Bank, Mercury, Nubank, OpenAI, Revolut, Shopify, Standard Chartered, Visa
+- Optimized for real-world payment flows with embedded payment features, memo fields, batch transfers
+- High-throughput, low-cost global transactions
+- Currently in development/upcoming launch
+
+**ARC NETWORK:**
+- Open Layer-1 blockchain purpose-built for stablecoin finance by Circle
+- Designed for performance, reliability, and liquidity to meet global financial demands
+- Native support for USDC and other stablecoins
+- Addresses enterprise concerns: predictable fees, no volatile gas tokens, private payment data
+- Institutional-grade infrastructure with regulatory alignment
+- Currently in testnet phase
+
+**PLASMA:**  
+- High-performance Layer 1 blockchain purpose-built for stablecoins
+- Near instant, fee-free payments with institutional-grade security
+- Native support for USDT and multiple stablecoins including sNUSD, AUSD, USD.ai, USDS, USDtb
+- Sub-second finality with zero-fee USD₮ transfers
+- Custom gas tokens and support for confidential payments
+- Currently live/mainnet
+
+**STABLE:**
+- Institutional grade blockchain built specifically for USDT
+- High-throughput Layer 1 with sub-second finality designed as asset issuance and settlement layer
+- USDT as native gas token enabling gas-free transactions
+- Backed by Franklin Templeton and Bybit/Mirana Ventures
+- Addresses unpredictable costs, enterprise gaps, and UX issues
+- Currently in development
+
+**CODEX:**
+- EVM-equivalent Layer 2 blockchain purpose-built for stablecoin-native payments, FX, and settlement
+- Native USDC integration with programmable onchain ramping, compliance, identity, FX
+- Backed by Caladan, Circle, CMT Digital, Coinbase Ventures, Cumberland, Fabric Ventures, Hustle Fund, Mirana Ventures, Selini Capital, Reverie, Wintermute
+- Optimized for stablecoin liquidity, custody, and atomic settlement on Ethereum
+- Currently live with native USDC
+
+FORMATTING REQUIREMENTS:
+1. Each section title must be in bold using **title** format
+2. Add two blank lines between each section  
+3. Content should be formatted as bullet points using "- " when appropriate
+4. Do not include any other information outside these 5 sections
+
+**REQUIRED FORMAT:**
+**Overview**
+What the chain is and its main purpose.
+
+**Native Stablecoin** 
+Which stablecoin(s) it's built around, and if used as gas.
+
+**Launch Status**
+Mainnet / Testnet / Upcoming.
+
+**Key Backers**
+Founders, major companies or protocols behind it.
+
+**Unique Edge**
+What makes this chain different from others.
+
+Query: ${query}`;
+      } else if (isExplainQuery) {
         // Extract the stablecoin name from the query
         const stablecoinSymbols = this.extractStablecoinSymbols(query);
         const stablecoinName = stablecoinSymbols.length > 0 ? stablecoinSymbols[0] : query.replace(/explain|stablecoin/gi, '').trim();
@@ -1087,9 +1186,33 @@ ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
     query: string, 
     marketData: string
   ): string {
+    const lowerQuery = query.toLowerCase();
+    
+    // Check if this is a blockchain explanation query
+    const isBlockchainExplainQuery = lowerQuery.includes('explain') && 
+                                   (lowerQuery.includes('blockchain') || 
+                                    lowerQuery.includes('chain') ||
+                                    lowerQuery.includes('tempo') ||
+                                    lowerQuery.includes('arc network') ||
+                                    lowerQuery.includes('plasma') ||
+                                    lowerQuery.includes('stable') ||
+                                    lowerQuery.includes('codex'));
+
+    if (isBlockchainExplainQuery) {
+      // Extract blockchain name from query
+      let blockchainName = 'the requested blockchain';
+      if (lowerQuery.includes('tempo')) blockchainName = 'Tempo';
+      else if (lowerQuery.includes('arc')) blockchainName = 'Arc Network';
+      else if (lowerQuery.includes('plasma')) blockchainName = 'Plasma';
+      else if (lowerQuery.includes('stable')) blockchainName = 'Stable';
+      else if (lowerQuery.includes('codex')) blockchainName = 'Codex';
+
+      return `**Overview**\n${blockchainName} is a specialized blockchain designed for stablecoin operations and payments.\n\n\n**Native Stablecoin**\nThe blockchain is optimized for major stablecoins with enhanced functionality.\n\n\n**Launch Status**\nPlease check the official documentation for current launch status.\n\n\n**Key Backers**\nSupported by leading institutions and venture capital firms in the blockchain space.\n\n\n**Unique Edge**\nBuilt specifically for stablecoin infrastructure with optimized performance and user experience.`;
+    }
+
     // Check if this is an explain stablecoin query
-    const isExplainQuery = query.toLowerCase().includes('explain') && 
-                         (query.toLowerCase().includes('stablecoin') || 
+    const isExplainQuery = lowerQuery.includes('explain') && 
+                         (lowerQuery.includes('stablecoin') || 
                           this.extractStablecoinSymbols(query).length > 0);
 
     if (isExplainQuery) {
