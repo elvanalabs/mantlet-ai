@@ -492,6 +492,7 @@ IMPORTANT FORMATTING RULES:
 4. Each bullet point should be on a separate line
 5. Content under each section should be in regular text (not bold)
 6. Do not include any other information outside these 4 sections
+7. For the Usecases section, provide EXACTLY 4 use cases only, no more, no less
 
 Example format:
 **Overview**
@@ -501,6 +502,12 @@ Content here...
 - Point 1
 - Point 2
 - Point 3
+
+**Usecases**
+- Use case 1
+- Use case 2
+- Use case 3
+- Use case 4
 
 **Associated Institutions**
 - Issuer: Company name

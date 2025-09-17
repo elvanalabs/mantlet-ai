@@ -333,9 +333,17 @@ export const DemoInterface = ({
   const formatTextWithBoldTitles = (text: string): string => {
     if (!text) return '';
 
+    // First, handle markdown bold formatting **text**
+    let processedText = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+
     // Split text into lines for processing
-    const lines = text.split('\n');
+    const lines = processedText.split('\n');
     const formattedLines = lines.map(line => {
+      // Skip lines that already have strong tags from markdown processing
+      if (line.includes('<strong>')) {
+        return line;
+      }
+
       // Pattern 1: Text followed by colon (e.g., "Key Benefits:")
       if (line.match(/^[A-Z][^:]*:$/)) {
         return `<strong>${line}</strong>`;
@@ -361,7 +369,7 @@ export const DemoInterface = ({
       }
 
       // Pattern 4: Section headers with specific keywords
-      if (line.match(/^(TYPES?|CATEGORIES|BENEFITS?|FEATURES?|MECHANISMS?|BACKING|COLLATERAL|RISKS?|ADVANTAGES?|DISADVANTAGES?|COMPARISON|OVERVIEW|SUMMARY|CONCLUSION)[A-Za-z\s]*$/i)) {
+      if (line.match(/^(TYPES?|CATEGORIES|BENEFITS?|FEATURES?|MECHANISMS?|BACKING|COLLATERAL|RISKS?|ADVANTAGES?|DISADVANTAGES?|COMPARISON|OVERVIEW|SUMMARY|CONCLUSION|USECASES?|ASSOCIATED INSTITUTIONS?)[A-Za-z\s]*$/i)) {
         return `<strong>${line}</strong>`;
       }
 

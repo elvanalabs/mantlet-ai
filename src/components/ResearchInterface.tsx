@@ -380,11 +380,22 @@ export const ResearchInterface = () => {
               <Card className={`p-4 ${message.type === 'user' ? 'bg-secondary' : 'glass'}`} id={`message-${message.id}`}>
                 <div className="max-w-none whitespace-pre-wrap text-sm leading-relaxed">
                   {(() => {
-                    const parts = message.content.split(/(\[([^\]]+)\]\(([^)]+)\)|https?:\/\/[^\s\)\]>,\n]+)/g);
+                    const parts = message.content.split(/(\[([^\]]+)\]\(([^)]+)\)|https?:\/\/[^\s\)\]>,\n]+|\*\*[^*]+\*\*)/g);
                     console.log('Message content:', message.content);
                     console.log('Split parts:', parts);
                     
                     return parts.map((part, index) => {
+                      // Handle bold text **text**
+                      const boldMatch = part.match(/^\*\*([^*]+)\*\*$/);
+                      if (boldMatch) {
+                        const boldText = boldMatch[1];
+                        return (
+                          <strong key={index} className="font-bold text-foreground">
+                            {boldText}
+                          </strong>
+                        );
+                      }
+
                       // Handle markdown links [text](url)
                       const markdownMatch = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
                       if (markdownMatch) {
