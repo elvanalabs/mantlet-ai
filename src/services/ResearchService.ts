@@ -87,7 +87,25 @@ export class ResearchService {
         }
       }
       
-      // Check if this is an explain blockchain query (specific blockchain projects)
+      // Check if this is an explain stablecoin query FIRST (highest priority)
+      const isExplainQuery = query.toLowerCase().includes('explain') && 
+                           (query.toLowerCase().includes('stablecoin') || 
+                            this.extractStablecoinSymbols(query).length > 0);
+      const stablecoinSymbols = this.extractStablecoinSymbols(query);
+      
+      if (isExplainQuery && stablecoinSymbols.length > 0) {
+        console.log('Explain stablecoin query detected for:', stablecoinSymbols[0]);
+        const contextData = await this.generateResponse(query, '');
+        const chartData = await this.getChartData(stablecoinSymbols[0]);
+        
+        return {
+          contextData,
+          sources: [],
+          chartData
+        };
+      }
+
+      // Check if this is an explain blockchain query (specific blockchain projects only)
       const lowerQuery = query.toLowerCase();
       const isBlockchainExplainQuery = lowerQuery.includes('explain') && 
                                      (lowerQuery.includes('tempo blockchain') || 
@@ -103,8 +121,9 @@ export class ResearchService {
                                       (lowerQuery.includes('tempo') && lowerQuery.includes('stablechain')) ||
                                       (lowerQuery.includes('arc') && lowerQuery.includes('stablechain')) ||
                                       (lowerQuery.includes('plasma') && lowerQuery.includes('stablechain')) ||
-                                      (lowerQuery.includes('stable') && lowerQuery.includes('stablechain')) ||
-                                      (lowerQuery.includes('codex') && lowerQuery.includes('stablechain')));
+                                      (lowerQuery.includes('codex') && lowerQuery.includes('stablechain')) ||
+                                      // Only match 'stable' for blockchain if it's very specific
+                                      (lowerQuery.includes('stable') && lowerQuery.includes('stablechain') && !lowerQuery.includes('stablecoin')));
       
       if (isBlockchainExplainQuery) {
         console.log('Explain blockchain query detected');
@@ -114,24 +133,6 @@ export class ResearchService {
           contextData,
           sources: []
           // Note: No chartData for blockchain explanations
-        };
-      }
-      
-      // Check if this is an explain stablecoin query
-      const isExplainQuery = query.toLowerCase().includes('explain') && 
-                           (query.toLowerCase().includes('stablecoin') || 
-                            this.extractStablecoinSymbols(query).length > 0);
-      const stablecoinSymbols = this.extractStablecoinSymbols(query);
-      
-      if (isExplainQuery && stablecoinSymbols.length > 0) {
-        console.log('Explain stablecoin query detected for:', stablecoinSymbols[0]);
-        const contextData = await this.generateResponse(query, '');
-        const chartData = await this.getChartData(stablecoinSymbols[0]);
-        
-        return {
-          contextData,
-          sources: [],
-          chartData
         };
       }
       
