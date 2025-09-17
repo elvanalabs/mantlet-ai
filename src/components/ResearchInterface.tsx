@@ -15,7 +15,6 @@ import AdoptionMetrics from '@/components/AdoptionMetrics';
 import { getStablecoinExplanation, isBasicStablecoinQuery, type StablecoinExplanation } from '@/data/stablecoinExplanations';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-
 interface Message {
   id: string;
   type: 'user' | 'assistant' | 'system';
@@ -78,16 +77,13 @@ interface Message {
     };
   };
 }
-
 export const ResearchInterface = () => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      type: 'system',
-      content: 'Hello! I am Mantlet, your AI assistant specialized in stablecoins. Start with the below given quick start options',
-      timestamp: new Date(),
-    }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([{
+    id: '1',
+    type: 'system',
+    content: 'Hello! I am Mantlet, your AI assistant specialized in stablecoins. Start with the below given quick start options',
+    timestamp: new Date()
+  }]);
   const [isLoading, setIsLoading] = useState(false);
   const [compareStablecoin1, setCompareStablecoin1] = useState('');
   const [compareStablecoin2, setCompareStablecoin2] = useState('');
@@ -95,61 +91,46 @@ export const ResearchInterface = () => {
   const [adoptionStablecoin, setAdoptionStablecoin] = useState('');
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { toast } = useToast();
-
+  const {
+    toast
+  } = useToast();
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({
+      behavior: 'smooth'
+    });
   };
-
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
-
   const validateQuery = (query: string): boolean => {
     // Allow common stablecoin-related keywords
-    const stablecoinKeywords = [
-      'stablecoin', 'usdt', 'usdc', 'dai', 'tether', 'circle', 'maker', 
-      'price', 'market', 'adoption', 'compare', 'explain', 'news',
-      'backing', 'collateral', 'mechanism', 'yield', 'protocol',
-      'ethena', 'usde', 'pyusd', 'paypal', 'fdusd', 'paxg', 'xaut',
-      'eurs', 'eurc', 'frax', 'mim', 'gho', 'aave', 'curve', 'crvusd',
-      'treasury', 'reserves', 'defi', 'celsius', 'terra', 'anchor'
-    ];
-
+    const stablecoinKeywords = ['stablecoin', 'usdt', 'usdc', 'dai', 'tether', 'circle', 'maker', 'price', 'market', 'adoption', 'compare', 'explain', 'news', 'backing', 'collateral', 'mechanism', 'yield', 'protocol', 'ethena', 'usde', 'pyusd', 'paypal', 'fdusd', 'paxg', 'xaut', 'eurs', 'eurc', 'frax', 'mim', 'gho', 'aave', 'curve', 'crvusd', 'treasury', 'reserves', 'defi', 'celsius', 'terra', 'anchor'];
     const lowerQuery = query.toLowerCase();
-    
+
     // Check if query contains stablecoin-related terms
-    const hasStablecoinTerms = stablecoinKeywords.some(keyword => 
-      lowerQuery.includes(keyword)
-    );
-    
+    const hasStablecoinTerms = stablecoinKeywords.some(keyword => lowerQuery.includes(keyword));
+
     // Check if query mentions specific stablecoin symbols/names
     const mentionsStablecoin = validateStablecoin(query).isValid;
-    
     return hasStablecoinTerms || mentionsStablecoin;
   };
-
   const handleQuickAction = async (query: string) => {
     if (isLoading) return;
-
     const userMessage: Message = {
       id: Date.now().toString(),
       type: 'user',
       content: query,
-      timestamp: new Date(),
+      timestamp: new Date()
     };
-
     setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
-
     try {
       // Always use API calls for fresh data with Associated Institutions section
       // and without Risks/Criticism sections
-      
+
       // API call for queries
       console.log('Using API for query:', query);
       const response = await ResearchService.processQuery(query);
-      
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'assistant',
@@ -161,23 +142,24 @@ export const ResearchInterface = () => {
         comparisonData: response.comparisonData,
         adoptionData: response.adoptionData ? {
           ...response.adoptionData,
-          depegEvents: (response.adoptionData as any).depegEvents || { count: 0, events: [] }
-        } : undefined,
+          depegEvents: (response.adoptionData as any).depegEvents || {
+            count: 0,
+            events: []
+          }
+        } : undefined
       };
-
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Research error:', error);
       toast({
         title: "Research Error",
         description: "Failed to process your query. Please try again.",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setIsLoading(false);
     }
   };
-
   const handleCompareSubmit = () => {
     const input1 = compareStablecoin1.trim();
     const input2 = compareStablecoin2.trim();
@@ -198,14 +180,12 @@ export const ResearchInterface = () => {
       });
       return;
     }
-
     const symbol1 = validation.stablecoin1.matchedSymbol;
     const symbol2 = validation.stablecoin2.matchedSymbol;
     handleQuickAction(`Compare ${symbol1} and ${symbol2} stablecoins`);
     setCompareStablecoin1('');
     setCompareStablecoin2('');
   };
-
   const handleExplainSubmit = () => {
     const input = explainStablecoin.trim();
     if (!input) {
@@ -225,12 +205,10 @@ export const ResearchInterface = () => {
       });
       return;
     }
-
     const symbol = validation.matchedSymbol;
     handleQuickAction(`Explain ${symbol} stablecoin`);
     setExplainStablecoin('');
   };
-
   const handleAdoptionSubmit = () => {
     const input = adoptionStablecoin.trim();
     if (!input) {
@@ -250,16 +228,13 @@ export const ResearchInterface = () => {
       });
       return;
     }
-
     const symbol = validation.matchedSymbol;
     handleQuickAction(`Adoption tracker for ${symbol}`);
     setAdoptionStablecoin('');
   };
-
   const handleLatestNews = () => {
     handleQuickAction('Latest news about stablecoins');
   };
-
   const handleCopyMessage = async (message: Message) => {
     try {
       await navigator.clipboard.writeText(message.content);
@@ -277,7 +252,6 @@ export const ResearchInterface = () => {
       });
     }
   };
-
   const handleDownloadPDF = async (message: Message) => {
     try {
       const messageElement = document.getElementById(`message-${message.id}`);
@@ -319,7 +293,6 @@ export const ResearchInterface = () => {
         allowTaint: true
       });
       document.body.removeChild(tempContainer);
-
       const pdf = new jsPDF('p', 'mm', 'a4');
       const imgData = canvas.toDataURL('image/png');
       const imgWidth = 190;
@@ -327,20 +300,16 @@ export const ResearchInterface = () => {
       const imgHeight = canvas.height * imgWidth / canvas.width;
       let heightLeft = imgHeight;
       let position = 10;
-
       pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
       heightLeft -= pageHeight;
-
       while (heightLeft >= 0) {
         position = heightLeft - imgHeight + 10;
         pdf.addPage();
         pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
         heightLeft -= pageHeight;
       }
-
       const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
       pdf.save(`mantlet-research-${timestamp}.pdf`);
-      
       toast({
         title: "PDF Downloaded",
         description: "Research response saved as PDF successfully."
@@ -354,8 +323,6 @@ export const ResearchInterface = () => {
       });
     }
   };
-
-
   const getMessageIcon = (type: string) => {
     switch (type) {
       case 'user':
@@ -368,108 +335,72 @@ export const ResearchInterface = () => {
         return null;
     }
   };
-
-  return (
-    <div className="flex flex-col h-full max-w-full overflow-hidden">
+  return <div className="flex flex-col h-full max-w-full overflow-hidden">
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-4 min-h-0">
-        {messages.map((message) => (
-          <div key={message.id} className="flex space-x-3">
+        {messages.map(message => <div key={message.id} className="flex space-x-3">
             {getMessageIcon(message.type)}
             <div className="flex-1 min-w-0">
               <Card className={`p-4 ${message.type === 'user' ? 'bg-secondary' : 'glass'}`} id={`message-${message.id}`}>
                 <div className="max-w-none whitespace-pre-wrap text-sm leading-relaxed">
                   {(() => {
-                    const parts = message.content.split(/(\[([^\]]+)\]\(([^)]+)\)|https?:\/\/[^\s\)\]>,\n]+|\*\*[^*]+\*\*)/g);
-                    console.log('Message content:', message.content);
-                    console.log('Split parts:', parts);
-                    
-                    return parts.map((part, index) => {
-                      // Handle bold text **text**
-                      const boldMatch = part.match(/^\*\*([^*]+)\*\*$/);
-                      if (boldMatch) {
-                        const boldText = boldMatch[1];
-                        return (
-                          <strong key={index} className="font-bold text-foreground">
+                const parts = message.content.split(/(\[([^\]]+)\]\(([^)]+)\)|https?:\/\/[^\s\)\]>,\n]+|\*\*[^*]+\*\*)/g);
+                console.log('Message content:', message.content);
+                console.log('Split parts:', parts);
+                return parts.map((part, index) => {
+                  // Handle bold text **text**
+                  const boldMatch = part.match(/^\*\*([^*]+)\*\*$/);
+                  if (boldMatch) {
+                    const boldText = boldMatch[1];
+                    return <strong key={index} className="font-bold text-foreground">
                             {boldText}
-                          </strong>
-                        );
-                      }
+                          </strong>;
+                  }
 
-                      // Handle markdown links [text](url)
-                      const markdownMatch = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
-                      if (markdownMatch) {
-                        const [, linkText, url] = markdownMatch;
-                        console.log('Found markdown link:', linkText, url);
-                        return (
-                          <a
-                            key={index}
-                            href={url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 underline font-medium break-all transition-colors duration-200 cursor-pointer inline-block"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              console.log('Markdown link clicked:', url);
-                              window.open(url, '_blank');
-                            }}
-                          >
+                  // Handle markdown links [text](url)
+                  const markdownMatch = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+                  if (markdownMatch) {
+                    const [, linkText, url] = markdownMatch;
+                    console.log('Found markdown link:', linkText, url);
+                    return <a key={index} href={url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 underline font-medium break-all transition-colors duration-200 cursor-pointer inline-block" onClick={e => {
+                      e.stopPropagation();
+                      console.log('Markdown link clicked:', url);
+                      window.open(url, '_blank');
+                    }}>
                             {linkText} ↗
-                          </a>
-                        );
-                      }
-                      
-                      // Handle plain URLs
-                      if (part.match(/^https?:\/\//)) {
-                        console.log('Found plain URL:', part);
-                        return (
-                          <a
-                            key={index}
-                            href={part}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 underline font-medium break-all transition-colors duration-200 cursor-pointer inline-block"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              console.log('Plain URL clicked:', part);
-                              window.open(part, '_blank');
-                            }}
-                          >
+                          </a>;
+                  }
+
+                  // Handle plain URLs
+                  if (part.match(/^https?:\/\//)) {
+                    console.log('Found plain URL:', part);
+                    return <a key={index} href={part} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 underline font-medium break-all transition-colors duration-200 cursor-pointer inline-block" onClick={e => {
+                      e.stopPropagation();
+                      console.log('Plain URL clicked:', part);
+                      window.open(part, '_blank');
+                    }}>
                             {part} ↗
-                          </a>
-                        );
-                      }
-                      
-                      return <span key={index}>{part}</span>;
-                    });
-                  })()}
+                          </a>;
+                  }
+                  return <span key={index}>{part}</span>;
+                });
+              })()}
                 </div>
-                {message.adoptionData && (
-                  <div className="mt-3">
+                {message.adoptionData && <div className="mt-3">
                     <AdoptionMetrics adoptionData={message.adoptionData} />
-                  </div>
-                 )}
-                 {message.chartData && (
-                   <div className="mt-3">
-                     <StablecoinChart 
-                       chartData={message.chartData} 
-                     />
-                   </div>
-                 )}
-                 {message.newsResults && (
-                   <div className="mt-3">
+                  </div>}
+                 {message.chartData && <div className="mt-3">
+                     <StablecoinChart chartData={message.chartData} />
+                   </div>}
+                 {message.newsResults && <div className="mt-3">
                      <NewsGrid newsResults={message.newsResults} />
-                   </div>
-                 )}
-                 {message.comparisonData && (
-                   <div className="mt-3">
+                   </div>}
+                 {message.comparisonData && <div className="mt-3">
                      <ComparisonTable comparisonData={message.comparisonData} />
-                   </div>
-                 )}
+                   </div>}
                  
                  {/* Copy and Download buttons for assistant messages (except when showing news or adoption metrics) */}
-                 {message.type === 'assistant' && !message.newsResults && !message.adoptionData && (
-                   <div className="mt-4 pt-3 border-t border-border flex items-center justify-end gap-2">
+                 {message.type === 'assistant' && !message.newsResults && !message.adoptionData && <div className="mt-4 pt-3 border-t border-border flex items-center justify-end gap-2">
                      <Button variant="ghost" size="sm" onClick={() => handleCopyMessage(message)} className="text-muted-foreground hover:text-foreground">
                        {copiedMessageId === message.id ? <Check className="w-4 h-4 mr-1 text-green-500" /> : <Copy className="w-4 h-4 mr-1" />}
                        {copiedMessageId === message.id ? 'Copied!' : 'Copy'}
@@ -478,32 +409,25 @@ export const ResearchInterface = () => {
                        <Download className="w-4 h-4 mr-1" />
                        PDF
                      </Button>
-                   </div>
-                 )}
-                 {message.sources && message.sources.length > 0 && (
-                   <div className="mt-3 pt-3 border-t border-border">
+                   </div>}
+                 {message.sources && message.sources.length > 0 && <div className="mt-3 pt-3 border-t border-border">
                      <p className="text-xs text-muted-foreground mb-2 flex items-center">
                        <Globe className="w-3 h-3 mr-1" />
                        Sources:
                      </p>
                      <div className="flex flex-wrap gap-2">
-                       {message.sources.map((source, index) => (
-                         <span key={index} className="text-xs px-2 py-1 bg-muted rounded-md">
+                       {message.sources.map((source, index) => <span key={index} className="text-xs px-2 py-1 bg-muted rounded-md">
                            {source}
-                         </span>
-                       ))}
+                         </span>)}
                      </div>
-                   </div>
-                  )}
+                   </div>}
                 </Card>
                <p className="text-xs text-muted-foreground mt-1">
                  {message.timestamp.toLocaleTimeString()}
                </p>
              </div>
-           </div>
-         ))}
-         {isLoading && (
-           <div className="flex space-x-3">
+           </div>)}
+         {isLoading && <div className="flex space-x-3">
              <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center">
               <Loader2 className="w-4 h-4 text-accent-foreground animate-spin" />
             </div>
@@ -515,8 +439,7 @@ export const ResearchInterface = () => {
                 </div>
               </Card>
             </div>
-          </div>
-        )}
+          </div>}
         <div ref={messagesEndRef} />
       </div>
 
@@ -538,28 +461,14 @@ export const ResearchInterface = () => {
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="stablecoin1">First Stablecoin</Label>
-                    <Input 
-                      id="stablecoin1" 
-                      placeholder="e.g., USDT" 
-                      value={compareStablecoin1} 
-                      onChange={e => setCompareStablecoin1(e.target.value)} 
-                    />
+                    <Input id="stablecoin1" placeholder="e.g., USDT" value={compareStablecoin1} onChange={e => setCompareStablecoin1(e.target.value)} />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="stablecoin2">Second Stablecoin</Label>
-                    <Input 
-                      id="stablecoin2" 
-                      placeholder="e.g., USDC" 
-                      value={compareStablecoin2} 
-                      onChange={e => setCompareStablecoin2(e.target.value)} 
-                    />
+                    <Input id="stablecoin2" placeholder="e.g., USDC" value={compareStablecoin2} onChange={e => setCompareStablecoin2(e.target.value)} />
                   </div>
                   <DialogTrigger asChild>
-                    <Button 
-                      onClick={handleCompareSubmit} 
-                      className="w-full" 
-                      disabled={!compareStablecoin1.trim() || !compareStablecoin2.trim()}
-                    >
+                    <Button onClick={handleCompareSubmit} className="w-full" disabled={!compareStablecoin1.trim() || !compareStablecoin2.trim()}>
                       Compare Stablecoins
                     </Button>
                   </DialogTrigger>
@@ -580,20 +489,11 @@ export const ResearchInterface = () => {
                 </DialogHeader>
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="explain-stablecoin">Stablecoin Name/Ticker</Label>
-                    <Input 
-                      id="explain-stablecoin" 
-                      placeholder="e.g., DAI, USDC, USDT" 
-                      value={explainStablecoin} 
-                      onChange={e => setExplainStablecoin(e.target.value)} 
-                    />
+                    <Label htmlFor="explain-stablecoin">Enter Name</Label>
+                    <Input id="explain-stablecoin" placeholder="e.g., DAI, USDC, USDT" value={explainStablecoin} onChange={e => setExplainStablecoin(e.target.value)} />
                   </div>
                   <DialogTrigger asChild>
-                    <Button 
-                      onClick={handleExplainSubmit} 
-                      className="w-full" 
-                      disabled={!explainStablecoin.trim()}
-                    >
+                    <Button onClick={handleExplainSubmit} className="w-full" disabled={!explainStablecoin.trim()}>
                       Explain Stablecoin
                     </Button>
                   </DialogTrigger>
@@ -615,23 +515,14 @@ export const ResearchInterface = () => {
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="adoption-stablecoin">Stablecoin Name/Ticker</Label>
-                    <Input 
-                      id="adoption-stablecoin" 
-                      placeholder="e.g., USDT, USDC, DAI" 
-                      value={adoptionStablecoin} 
-                      onChange={e => setAdoptionStablecoin(e.target.value)} 
-                    />
+                    <Input id="adoption-stablecoin" placeholder="e.g., USDT, USDC, DAI" value={adoptionStablecoin} onChange={e => setAdoptionStablecoin(e.target.value)} />
                     <div className="flex items-center gap-1 text-xs text-orange-500">
                       <Info className="w-3 h-3" />
                       <span>Data is precise only for widely-used stablecoins</span>
                     </div>
                   </div>
                   <DialogTrigger asChild>
-                    <Button 
-                      onClick={handleAdoptionSubmit} 
-                      className="w-full" 
-                      disabled={!adoptionStablecoin.trim()}
-                    >
+                    <Button onClick={handleAdoptionSubmit} className="w-full" disabled={!adoptionStablecoin.trim()}>
                       Track Adoption Metrics
                     </Button>
                   </DialogTrigger>
@@ -646,6 +537,5 @@ export const ResearchInterface = () => {
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
