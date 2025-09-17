@@ -87,14 +87,13 @@ export class ResearchService {
         }
       }
       
-      // Check if this is an explain stablecoin query FIRST (highest priority)
-      const isExplainQuery = query.toLowerCase().includes('explain') && 
-                           (query.toLowerCase().includes('stablecoin') || 
-                            this.extractStablecoinSymbols(query).length > 0);
+      // PRIORITY 1: STABLECOINS - Always check stablecoins first and give them absolute priority
       const stablecoinSymbols = this.extractStablecoinSymbols(query);
+      const isStablecoinQuery = query.toLowerCase().includes('explain') && 
+                               (query.toLowerCase().includes('stablecoin') || stablecoinSymbols.length > 0);
       
-      if (isExplainQuery && stablecoinSymbols.length > 0) {
-        console.log('Explain stablecoin query detected for:', stablecoinSymbols[0]);
+      if (isStablecoinQuery && stablecoinSymbols.length > 0) {
+        console.log('STABLECOIN PRIORITY: Explain stablecoin query detected for:', stablecoinSymbols[0]);
         const contextData = await this.generateResponse(query, '');
         const chartData = await this.getChartData(stablecoinSymbols[0]);
         
@@ -105,9 +104,10 @@ export class ResearchService {
         };
       }
 
-      // Check if this is an explain blockchain query (specific blockchain projects only)
+      // PRIORITY 2: BLOCKCHAIN CHAINS - Only if it's definitely NOT a stablecoin query
       const lowerQuery = query.toLowerCase();
-      const isBlockchainExplainQuery = lowerQuery.includes('explain') && 
+      const isBlockchainExplainQuery = !isStablecoinQuery && 
+                                     lowerQuery.includes('explain') && 
                                      (lowerQuery.includes('tempo blockchain') || 
                                       lowerQuery.includes('tempo chain') ||
                                       lowerQuery.includes('arc network') ||
@@ -126,7 +126,7 @@ export class ResearchService {
                                       (lowerQuery.includes('stable') && lowerQuery.includes('stablechain') && !lowerQuery.includes('stablecoin')));
       
       if (isBlockchainExplainQuery) {
-        console.log('Explain blockchain query detected');
+        console.log('Blockchain query detected (after stablecoin priority check)');
         const contextData = await this.generateResponse(query, '');
         
         return {
