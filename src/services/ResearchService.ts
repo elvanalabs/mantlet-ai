@@ -87,15 +87,24 @@ export class ResearchService {
         }
       }
       
-      // Check if this is an explain blockchain query
-      const isBlockchainExplainQuery = query.toLowerCase().includes('explain') && 
-                                     (query.toLowerCase().includes('blockchain') || 
-                                      query.toLowerCase().includes('chain') ||
-                                      query.toLowerCase().includes('tempo') ||
-                                      query.toLowerCase().includes('arc network') ||
-                                      query.toLowerCase().includes('plasma') ||
-                                      query.toLowerCase().includes('stable') ||
-                                      query.toLowerCase().includes('codex'));
+      // Check if this is an explain blockchain query (specific blockchain projects)
+      const lowerQuery = query.toLowerCase();
+      const isBlockchainExplainQuery = lowerQuery.includes('explain') && 
+                                     (lowerQuery.includes('tempo blockchain') || 
+                                      lowerQuery.includes('tempo chain') ||
+                                      lowerQuery.includes('arc network') ||
+                                      lowerQuery.includes('arc blockchain') ||
+                                      lowerQuery.includes('plasma blockchain') ||
+                                      lowerQuery.includes('plasma chain') ||
+                                      lowerQuery.includes('stable blockchain') ||
+                                      lowerQuery.includes('stable chain') ||
+                                      lowerQuery.includes('codex blockchain') ||
+                                      lowerQuery.includes('codex chain') ||
+                                      (lowerQuery.includes('tempo') && lowerQuery.includes('stablechain')) ||
+                                      (lowerQuery.includes('arc') && lowerQuery.includes('stablechain')) ||
+                                      (lowerQuery.includes('plasma') && lowerQuery.includes('stablechain')) ||
+                                      (lowerQuery.includes('stable') && lowerQuery.includes('stablechain')) ||
+                                      (lowerQuery.includes('codex') && lowerQuery.includes('stablechain')));
       
       if (isBlockchainExplainQuery) {
         console.log('Explain blockchain query detected');
@@ -466,15 +475,24 @@ export class ResearchService {
     marketData: string
   ): Promise<string> {
     try {
-      // Check if this is an "explain stablecoin blockchain" query
-      const isBlockchainExplainQuery = query.toLowerCase().includes('explain') && 
-                                     (query.toLowerCase().includes('blockchain') || 
-                                      query.toLowerCase().includes('chain') ||
-                                      query.toLowerCase().includes('tempo') ||
-                                      query.toLowerCase().includes('arc network') ||
-                                      query.toLowerCase().includes('plasma') ||
-                                      query.toLowerCase().includes('stable') ||
-                                      query.toLowerCase().includes('codex'));
+      // Check if this is an "explain stablecoin blockchain" query (specific blockchain projects)
+      const lowerQueryGen = query.toLowerCase();
+      const isBlockchainExplainQuery = lowerQueryGen.includes('explain') && 
+                                     (lowerQueryGen.includes('tempo blockchain') || 
+                                      lowerQueryGen.includes('tempo chain') ||
+                                      lowerQueryGen.includes('arc network') ||
+                                      lowerQueryGen.includes('arc blockchain') ||
+                                      lowerQueryGen.includes('plasma blockchain') ||
+                                      lowerQueryGen.includes('plasma chain') ||
+                                      lowerQueryGen.includes('stable blockchain') ||
+                                      lowerQueryGen.includes('stable chain') ||
+                                      lowerQueryGen.includes('codex blockchain') ||
+                                      lowerQueryGen.includes('codex chain') ||
+                                      (lowerQueryGen.includes('tempo') && lowerQueryGen.includes('stablechain')) ||
+                                      (lowerQueryGen.includes('arc') && lowerQueryGen.includes('stablechain')) ||
+                                      (lowerQueryGen.includes('plasma') && lowerQueryGen.includes('stablechain')) ||
+                                      (lowerQueryGen.includes('stable') && lowerQueryGen.includes('stablechain')) ||
+                                      (lowerQueryGen.includes('codex') && lowerQueryGen.includes('stablechain')));
 
       // Check if this is an "explain stablecoin" query
       const isExplainQuery = query.toLowerCase().includes('explain') && 
