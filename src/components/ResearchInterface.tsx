@@ -159,10 +159,38 @@ export const ResearchInterface = () => {
               }))
             : [];
           
+          // Format the explanation content with institutional information
+          let explanationContent = cachedExplanation.explanation.replace(/https?:\/\/[^\s\)\]>,]+/g, '').replace(/\s+/g, ' ').trim();
+          
+          // Add Associated Institutions section if available
+          if (cachedExplanation.associatedInstitutions) {
+            const institutions = cachedExplanation.associatedInstitutions;
+            explanationContent += '\n\n**Associated Institutions:**\n';
+            
+            if (institutions.issuer) {
+              explanationContent += `• **Issuer**: ${institutions.issuer}\n`;
+            }
+            if (institutions.custodian) {
+              explanationContent += `• **Custodian**: ${institutions.custodian}\n`;
+            }
+            if (institutions.auditor) {
+              explanationContent += `• **Auditor**: ${institutions.auditor}\n`;
+            }
+            if (institutions.partners && institutions.partners.length > 0) {
+              explanationContent += `• **Key Partners**: ${institutions.partners.join(', ')}\n`;
+            }
+            if (institutions.exchanges && institutions.exchanges.length > 0) {
+              explanationContent += `• **Major Exchanges**: ${institutions.exchanges.join(', ')}\n`;
+            }
+            if (institutions.institutionalUsers && institutions.institutionalUsers.length > 0) {
+              explanationContent += `• **Institutional Users**: ${institutions.institutionalUsers.join(', ')}\n`;
+            }
+          }
+          
           const assistantMessage: Message = {
             id: (Date.now() + 1).toString(),
             type: 'assistant',
-            content: cachedExplanation.explanation.replace(/https?:\/\/[^\s\)\]>,]+/g, '').replace(/\s+/g, ' ').trim(),
+            content: explanationContent,
             timestamp: new Date(),
             sources: cachedExplanation.sources,
             adoptionData: cachedExplanation.adoptionData ? {

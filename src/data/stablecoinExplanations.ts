@@ -2,6 +2,14 @@ export interface StablecoinExplanation {
   symbol: string;
   name: string;
   explanation: string;
+  associatedInstitutions?: {
+    issuer: string;
+    custodian?: string;
+    auditor?: string;
+    partners?: string[];
+    exchanges?: string[];
+    institutionalUsers?: string[];
+  };
   adoptionData?: {
     circulatingSupply: string;
     marketShare: string;
@@ -45,6 +53,13 @@ Tether has faced regulatory scrutiny but maintains operations globally. The comp
 ⚠️ Historical regulatory concerns
 ⚠️ Regulatory uncertainties
 ⚠️ Centralized control`,
+    associatedInstitutions: {
+      issuer: 'Tether Limited',
+      auditor: 'BDO Italia',
+      partners: ['Bitfinex', 'Cantor Fitzgerald'],
+      exchanges: ['Binance', 'Coinbase', 'Kraken', 'Huobi', 'OKX', 'Bitfinex'],
+      institutionalUsers: ['Major crypto exchanges', 'Trading firms', 'DeFi protocols', 'Payment processors']
+    },
     adoptionData: {
       circulatingSupply: '120.2B USDT',
       marketShare: '68.5%',
@@ -101,6 +116,14 @@ USDC operates under strict regulatory oversight with full reserve backing and re
 **Considerations:**
 ⚠️ Smaller market share than USDT
 ⚠️ Potential regulatory changes`,
+    associatedInstitutions: {
+      issuer: 'Circle Internet Financial',
+      custodian: 'BlackRock (Circle Reserve Fund)',
+      auditor: 'Grant Thornton LLP',
+      partners: ['Coinbase', 'BlackRock', 'Goldman Sachs', 'Bank of New York Mellon'],
+      exchanges: ['Coinbase', 'Binance', 'Kraken', 'FTX', 'Gemini', 'Bitstamp'],
+      institutionalUsers: ['Tesla', 'MicroStrategy', 'Square', 'Major banks', 'Institutional investors', 'Corporate treasuries']
+    },
     adoptionData: {
       circulatingSupply: '36.8B USDC',
       marketShare: '21.0%',
@@ -161,6 +184,12 @@ USDC operates under strict regulatory oversight with full reserve backing and re
 ⚠️ Complex liquidation mechanisms
 ⚠️ Collateral volatility risk
 ⚠️ Lower liquidity than USDT/USDC`,
+    associatedInstitutions: {
+      issuer: 'MakerDAO (Decentralized)',
+      partners: ['Compound', 'Aave', 'Uniswap', 'Curve', 'Yearn Finance'],
+      exchanges: ['Coinbase', 'Binance', 'Kraken', 'Uniswap', 'SushiSwap'],
+      institutionalUsers: ['DeFi protocols', 'Institutional DeFi users', 'Crypto hedge funds', 'Arbitrage traders']
+    },
     adoptionData: {
       circulatingSupply: '4.9B DAI',
       marketShare: '2.8%',
@@ -332,6 +361,14 @@ PYUSD is designed to integrate seamlessly with PayPal's existing financial servi
 ⚠️ Relatively new entrant (launched 2023)
 ⚠️ Limited DeFi ecosystem integration
 ⚠️ Centralized control by PayPal`,
+    associatedInstitutions: {
+      issuer: 'PayPal Holdings Inc.',
+      custodian: 'Paxos Trust Company',
+      auditor: 'Withum & Company',
+      partners: ['Paxos', 'Venmo', 'Xoom'],
+      exchanges: ['Crypto.com', 'Coinbase', 'Kraken', 'Bitstamp'],
+      institutionalUsers: ['PayPal merchants', 'E-commerce platforms', 'Payment processors', 'Fintech companies']
+    },
     adoptionData: {
       circulatingSupply: '750M PYUSD',
       marketShare: '0.4%',
