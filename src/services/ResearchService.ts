@@ -485,8 +485,15 @@ export class ResearchService {
       let prompt = '';
 
       if (isBlockchainExplainQuery) {
+        // Extract blockchain name from query for proper formatting
+        const blockchainName = query.toLowerCase().includes('tempo') ? 'Tempo' :
+                             query.toLowerCase().includes('arc') ? 'Arc' :
+                             query.toLowerCase().includes('plasma') ? 'Plasma' :
+                             query.toLowerCase().includes('stable') ? 'Stable' :
+                             query.toLowerCase().includes('codex') ? 'Codex' : 'Unknown';
+        
         // Create a specific prompt for blockchain explain queries
-        prompt = `Please provide information about the requested stablecoin blockchain using the exact format below. Use the training data provided to answer accurately:
+        prompt = `You are explaining the ${blockchainName} Stablechain. Please provide information using the exact format below. Use the training data provided to answer accurately.
 
 **TRAINING DATA FOR STABLECOIN BLOCKCHAINS:**
 
@@ -529,14 +536,16 @@ export class ResearchService {
 - Optimized for stablecoin liquidity, custody, and atomic settlement on Ethereum
 - Currently live with native USDC
 
-FORMATTING REQUIREMENTS:
-1. Each section title must be in bold using **title** format
-2. Add two blank lines between each section  
-3. Content should be formatted as bullet points using "- " when appropriate
-4. Do not include any other information outside these 5 sections
-5. Structure the Key Backers section with clear organization (e.g., Founders: [names], Investors: [names], Partners: [names])
+CRITICAL FORMATTING REQUIREMENTS:
+1. DO NOT include any introduction lines like "Here is the information about..." 
+2. Start directly with the first section header in bold: **Overview**
+3. Each section title MUST be in bold using **title** format
+4. Add exactly two blank lines between each section
+5. Content should be formatted as bullet points using "- " when appropriate
+6. Structure the Key Backers section with clear organization
+7. Only include these 5 sections, nothing else
 
-**REQUIRED FORMAT:**
+**REQUIRED OUTPUT FORMAT:**
 **Overview**
 What the chain is and its main purpose.
 
@@ -552,14 +561,14 @@ Mainnet / Testnet / Upcoming.
 **Key Backers**
 Structure with clear organization:
 - Founders: [list founders/founding team]
-- Major Investors: [list key investors and VCs]
+- Major Investors: [list key investors and VCs]  
 - Key Partners: [list strategic partners and institutions]
 
 
 **Unique Edge**
 What makes this chain different from others.
 
-Query: ${query}`;
+Explain ${blockchainName} Stablechain`;
       } else if (isExplainQuery) {
         // Extract the stablecoin name from the query
         const stablecoinSymbols = this.extractStablecoinSymbols(query);
