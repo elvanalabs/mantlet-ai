@@ -475,26 +475,7 @@ export class ResearchService {
     marketData: string
   ): Promise<string> {
     try {
-      // Check if this is an "explain stablecoin blockchain" query (specific blockchain projects)
-      const lowerQueryGen = query.toLowerCase();
-      const isBlockchainExplainQuery = lowerQueryGen.includes('explain') && 
-                                     (lowerQueryGen.includes('tempo blockchain') || 
-                                      lowerQueryGen.includes('tempo chain') ||
-                                      lowerQueryGen.includes('arc network') ||
-                                      lowerQueryGen.includes('arc blockchain') ||
-                                      lowerQueryGen.includes('plasma blockchain') ||
-                                      lowerQueryGen.includes('plasma chain') ||
-                                      lowerQueryGen.includes('stable blockchain') ||
-                                      lowerQueryGen.includes('stable chain') ||
-                                      lowerQueryGen.includes('codex blockchain') ||
-                                      lowerQueryGen.includes('codex chain') ||
-                                      (lowerQueryGen.includes('tempo') && lowerQueryGen.includes('stablechain')) ||
-                                      (lowerQueryGen.includes('arc') && lowerQueryGen.includes('stablechain')) ||
-                                      (lowerQueryGen.includes('plasma') && lowerQueryGen.includes('stablechain')) ||
-                                      (lowerQueryGen.includes('stable') && lowerQueryGen.includes('stablechain')) ||
-                                      (lowerQueryGen.includes('codex') && lowerQueryGen.includes('stablechain')));
-
-      // Check if this is an "explain stablecoin" query
+      // Check if this is an "explain stablecoin" query first (highest priority)
       const isExplainQuery = query.toLowerCase().includes('explain') && 
                            (query.toLowerCase().includes('stablecoin') || 
                             this.extractStablecoinSymbols(query).length > 0);
@@ -502,16 +483,103 @@ export class ResearchService {
       let formattedQuery = query;
       let prompt = '';
 
-      if (isBlockchainExplainQuery) {
-        // Extract blockchain name from query for proper formatting
-        const blockchainName = query.toLowerCase().includes('tempo') ? 'Tempo' :
-                             query.toLowerCase().includes('arc') ? 'Arc' :
-                             query.toLowerCase().includes('plasma') ? 'Plasma' :
-                             query.toLowerCase().includes('stable') ? 'Stable' :
-                             query.toLowerCase().includes('codex') ? 'Codex' : 'Unknown';
+      if (isExplainQuery) {
+        // Extract the stablecoin name from the query
+        const stablecoinSymbols = this.extractStablecoinSymbols(query);
+        const stablecoinName = stablecoinSymbols.length > 0 ? stablecoinSymbols[0] : query.replace(/explain|stablecoin/gi, '').trim();
         
-        // Create a specific prompt for blockchain explain queries
-        prompt = `You are explaining the ${blockchainName} Stablechain. Please provide information using the exact format below. Use the training data provided to answer accurately.
+        // Get reference data for the stablecoin
+        const referenceData = getStablecoinBySymbol(stablecoinName);
+        let referenceInfo = '';
+        
+        if (referenceData) {
+          referenceInfo = `
+Reference Data for ${referenceData.name} (${referenceData.symbol}):
+- Category: ${referenceData.category}
+- Backing: ${referenceData.backing}
+- Market Cap: $${(referenceData.marketCap / 1e9).toFixed(2)}B
+- Issuer: ${referenceData.issuer || 'N/A'}
+- Chains: ${referenceData.chains.join(', ')}
+- Use Cases: ${referenceData.useCase}
+- Risk Level: ${referenceData.riskLevel}
+- Description: ${referenceData.description}`;
+        }
+        
+        // Create a specific prompt for explain queries that only returns the 4 sections
+        prompt = `Please provide information about the ${stablecoinName} stablecoin in exactly these 4 sections only:
+
+**Overview**
+**Backing Mechanism**
+**Usecases** 
+**Associated Institutions**
+
+IMPORTANT FORMATTING RULES:
+1. Each section title must be in bold using **title** format
+2. Add two blank lines between each section
+3. If any section contains multiple points, format them as bullet points using "- " (dash and space)
+4. Each bullet point should be on a separate line
+5. Content under each section should be in regular text (not bold)
+6. Do not include any other information outside these 4 sections
+7. For the Usecases section, provide EXACTLY 4 use cases only, no more, no less
+
+Example format:
+**Overview**
+Content here...
+
+
+**Backing Mechanism**
+- Point 1
+- Point 2
+- Point 3
+
+
+**Usecases**
+- Use case 1
+- Use case 2
+- Use case 3
+- Use case 4
+
+
+**Associated Institutions**
+- Issuer: Company name
+- Custodian: Bank/Institution name
+- Auditor: Auditing firm name
+- Key Partners: List of major partners
+- Major Exchanges: List of exchanges
+
+${referenceInfo}
+
+${marketData ? `Current Market Data:\n${marketData}` : ''}`;
+      } else {
+        // Check if this is a blockchain explanation query
+        const lowerQueryGen = query.toLowerCase();
+        const isBlockchainExplainQuery = lowerQueryGen.includes('explain') && 
+                                       (lowerQueryGen.includes('tempo blockchain') || 
+                                        lowerQueryGen.includes('tempo chain') ||
+                                        lowerQueryGen.includes('arc network') ||
+                                        lowerQueryGen.includes('arc blockchain') ||
+                                        lowerQueryGen.includes('plasma blockchain') ||
+                                        lowerQueryGen.includes('plasma chain') ||
+                                        lowerQueryGen.includes('stable blockchain') ||
+                                        lowerQueryGen.includes('stable chain') ||
+                                        lowerQueryGen.includes('codex blockchain') ||
+                                        lowerQueryGen.includes('codex chain') ||
+                                        (lowerQueryGen.includes('tempo') && lowerQueryGen.includes('stablechain')) ||
+                                        (lowerQueryGen.includes('arc') && lowerQueryGen.includes('stablechain')) ||
+                                        (lowerQueryGen.includes('plasma') && lowerQueryGen.includes('stablechain')) ||
+                                        (lowerQueryGen.includes('stable') && lowerQueryGen.includes('stablechain')) ||
+                                        (lowerQueryGen.includes('codex') && lowerQueryGen.includes('stablechain')));
+
+        if (isBlockchainExplainQuery) {
+          // Extract blockchain name from query for proper formatting
+          const blockchainName = lowerQueryGen.includes('tempo') ? 'Tempo' :
+                               lowerQueryGen.includes('arc') ? 'Arc' :
+                               lowerQueryGen.includes('plasma') ? 'Plasma' :
+                               lowerQueryGen.includes('stable') ? 'Stable' :
+                               lowerQueryGen.includes('codex') ? 'Codex' : 'Unknown';
+        
+          // Create a specific prompt for blockchain explain queries
+          prompt = `You are explaining the ${blockchainName} Stablechain. Please provide information using the exact format below. Use the training data provided to answer accurately.
 
 **TRAINING DATA FOR STABLECOIN BLOCKCHAINS:**
 
@@ -588,83 +656,18 @@ Structure with clear organization:
 What makes this chain different from others.
 
 Explain ${blockchainName} Stablechain`;
-      } else if (isExplainQuery) {
-        // Extract the stablecoin name from the query
-        const stablecoinSymbols = this.extractStablecoinSymbols(query);
-        const stablecoinName = stablecoinSymbols.length > 0 ? stablecoinSymbols[0] : query.replace(/explain|stablecoin/gi, '').trim();
-        
-        // Get reference data for the stablecoin
-        const referenceData = getStablecoinBySymbol(stablecoinName);
-        let referenceInfo = '';
-        
-        if (referenceData) {
-          referenceInfo = `
-Reference Data for ${referenceData.name} (${referenceData.symbol}):
-- Category: ${referenceData.category}
-- Backing: ${referenceData.backing}
-- Market Cap: $${(referenceData.marketCap / 1e9).toFixed(2)}B
-- Issuer: ${referenceData.issuer || 'N/A'}
-- Chains: ${referenceData.chains.join(', ')}
-- Use Cases: ${referenceData.useCase}
-- Risk Level: ${referenceData.riskLevel}
-- Description: ${referenceData.description}`;
-        }
-        
-        // No transparency reports included
+        } else {
+          // Improve the query format for single words
+          if (query.trim().split(' ').length === 1) {
+            // If it's a single word (like "USDT"), make it a proper question
+            formattedQuery = `What is ${query}? Please provide comprehensive information.`;
+          }
 
-        // Create a specific prompt for explain queries that only returns the 4 sections
-        prompt = `Please provide information about the ${stablecoinName} stablecoin in exactly these 4 sections only:
-
-**Overview**
-**Backing Mechanism**
-**Usecases** 
-**Associated Institutions**
-
-IMPORTANT FORMATTING RULES:
-1. Each section title must be in bold using **title** format
-2. Add two blank lines between each section
-3. If any section contains multiple points, format them as bullet points using "- " (dash and space)
-4. Each bullet point should be on a separate line
-5. Content under each section should be in regular text (not bold)
-6. Do not include any other information outside these 4 sections
-7. For the Usecases section, provide EXACTLY 4 use cases only, no more, no less
-
-Example format:
-**Overview**
-Content here...
-
-**Backing Mechanism**
-- Point 1
-- Point 2
-- Point 3
-
-**Usecases**
-- Use case 1
-- Use case 2
-- Use case 3
-- Use case 4
-
-**Associated Institutions**
-- Issuer: Company name
-- Custodian: Bank/Institution name
-- Auditor: Auditing firm name
-- Key Partners: List of major partners
-- Major Exchanges: List of exchanges
-
-${referenceInfo}
+          // Prepare the prompt for Claude
+          prompt = `Query: ${formattedQuery}
 
 ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
-      } else {
-        // Improve the query format for single words
-        if (query.trim().split(' ').length === 1) {
-          // If it's a single word (like "USDT"), make it a proper question
-          formattedQuery = `What is ${query}? Please provide comprehensive information.`;
         }
-
-        // Prepare the prompt for Claude
-        prompt = `Query: ${formattedQuery}
-
-${marketData ? `Current Market Data:\n${marketData}` : ''}`;
       }
 
       console.log('Calling Claude with prompt:', prompt);
@@ -672,7 +675,7 @@ ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
       const { data, error } = await supabase.functions.invoke('claude-chat', {
         body: {
           message: prompt,
-          model: 'claude-opus-4-20250514'
+          model: 'claude-sonnet-4-20250514'
         }
       });
 
