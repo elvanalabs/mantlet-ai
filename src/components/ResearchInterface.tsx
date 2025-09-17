@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
 import { Send, Loader2, TrendingUp, Database, Globe, ExternalLink, ArrowUpRight, GitCompare, HelpCircle, BarChart3, Newspaper, Info, Copy, Download, Check } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { ResearchService } from '@/services/ResearchService';
 import { validateStablecoin, validateStablecoinComparison } from '@/utils/stablecoinValidation';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -508,9 +509,10 @@ export const ResearchInterface = () => {
 
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" className="relative">
                   <BarChart3 className="w-4 h-4 mr-2" />
                   Onchain Metrics
+                  <Badge variant="secondary" className="ml-2 px-1.5 py-0.5 text-xs">Beta</Badge>
                 </Button>
               </DialogTrigger>
               <DialogContent>

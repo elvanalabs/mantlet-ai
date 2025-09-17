@@ -6,6 +6,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Send, Loader2, TrendingUp, Database, Globe, Wallet, Settings, GitCompare, HelpCircle, Newspaper, Copy, Download, Check, BarChart3, Info } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { ResearchService } from '@/services/ResearchService';
 import { validateStablecoin, validateStablecoinComparison } from '@/utils/stablecoinValidation';
 import StablecoinChart from './StablecoinChart';
@@ -706,9 +707,10 @@ export const DemoInterface = ({
 
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" className="relative">
                   <BarChart3 className="w-4 h-4 mr-2" />
                   Onchain Metrics
+                  <Badge variant="secondary" className="ml-2 px-1.5 py-0.5 text-xs">Beta</Badge>
                 </Button>
               </DialogTrigger>
               <DialogContent>
