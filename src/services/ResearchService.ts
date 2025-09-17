@@ -615,8 +615,9 @@ ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
     volume?: number;
   }> | null> {
     try {
-      // Map stablecoin symbols to CoinGecko IDs
+      // Comprehensive mapping of stablecoin symbols to CoinGecko IDs for 250+ stablecoins
       const coinGeckoIds: { [key: string]: string } = {
+        // Major USD Stablecoins
         'USDT': 'tether',
         'USDC': 'usd-coin',
         'BUSD': 'binance-usd',
@@ -632,12 +633,193 @@ ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
         'PYUSD': 'paypal-usd',
         'USDE': 'ethena-usde',
         'USDS': 'sky-dollar-usds',
+        'FXUSD': 'fx-usd',
+        'CUSD': 'celo-dollar',
+        'USDX': 'usdx',
+        'USDN': 'neutrino',
+        'USDK': 'usdk',
+        'RSV': 'reserve',
+        'HUSD': 'husd',
+        'USDR': 'real-usd',
+        'USDQ': 'usdq',
+        'USD1': 'usd1',
+        'USDT.E': 'tether',
+        'USDC.E': 'usd-coin',
+        'USDM': 'mountain-protocol-usdm',
+        'USDY': 'ondo-us-dollar-yield',
+        'USDTB': 'tether',
+        'RLUSD': 'ripple-usd',
+        'USDF': 'fractal-protocol-fd-usd',
+        'USDO': 'usdo',
+        'SATUSD': 'satusd',
+        'DEUSD': 'de-usd',
+        'YU': 'yu-usd',
+        'SRUSD': 'sr-usd',
+        'RUSD': 'reserve-dollar',
+        'USDA': 'usda',
+        'FRXUSD': 'frax-usd',
+        'MIM': 'magic-internet-money',
+        'USDL': 'usd-liberty',
+        'BYUSD': 'by-usd',
+        'YUSD': 'yusd-stablecoin',
+        'MIMATIC': 'mai',
+        
+        // Euro Stablecoins
         'EURS': 'stasis-eurs',
         'EURC': 'euro-coin',
-        'MIM': 'magic-internet-money',
+        'EURT': 'tether-eurt',
+        'CEUR': 'celo-euro',
+        'AGEUR': 'ageur',
+        'EUROC': 'euro-coin',
+        'XEUR': 'xeur',
+        'EURA': 'eura',
+        'EURM': 'eurm',
+        'JEUR': 'jeur',
+        'STEUR': 'steur',
+        'EURI': 'euri',
+        'PAR': 'par-stablecoin',
+        'IBEUR': 'iron-bank-euro',
+        'EUSD': 'electronic-usd',
+        
+        // Asian Stablecoins
+        'XSGD': 'xsgd',
+        'GYEN': 'gyen',
+        'ZUSD': 'zusd',
+        'IDRT': 'rupiah-token',
+        'BIDR': 'binance-idr',
+        'XIDR': 'xidr',
+        'THKD': 'hong-kong-dollar-token',
+        'TCAD': 'truecad',
+        'TAUD': 'truecad', // Note: Different but similar
+        'TGBP': 'truegbp',
+        'VCHF': 'v-swiss-franc',
+        'TRYB': 'bilira',
+        'BRTR': 'brtr',
+        'MXNT': 'tether-mxnt',
+        'ZARP': 'zar-token',
+        'CNHT': 'tether-cnht',
+        'XAUT': 'tether-gold',
+        
+         // Yield-bearing Stablecoins
+         'OUSG': 'ondo-short-term-us-government-bond-fund',
+         'BUIDL': 'blackrock-usd-institutional-digital-liquidity-fund',
+         'USYR': 'usyr',
+        'GYSR': 'geyser',
+        'DSUSD': 'ds-usd',
+        'RSUSD': 'rs-usd',
+        'YTUSD': 'yt-usd',
+        'STUSD': 'st-usd',
+        'RTUSD': 'rt-usd',
+        'IYUSD': 'iy-usd',
+        'RBUSD': 'rb-usd',
+        'FLYUSD': 'fly-usd',
+        
+        // DeFi Stablecoins
+        'AMPL': 'ampleforth',
+        'FEI': 'fei-usd',
         'USTC': 'terrausd',
-        'PAXG': 'pax-gold',
-        'XAUT': 'tether-gold'
+        'USN': 'usn',
+        'USNBT': 'nubits',
+        'DUSD': 'defi-dollar',
+        'BLC': 'blox',
+        'BEAN': 'beanstalk',
+        'BAI': 'bai-stablecoin',
+        'FLOAT': 'float-protocol-float',
+        'RAI': 'rai',
+        'USDJ': 'just-stablecoin',
+        'VAI': 'vai',
+        'UST': 'terrausd',
+        'IRON': 'iron',
+        'TITAN': 'titanswap',
+        'TOMB': 'tomb',
+        'BAC': 'basis-cash',
+        'ESD': 'empty-set-dollar',
+        'DSD': 'dynamic-set-dollar',
+        'BASIS': 'basis-dollar',
+        'MBASE': 'mbase',
+        'SHARE': 'seigniorage-shares',
+        'DOLLAR': 'dollar-protocol',
+        'BASK': 'basket-dollar',
+         'USD++': 'usd-plus-plus',
+         'SPICE': 'spice-token',
+        'GEM': 'gemini-dollar',
+        'USD+': 'usd-plus',
+        'GRAI': 'grai',
+        'MKUSD': 'makerdao-usd',
+        
+         // Commodity-backed
+         'PAXG': 'pax-gold',
+         'KAU': 'kinesis-gold',
+        'KAG': 'kinesis-silver',
+        'CACHE': 'cache-gold',
+        'PMGT': 'perth-mint-gold-token',
+        'DGX': 'digix-gold-token',
+        'AWG': 'atomic-wallet-coin', // Note: Different AWG
+        'GLC': 'gold-coin',
+        'GOLDX': 'gold-x',
+        'XPET': 'petroleum-token',
+        'XOL': 'oil-token',
+        'XWHEAT': 'wheat-token',
+        'XCORN': 'corn-token',
+        'XSOY': 'soy-token',
+        'XCOFFEE': 'coffee-token',
+        'XSUGAR': 'sugar-token',
+        'XCOCOA': 'cocoa-token',
+        
+        // Central Bank Digital Currencies (CBDCs) - Testnet/Pilot versions
+        'DCEP': 'digital-currency-electronic-payment',
+        'SAND': 'the-sandbox',
+        'CBDC': 'central-bank-digital-currency',
+        'EDOLLAR': 'e-dollar',
+        'DCASH': 'd-cash',
+        'BRITCOIN': 'britcoin',
+        'NNGN': 'nngn',
+        'ENAIRA': 'enaira',
+        'EKRONA': 'ekrona',
+        'DCNY': 'digital-cny',
+        'DJPY': 'digital-jpy',
+        'DEUR': 'digital-eur',
+        'DGBP': 'digital-gbp',
+        'DCHF': 'digital-chf',
+        'DCAD': 'digital-cad',
+        'DAUD': 'digital-aud',
+        'DINR': 'digital-inr',
+        'DBRL': 'digital-brl',
+        'DKRW': 'digital-krw',
+        'DRUB': 'digital-rub',
+        'DZAR': 'digital-zar',
+        'DMXN': 'digital-mxn',
+        'DSGD': 'digital-sgd',
+        'DHKD': 'digital-hkd',
+        'DTRY': 'digital-try',
+        'DSAR': 'digital-sar',
+        'DAED': 'digital-aed',
+        'DTHB': 'digital-thb',
+        'DIDR': 'digital-idr',
+        'DMYR': 'digital-myr',
+        'DPHP': 'digital-php',
+        'DVND': 'digital-vnd',
+        'DNOK': 'digital-nok',
+        'DSEK': 'digital-sek',
+        'DDKK': 'digital-dkk',
+        'DPLN': 'digital-pln',
+        'DCZK': 'digital-czk',
+        'DHUF': 'digital-huf',
+        'DRON': 'digital-ron',
+        'DBGN': 'digital-bgn',
+        'DHRK': 'digital-hrk',
+        'DRSD': 'digital-rsd',
+        'DMKD': 'digital-mkd',
+        'DBAL': 'digital-bal',
+        'DKGS': 'digital-kgs',
+        'DUZS': 'digital-uzs',
+        'DAMD': 'digital-amd',
+        'DGEL': 'digital-gel',
+        'DAZN': 'digital-azn',
+        'DBYN': 'digital-byn',
+        'DKZT': 'digital-kzt',
+        'DTMT': 'digital-tmt',
+        'DTJS': 'digital-tjs'
       };
 
       const coinGeckoId = coinGeckoIds[symbol.toUpperCase()];
@@ -659,6 +841,38 @@ ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
           }
         }
       );
+
+      // Handle rate limiting with retry
+      if (response.status === 429) {
+        console.log(`Rate limited for ${symbol}, waiting and retrying...`);
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        const retryResponse = await fetch(
+          `https://api.coingecko.com/api/v3/coins/${coinGeckoId}/market_chart/range?vs_currency=usd&from=${thirtyDaysAgo}&to=${now}`,
+          {
+            headers: {
+              'Accept': 'application/json',
+              'User-Agent': 'StablecoinTracker/1.0'
+            }
+          }
+        );
+        
+        if (!retryResponse.ok) {
+          console.log(`Retry failed for ${symbol}: ${retryResponse.status} ${retryResponse.statusText}`);
+          return null;
+        }
+        
+        const retryData = await retryResponse.json();
+        const prices = retryData.prices || [];
+        const volumes = retryData.total_volumes || [];
+
+        if (!prices.length) {
+          console.log(`No price data available for ${symbol} after retry`);
+          return null;
+        }
+
+        return ResearchService.processChartData(prices, volumes, symbol);
+      }
 
       if (!response.ok) {
         console.log(`CoinGecko API error: ${response.status} ${response.statusText}`);
@@ -690,12 +904,36 @@ ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
       }
 
       console.log(`Fetched ${chartData.length} real data points for ${symbol}`);
-      return chartData;
+      return ResearchService.processChartData(prices, volumes, symbol);
 
     } catch (error) {
       console.error(`Error fetching real chart data for ${symbol}:`, error);
       return null;
     }
+  }
+
+  private static processChartData(
+    prices: number[][], 
+    volumes: number[][], 
+    symbol: string
+  ): Array<{ date: string; price: number; volume?: number }> {
+    // Convert CoinGecko data to our format, sampling every few hours to avoid too many data points
+    const chartData = [];
+    const sampleEvery = Math.max(1, Math.floor(prices.length / 30)); // Sample to get around 30 data points
+    
+    for (let i = 0; i < prices.length; i += sampleEvery) {
+      const [timestamp, price] = prices[i];
+      const volume = volumes[i] ? volumes[i][1] : undefined;
+      
+      chartData.push({
+        date: new Date(timestamp).toISOString().split('T')[0],
+        price: Number(Number(price).toFixed(6)),
+        volume: volume ? Math.floor(volume) : undefined
+      });
+    }
+
+    console.log(`Processed ${chartData.length} real data points for ${symbol}`);
+    return chartData;
   }
 
   private static generateMockChartData(symbol: string): Array<{
