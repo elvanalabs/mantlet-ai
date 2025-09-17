@@ -143,87 +143,8 @@ export const ResearchInterface = () => {
     setIsLoading(true);
 
     try {
-      // Check if this is a basic stablecoin query that we have cached
-      if (isBasicStablecoinQuery(query)) {
-        const cachedExplanation = getStablecoinExplanation(query);
-        
-        if (cachedExplanation) {
-          console.log('Using cached explanation for:', cachedExplanation.symbol);
-          
-          // Convert chainDistribution from object to array format
-          const chainDistributionArray = cachedExplanation.adoptionData?.chainDistribution 
-            ? Object.entries(cachedExplanation.adoptionData.chainDistribution).map(([chain, percentage]) => ({
-                chain,
-                percentage,
-                amount: `${Math.round(parseFloat(percentage) * parseFloat(cachedExplanation.adoptionData!.circulatingSupply) / 100)} tokens`
-              }))
-            : [];
-          
-          // Format the explanation content with institutional information
-          let explanationContent = cachedExplanation.explanation.replace(/https?:\/\/[^\s\)\]>,]+/g, '').replace(/\s+/g, ' ').trim();
-          
-          // Add Associated Institutions section if available
-          if (cachedExplanation.associatedInstitutions) {
-            const institutions = cachedExplanation.associatedInstitutions;
-            explanationContent += '\n\n**Associated Institutions:**\n';
-            
-            if (institutions.issuer) {
-              explanationContent += `• **Issuer**: ${institutions.issuer}\n`;
-            }
-            if (institutions.custodian) {
-              explanationContent += `• **Custodian**: ${institutions.custodian}\n`;
-            }
-            if (institutions.auditor) {
-              explanationContent += `• **Auditor**: ${institutions.auditor}\n`;
-            }
-            if (institutions.partners && institutions.partners.length > 0) {
-              explanationContent += `• **Key Partners**: ${institutions.partners.join(', ')}\n`;
-            }
-            if (institutions.exchanges && institutions.exchanges.length > 0) {
-              explanationContent += `• **Major Exchanges**: ${institutions.exchanges.join(', ')}\n`;
-            }
-            if (institutions.institutionalUsers && institutions.institutionalUsers.length > 0) {
-              explanationContent += `• **Institutional Users**: ${institutions.institutionalUsers.join(', ')}\n`;
-            }
-          }
-          
-          const assistantMessage: Message = {
-            id: (Date.now() + 1).toString(),
-            type: 'assistant',
-            content: explanationContent,
-            timestamp: new Date(),
-            sources: cachedExplanation.sources,
-            adoptionData: cachedExplanation.adoptionData ? {
-              stablecoin: cachedExplanation.symbol,
-              totalCirculatingSupply: cachedExplanation.adoptionData.circulatingSupply,
-              marketSharePercent: cachedExplanation.adoptionData.marketShare,
-              chainDistribution: chainDistributionArray,
-              transactionVolume24h: cachedExplanation.adoptionData.volume24h,
-              growthDecline30d: {
-                percentage: '2.1%',
-                direction: 'up' as const
-              },
-              depegEvents: {
-                count: cachedExplanation.adoptionData.depegEvents.length,
-                events: cachedExplanation.adoptionData.depegEvents.map(event => ({
-                  date: event.date,
-                  time: '00:00',
-                  deviation: event.severity,
-                  price: '$0.95'
-                }))
-              }
-            } : undefined,
-          };
-
-          setMessages(prev => [...prev, assistantMessage]);
-          toast({
-            title: "Response Served from Cache",
-            description: `Retrieved ${cachedExplanation.symbol} information instantly from our knowledge base.`,
-          });
-          setIsLoading(false);
-          return;
-        }
-      }
+      // Always use API calls for fresh data with Associated Institutions section
+      // and without Risks/Criticism sections
       
       // API call for queries
       console.log('Using API for query:', query);
