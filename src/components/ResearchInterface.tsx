@@ -352,7 +352,7 @@ export const ResearchInterface = () => {
                   if (!part || typeof part !== 'string') {
                     return null;
                   }
-                  
+
                   // Handle bold text **text**
                   const boldMatch = part.match(/^\*\*([^*]+)\*\*$/);
                   if (boldMatch) {
@@ -490,11 +490,11 @@ export const ResearchInterface = () => {
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Explain Stablecoin/Stablechain</DialogTitle>
+                  <DialogTitle>Explain Stablecoin</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="explain-stablecoin">Enter Name</Label>
+                    <Label htmlFor="explain-stablecoin">Stablecoin Name/Ticker</Label>
                     <Input id="explain-stablecoin" placeholder="e.g., DAI, USDC, USDT" value={explainStablecoin} onChange={e => setExplainStablecoin(e.target.value)} />
                   </div>
                   <DialogTrigger asChild>
