@@ -91,6 +91,19 @@ export const validateStablecoin = (input: string): {
     'binance': 'BUSD'
   };
 
+  // Check for stablecoin blockchain names
+  const blockchainNames = [
+    'tempo', 'arc', 'arc network', 'plasma', 'plasma foundation', 'codex', 'stable'
+  ];
+  
+  if (blockchainNames.includes(cleanInput)) {
+    return {
+      isValid: true,
+      matchedSymbol: cleanInput.toUpperCase(),
+      matchedName: cleanInput.charAt(0).toUpperCase() + cleanInput.slice(1)
+    };
+  }
+
   const aliasMatch = aliases[cleanInput];
   if (aliasMatch) {
     const matchedCoin = STABLECOIN_REFERENCE_DATA.find(coin => coin.symbol === aliasMatch);
