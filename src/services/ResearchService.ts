@@ -533,9 +533,9 @@ export class ResearchService {
 **CODEX:**
 - EVM-equivalent Layer 2 blockchain purpose-built for stablecoin-native payments, FX, and settlement
 - Native USDC integration with programmable onchain ramping, compliance, identity, FX
-- Backed by Caladan, Circle, CMT Digital, Coinbase Ventures, Cumberland, Fabric Ventures, Hustle Fund, Mirana Ventures, Selini Capital, Reverie, Wintermute
 - Optimized for stablecoin liquidity, custody, and atomic settlement on Ethereum
 - Currently live with native USDC
+- Key Backers: Founders: Haonan Li, Victor Yaw, Momo Ong; Major Investors: Dragonfly Capital (lead, $15.8M seed round), Coinbase Ventures, Circle Ventures, Cumberland Labs, Wintermute, Selini Capital, Fabric Ventures, Mirana Ventures, Hustle Fund; Key Partners/Advisors: Circle (through Circle Ventures involvement)
 
 CRITICAL FORMATTING REQUIREMENTS:
 1. DO NOT include any introduction lines like "Here is the information about..." 
