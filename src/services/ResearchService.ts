@@ -1080,6 +1080,27 @@ ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
     query: string, 
     marketData: string
   ): string {
+    // Check if this is an explain stablecoin query
+    const isExplainQuery = query.toLowerCase().includes('explain') && 
+                         (query.toLowerCase().includes('stablecoin') || 
+                          this.extractStablecoinSymbols(query).length > 0);
+
+    if (isExplainQuery) {
+      // Extract stablecoin name for explain queries
+      const stablecoinSymbols = this.extractStablecoinSymbols(query);
+      const stablecoinName = stablecoinSymbols.length > 0 ? stablecoinSymbols[0] : query.replace(/explain|stablecoin/gi, '').trim();
+      
+      // Return formatted response with the 4 required sections
+      let response = `**Overview**\n${stablecoinName} is a stablecoin designed to maintain price stability through various mechanisms.\n\n\n**Backing Mechanism**\n- Information about backing mechanism unavailable at this time\n- Please check official documentation for latest details\n\n\n**Usecases**\n- Digital payments and transactions\n- Store of value during market volatility\n- DeFi protocol integration\n- Cross-border remittances\n\n\n**Associated Institutions**\n- Issuer: Information unavailable\n- Please refer to official sources for institutional details`;
+      
+      if (marketData) {
+        response += `\n\nCurrent Market Information:\n${marketData}`;
+      }
+      
+      return response;
+    }
+
+    // Regular fallback response for non-explain queries
     let response = `Based on the available information about "${query}":\n\n`;
     
     if (marketData) {
