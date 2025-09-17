@@ -534,19 +534,27 @@ FORMATTING REQUIREMENTS:
 2. Add two blank lines between each section  
 3. Content should be formatted as bullet points using "- " when appropriate
 4. Do not include any other information outside these 5 sections
+5. Structure the Key Backers section with clear organization (e.g., Founders: [names], Investors: [names], Partners: [names])
 
 **REQUIRED FORMAT:**
 **Overview**
 What the chain is and its main purpose.
 
+
 **Native Stablecoin** 
 Which stablecoin(s) it's built around, and if used as gas.
+
 
 **Launch Status**
 Mainnet / Testnet / Upcoming.
 
+
 **Key Backers**
-Founders, major companies or protocols behind it.
+Structure with clear organization:
+- Founders: [list founders/founding team]
+- Major Investors: [list key investors and VCs]
+- Key Partners: [list strategic partners and institutions]
+
 
 **Unique Edge**
 What makes this chain different from others.
