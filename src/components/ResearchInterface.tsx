@@ -576,7 +576,7 @@ export const ResearchInterface = () => {
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Explain a Stablecoin</DialogTitle>
+                  <DialogTitle>Explain Stablecoin/Stablechain</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div className="space-y-2">
