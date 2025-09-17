@@ -366,7 +366,7 @@ export class ResearchService {
       'usn': 'USN',
       'near usn': 'USN',
       
-      // Other fiat-backed
+       // Other fiat-backed
       'xsgd': 'XSGD',
       'singapore dollar': 'XSGD',
       'gyen': 'GYEN',
@@ -377,6 +377,14 @@ export class ResearchService {
       'zar token': 'ZARP',
       'vchf': 'VCHF',
       'vnx swiss franc': 'VCHF',
+      'cnht': 'CNHT',
+      'chinese yuan tether': 'CNHT',
+      'tether cnh': 'CNHT',
+      'brz': 'BRZ',
+      'brazilian real': 'BRZ',
+      'mxnt': 'MXNT',
+      'mexican peso tether': 'MXNT',
+      'tether mxn': 'MXNT',
       
       // Gold/commodity backed
       'xaut': 'XAUT',
@@ -388,11 +396,17 @@ export class ResearchService {
       'kag': 'KAG',
       'kinesis silver': 'KAG',
       
-      // Legacy/Other protocols  
+       // Legacy/Other protocols  
       'tusd': 'TUSD',
       'trueusd': 'TUSD',
+      'true usd': 'TUSD',
       'busd': 'BUSD',
       'binance usd': 'BUSD',
+      'gusd': 'GUSD',
+      'gemini usd': 'GUSD',
+      'gemini dollar': 'GUSD',
+      'build': 'BUILD',
+      'build finance': 'BUILD',
       'frax': 'FRAX',
       'frax dollar': 'FRAX',
       'gho': 'GHO',
