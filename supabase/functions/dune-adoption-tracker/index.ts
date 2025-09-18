@@ -129,73 +129,86 @@ async function fetchCoinGeckoSupply(stablecoin: string) {
 async function fetchDefiLlamaChainData(stablecoin: string) {
   console.log(`Fetching DeFi Llama chain data for ${stablecoin}`);
   
+  // Map stablecoin symbols to DeFi Llama IDs
+  const defiLlamaIds: { [key: string]: string } = {
+    'USDT': 'tether',
+    'USDC': 'usd-coin',
+    'BUSD': 'binance-usd',
+    'DAI': 'dai',
+    'FRAX': 'frax',
+    'TUSD': 'trueusd',
+    'USDP': 'paxos-standard',
+    'GUSD': 'gemini-dollar',
+    'LUSD': 'liquity-usd',
+    'sUSD': 'susd',
+    'DOLA': 'dola-usd',
+    'MIM': 'magic-internet-money',
+    'USTC': 'terrausd',
+    'USDD': 'usdd',
+    'USDE': 'ethena-usde',
+    'PYUSD': 'paypal-usd',
+    'FDUSD': 'first-digital-usd'
+  };
+  
+  const defiLlamaId = defiLlamaIds[stablecoin.toUpperCase()];
+  if (!defiLlamaId) {
+    console.log(`No DeFi Llama ID found for ${stablecoin}`);
+    return { chainDistribution: null, marketShare: null };
+  }
+  
   try {
-    // Get stablecoin data from DeFi Llama
-    const response = await fetch('https://stablecoins.llama.fi/stablecoins?includePrices=true');
+    // Get specific stablecoin data from DeFi Llama
+    const response = await fetch(`https://stablecoins.llama.fi/stablecoin/${defiLlamaId}`);
     
     if (!response.ok) {
       throw new Error(`DeFi Llama API error: ${response.statusText}`);
     }
 
     const data = await response.json();
-    const stablecoinData = data.peggedAssets?.find((asset: any) => 
-      asset.symbol?.toUpperCase() === stablecoin.toUpperCase() ||
-      asset.name?.toUpperCase().includes(stablecoin.toUpperCase())
-    );
-
-    if (!stablecoinData) {
-      console.log(`No DeFi Llama data found for ${stablecoin}`);
-      return { chainDistribution: null, marketShare: null };
-    }
-
-    // Helper to estimate an asset's total USD
-    const getAssetTotalUSD = (asset: any) => {
-      const chainsArr = Array.isArray(asset?.chains) ? asset.chains : [];
-      const chainsSum = chainsArr.reduce((sum: number, c: any) => {
-        const v = c?.circulating?.peggedUSD ?? c?.peggedUSD ?? c?.circulating ?? 0;
-        return sum + (typeof v === 'number' ? v : 0);
-      }, 0);
-      return asset?.circulating?.peggedUSD ?? chainsSum;
+    
+    // Calculate market share based on total stablecoin market cap
+    const totalMarketResponse = await fetch('https://stablecoins.llama.fi/stablecoins?includePrices=true');
+    const totalMarketData = await totalMarketResponse.json();
+    
+    const totalMarketCap = totalMarketData.reduce((sum: number, coin: any) => sum + (coin.circulating?.peggedUSD || 0), 0);
+    const stablecoinMarketCap = data.circulating?.peggedUSD || 0;
+    const marketShare = ((stablecoinMarketCap / totalMarketCap) * 100).toFixed(1);
+    
+    // Process chain distribution with proper chain name mapping
+    const chainNameMap: { [key: string]: string } = {
+      'ethereum': 'Ethereum',
+      'tron': 'TRON',
+      'bsc': 'BSC',
+      'polygon': 'Polygon', 
+      'avalanche': 'Avalanche',
+      'arbitrum': 'Arbitrum',
+      'optimism': 'Optimism',
+      'solana': 'Solana',
+      'fantom': 'Fantom',
+      'harmony': 'Harmony',
+      'base': 'Base'
     };
-
-    // Calculate market share using DeFi Llama totals
-    const totalStablecoinMcap = (data.peggedAssets || []).reduce((sum: number, asset: any) => sum + getAssetTotalUSD(asset), 0) || 289000000000;
-    const thisTotalUSD = getAssetTotalUSD(stablecoinData) || 0;
-    const marketShare = ((thisTotalUSD / totalStablecoinMcap) * 100).toFixed(1);
-
-    // Build chain distribution from robust structures
-    let chains: Array<{ chain: string; amount: number }>; 
-
-    if (Array.isArray(stablecoinData.chains) && stablecoinData.chains.length > 0) {
-      chains = stablecoinData.chains.map((c: any) => ({
-        chain: c.chain || c.name || c.blockchain || 'Unknown',
-        amount: (c?.circulating?.peggedUSD ?? c?.peggedUSD ?? c?.circulating ?? 0) as number,
-      })).filter(c => c.amount > 0);
-    } else if (stablecoinData.chainCirculating && typeof stablecoinData.chainCirculating === 'object') {
-      chains = Object.entries(stablecoinData.chainCirculating)
-        .map(([chain, v]: [string, any]) => ({
-          chain,
-          amount: (v?.peggedUSD ?? v?.circulating ?? 0) as number,
-        }))
-        .filter(c => c.amount > 0);
-    } else {
-      chains = [];
-    }
-
-    const totalOnChains = chains.reduce((sum, c) => sum + c.amount, 0);
-    const denom = totalOnChains > 0 ? totalOnChains : (thisTotalUSD || 1);
-
-    const chainDistribution = chains
+    
+    const chainDistribution = Object.entries(data.chainCirculating?.peggedUSD || {})
+      .map(([chain, amount]: [string, any]) => ({
+        chain: chainNameMap[chain.toLowerCase()] || chain.charAt(0).toUpperCase() + chain.slice(1),
+        amount: parseFloat(amount as string),
+        percentage: (((amount as number) / stablecoinMarketCap) * 100).toFixed(1)
+      }))
       .sort((a, b) => b.amount - a.amount)
       .slice(0, 6)
       .map(c => ({
         chain: c.chain,
-        percentage: ((c.amount / denom) * 100).toFixed(1),
-        amount: Math.round(c.amount).toString(),
+        percentage: c.percentage,
+        amount: Math.round(c.amount).toString()
       }));
-
+    
     console.log(`DeFi Llama data for ${stablecoin}: market share ${marketShare}%, ${chainDistribution.length} chains`);
-    return { chainDistribution, marketShare };
+    
+    return {
+      marketShare,
+      chainDistribution
+    };
   } catch (error) {
     console.error(`Error fetching DeFi Llama data for ${stablecoin}:`, error);
     return { chainDistribution: null, marketShare: null };
@@ -217,7 +230,8 @@ async function fetchMoralisVolume(stablecoin: string) {
     'DAI': { address: '0x6b175474e89094c44da98b954eedeac495271d0f', chain: 'eth' },
     'USDE': { address: '0x4c9edd5852cd905f086c759e8383e09bff1e68b3', chain: 'eth' },
     'PYUSD': { address: '0x6c3ea9036406852006290770bedfcaba0e23a0e8', chain: 'eth' },
-    'PAXG': { address: '0x45804880de22913dafe09f4980848ece6ecbaf78', chain: 'eth' }
+    'PAXG': { address: '0x45804880de22913dafe09f4980848ece6ecbaf78', chain: 'eth' },
+    'FDUSD': { address: '0xc5f0f7b66764f6ec8c8dff7ba683102295e16409', chain: 'eth' }
   };
 
   const tokenData = moralisTokens[stablecoin.toUpperCase()];
@@ -227,8 +241,10 @@ async function fetchMoralisVolume(stablecoin: string) {
   }
 
   try {
+    // Use the token transfers endpoint to calculate 24h volume
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
     const response = await fetch(
-      `https://deep-index.moralis.io/api/v2/erc20/${tokenData.address}/stats?chain=${tokenData.chain}`,
+      `https://deep-index.moralis.io/api/v2/erc20/${tokenData.address}/transfers?chain=${tokenData.chain}&from_date=${oneDayAgo}&limit=100`,
       {
         headers: {
           'X-API-Key': moralisApiKey,
@@ -242,10 +258,19 @@ async function fetchMoralisVolume(stablecoin: string) {
     }
 
     const data = await response.json();
-    const volume24h = data.volume_24h || data.transactions_24h || null;
     
-    console.log(`Moralis volume for ${stablecoin}: ${volume24h}`);
-    return { volume24h: volume24h ? volume24h.toString() : null };
+    // Calculate total volume from transfers in the last 24h
+    let totalVolume = 0;
+    if (data.result && Array.isArray(data.result)) {
+      totalVolume = data.result.reduce((sum: number, transfer: any) => {
+        const value = parseFloat(transfer.value || '0');
+        const decimals = parseInt(transfer.token_decimals || '6');
+        return sum + (value / Math.pow(10, decimals));
+      }, 0);
+    }
+    
+    console.log(`Moralis 24h volume for ${stablecoin}: ${totalVolume}`);
+    return { volume24h: totalVolume > 0 ? Math.round(totalVolume).toString() : null };
   } catch (error) {
     console.error(`Error fetching Moralis data for ${stablecoin}:`, error);
     return { volume24h: null };

@@ -52,19 +52,33 @@ const NewsGrid: React.FC<NewsGridProps> = ({ newsResults }) => {
             key={index} 
             className="group hover:shadow-lg transition-all duration-300 border border-border/50 hover:border-primary/20 glass"
           >
-            {news.thumbnail && (
+            {news.thumbnail ? (
               <div className="relative overflow-hidden rounded-t-lg">
                 <img 
                   src={news.thumbnail} 
                   alt={news.title}
                   className="w-full h-40 object-cover transition-transform duration-300 group-hover:scale-105"
                   onError={(e) => {
-                    e.currentTarget.style.display = 'none';
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                    const fallback = target.parentElement?.nextElementSibling as HTMLElement;
+                    if (fallback) fallback.style.display = 'block';
                   }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
               </div>
-            )}
+            ) : null}
+            
+            <div 
+              className="relative overflow-hidden rounded-t-lg h-40 bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center"
+              style={{ display: news.thumbnail ? 'none' : 'flex' }}
+            >
+              <div className="text-center p-4">
+                <Globe className="w-8 h-8 mx-auto mb-2 text-primary/60" />
+                <p className="text-sm font-medium text-foreground/80">{news.source}</p>
+                <p className="text-xs text-muted-foreground">News Article</p>
+              </div>
+            </div>
             
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
