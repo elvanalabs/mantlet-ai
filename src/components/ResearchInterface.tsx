@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
-import { Send, Loader2, TrendingUp, Database, Globe, ExternalLink, ArrowUpRight, GitCompare, HelpCircle, BarChart3, Newspaper, Info, Copy, Download, Check } from 'lucide-react';
+import { Send, Loader2, TrendingUp, Database, Globe, ExternalLink, ArrowUpRight, GitCompare, HelpCircle, BarChart3, Newspaper, Info, Copy, Download, Check, ChevronDown } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { ResearchService } from '@/services/ResearchService';
 import { validateStablecoin, validateStablecoinComparison } from '@/utils/stablecoinValidation';
@@ -448,6 +448,20 @@ export const ResearchInterface = () => {
           </div>}
         <div ref={messagesEndRef} />
       </div>
+
+      {/* Quick Actions Guide */}
+      {messages.length === 1 && (
+        <div className="border-t border-border glass flex-shrink-0 animate-fade-in">
+          <div className="p-2 sm:p-4">
+            <Card className="p-4 bg-accent/30 border-accent/50">
+              <div className="flex items-center justify-center gap-2 text-accent-foreground">
+                <span className="text-sm font-medium">Select any Option and begin</span>
+                <ChevronDown className="w-4 h-4 animate-bounce" />
+              </div>
+            </Card>
+          </div>
+        </div>
+      )}
 
       {/* Quick Actions */}
       <div className="border-t border-border glass flex-shrink-0">

@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Send, Loader2, TrendingUp, Database, Globe, Wallet, Settings, GitCompare, HelpCircle, Newspaper, Copy, Download, Check, BarChart3, Info } from 'lucide-react';
+import { Send, Loader2, TrendingUp, Database, Globe, Wallet, Settings, GitCompare, HelpCircle, Newspaper, Copy, Download, Check, BarChart3, Info, ChevronDown } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { ResearchService } from '@/services/ResearchService';
 import { validateStablecoin, validateStablecoinComparison } from '@/utils/stablecoinValidation';
@@ -646,6 +646,20 @@ export const DemoInterface = ({
             </div>
           </Card>
         </div>}
+
+      {/* Quick Actions Guide */}
+      {messages.length === 1 && (
+        <div className="border-t border-border glass flex-shrink-0 animate-fade-in">
+          <div className="p-2 sm:p-4">
+            <Card className="p-4 bg-accent/30 border-accent/50">
+              <div className="flex items-center justify-center gap-2 text-accent-foreground">
+                <span className="text-sm font-medium">Select any Option and begin</span>
+                <ChevronDown className="w-4 h-4 animate-bounce" />
+              </div>
+            </Card>
+          </div>
+        </div>
+      )}
 
       {/* Input */}
       <div className="border-t border-border glass flex-shrink-0">
