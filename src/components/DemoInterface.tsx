@@ -651,7 +651,7 @@ export const DemoInterface = ({
       {messages.length === 1 && (
         <div className="border-t border-border glass flex-shrink-0 animate-fade-in">
           <div className="p-2 sm:p-4">
-            <Card className="p-4 bg-accent/30 border-accent/50">
+            <Card className="p-4 border-border/50">
               <div className="flex items-center justify-center gap-2 text-accent-foreground">
                 <span className="text-sm font-medium">Select any Option and begin</span>
                 <ChevronDown className="w-4 h-4 animate-bounce" />
