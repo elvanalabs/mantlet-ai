@@ -50,7 +50,7 @@ Tether has faced regulatory scrutiny but maintains operations globally. The comp
 ✓ Established track record since 2014`,
     associatedInstitutions: {
       issuer: 'Tether Limited',
-      auditor: 'BDO Italia',
+      auditor: 'Big Four accounting firm (in transition 2024-2025)',
       partners: ['Bitfinex', 'Cantor Fitzgerald'],
       exchanges: ['Binance', 'Coinbase', 'Kraken', 'Huobi', 'OKX', 'Bitfinex'],
       institutionalUsers: ['Major crypto exchanges', 'Trading firms', 'DeFi protocols', 'Payment processors']
@@ -223,6 +223,14 @@ USDe is backed by ETH and stETH, with short positions in ETH perpetual futures t
 • Yield-bearing stablecoin alternative
 • DeFi protocols seeking yield
 • Sophisticated trading strategies`,
+    associatedInstitutions: {
+      issuer: 'Ethena Labs',
+      custodian: 'Multiple exchange partners (Binance, OKX, Bybit, Deribit)',
+      auditor: 'Chaos Labs (Edge Proof of Reserves)',
+      partners: ['BlackRock (USDtb)', 'Binance', 'OKX', 'Bybit', 'Deribit', 'Chaos Labs'],
+      exchanges: ['Binance', 'OKX', 'Gate.io', 'KuCoin', 'Bybit'],
+      institutionalUsers: ['DeFi protocols', 'Yield farming platforms', 'Trading firms', 'Institutional DeFi users']
+    },
     adoptionData: {
       circulatingSupply: '3.2B USDe',
       marketShare: '1.8%',
@@ -260,43 +268,59 @@ In February 2023, Paxos received a Wells notice from the SEC and stopped minting
   'TUSD': {
     symbol: 'TUSD',
     name: 'TrueUSD',
-    explanation: `**TrueUSD (TUSD)** is a USD-backed stablecoin that emphasizes regulatory compliance through independent verification and regular attestations.
+    explanation: `**TrueUSD (TUSD)** is a USD-backed stablecoin that has undergone significant changes in ownership and management. **Important: TUSD experienced major reserve issues in 2023-2024.**
+
+**Current Status (2024):**
+• **New Management**: Now managed by Techteryx with significant involvement from Tron's Justin Sun
+• **Reserve Crisis**: Faced $456M reserve shortfall in 2023-2024 when funds were stuck with Aria entities
+• **Emergency Funding**: Justin Sun provided emergency funding to maintain operations and redemptions
+• **Proof of Reserves**: Now uses Chainlink's proof-of-reserves system for verification
+• **Archblock Partnership**: Working with Archblock for enhanced transparency and custody
 
 **Backing Mechanism:**
-• **Real-Time Reserve Dashboard**: VeriNumus™ platform provides live balance tracking of escrowed USD collateral
-• **Multi-Bank Escrow**: USD reserves held in segregated escrow accounts across multiple regulated banking partners
-• **Independent Attestations**: Daily third-party verification of reserves by independent accounting firms
-• **Legal Protection Framework**: Funds protected through unique trust structure with specific legal safeguards for token holders
-• **100% USD Backing**: Every TUSD token backed by equivalent US dollar deposits in reserve accounts
-• **Multi-Chain Distribution**: Reserves support TUSD issued across Ethereum, BSC, TRON, and Avalanche networks
+• **USD Reserves**: Backed by US dollar deposits, though reserve management has been unstable
+• **Third-Party Verification**: Uses Chainlink's proof-of-reserves for real-time verification
+• **Multi-Chain Support**: Available on Ethereum, BSC, TRON networks
+• **Custody Changes**: Moved away from original TrustToken structure
 
-**Trust Structure:**
-TUSD uses a unique trust structure where USD reserves are held in escrow accounts at multiple banks, with regular attestations by independent accounting firms.
-
-**Advantages:**
-✓ Strong legal framework for fund protection
-✓ Regular independent attestations
-✓ No lending of reserves
-✓ Multiple banking relationships for diversification
+**Risk Considerations:**
+⚠️ Major reserve management issues in 2023-2024
+⚠️ Dependence on Justin Sun's financial support
+⚠️ Regulatory uncertainties around current structure
+⚠️ Historical liquidity crises
 
 **Use Cases:**
-• Conservative stablecoin alternative
-• Institutional treasury management
-• DeFi protocols requiring stable value
-• Trading and remittances`,
+• TRON ecosystem integration
+• Cross-chain transfers
+• Trading pairs (with caution)`,
+    associatedInstitutions: {
+      issuer: 'Techteryx (with Justin Sun involvement)',
+      custodian: 'Archblock',
+      auditor: 'Chainlink Proof of Reserves',
+      partners: ['Tron Network', 'Justin Sun', 'Archblock', 'Chainlink'],
+      exchanges: ['Binance', 'HTX (Huobi)', 'Gate.io', 'MEXC'],
+      institutionalUsers: ['TRON ecosystem users', 'Cross-chain protocols', 'Asian trading firms']
+    },
     adoptionData: {
       circulatingSupply: '500M TUSD',
       marketShare: '0.3%',
       chainDistribution: {
-        'Ethereum': '60%',
-        'BSC': '25%',
-        'TRON': '15%'
+        'TRON': '70%',
+        'Ethereum': '20%',
+        'BSC': '10%'
       },
       volume24h: '$15M',
       transactions24h: '5K',
-      depegEvents: []
+      depegEvents: [
+        {
+          date: '2023-12-15',
+          severity: 'Major',
+          duration: '30 days',
+          cause: 'Reserve shortfall when $456M stuck with Aria entities'
+        }
+      ]
     },
-    sources: ['TrustToken', 'Armanino Attestations', 'CoinGecko']
+    sources: ['CoinDesk', 'Techteryx', 'Chainlink', 'Court Filings']
   },
 
   'PYUSD': {
@@ -329,8 +353,8 @@ PYUSD is designed to integrate seamlessly with PayPal's existing financial servi
     associatedInstitutions: {
       issuer: 'PayPal Holdings Inc.',
       custodian: 'Paxos Trust Company',
-      auditor: 'Withum & Company',
-      partners: ['Paxos', 'Venmo', 'Xoom'],
+      auditor: 'Withum Smith + Brown PC',
+      partners: ['Paxos', 'Venmo', 'Xoom', 'Stellar Network (2025)'],
       exchanges: ['Crypto.com', 'Coinbase', 'Kraken', 'Bitstamp'],
       institutionalUsers: ['PayPal merchants', 'E-commerce platforms', 'Payment processors', 'Fintech companies']
     },
@@ -378,7 +402,12 @@ PYUSD is designed to integrate seamlessly with PayPal's existing financial servi
   'GUSD': {
     symbol: 'GUSD',
     name: 'Gemini Dollar',
-    explanation: `**Gemini Dollar (GUSD)** is a regulated, Ethereum-based stablecoin issued by Gemini Trust Company, combining USD stability with blockchain efficiency.
+    explanation: `**Gemini Dollar (GUSD)** is a regulated, Ethereum-based stablecoin issued by Gemini Trust Company. **Note: Gemini faced NYDFS enforcement action in February 2024.**
+
+**Regulatory Status (Updated 2024):**
+• **NYDFS Enforcement**: Received consent order from New York Department of Financial Services in February 2024
+• **Compliance Issues**: Addressed various regulatory compliance matters under NYDFS oversight
+• **Ongoing Operations**: Continues to operate under enhanced regulatory scrutiny
 
 **Backing Mechanism:**
 • **NYDFS Regulated**: Issued under New York Department of Financial Services banking regulations
@@ -389,7 +418,7 @@ PYUSD is designed to integrate seamlessly with PayPal's existing financial servi
 • **1:1 USD Backing**: Every GUSD token fully backed by equivalent US dollar deposit
 
 **Advantages:**
-✓ Banking-grade regulatory compliance
+✓ Banking-grade regulatory compliance (with enhanced oversight)
 ✓ FDIC insurance eligibility on reserves
 ✓ Transparent smart contract architecture
 ✓ Established institutional custody
@@ -399,6 +428,14 @@ PYUSD is designed to integrate seamlessly with PayPal's existing financial servi
 • Institutional cryptocurrency holdings
 • DeFi protocol integration
 • Cross-border value transfer`,
+    associatedInstitutions: {
+      issuer: 'Gemini Trust Company',
+      custodian: 'State Street Bank and Trust Company',
+      auditor: 'BPM LLP',
+      partners: ['State Street', 'Samsung Blockchain', 'Flexa Network'],
+      exchanges: ['Gemini', 'Coinbase', 'Binance', 'Kraken'],
+      institutionalUsers: ['Institutional investors', 'Corporate users', 'DeFi protocols']
+    },
     sources: ['Gemini Trust', 'NYDFS', 'BPM Attestations', 'Ethereum']
   },
 
