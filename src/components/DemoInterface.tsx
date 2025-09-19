@@ -638,26 +638,17 @@ export const DemoInterface = ({
       </div>
 
       {/* Demo Notice */}
-      {queryCount > 0 && queryCount < 2 && <div className="px-4 py-2">
-          <Card className="p-3 bg-accent/50 border-accent">
-            <div className="flex items-center gap-2 text-sm">
-              <Wallet className="w-4 h-4" />
-              <span>Demo mode: {2 - queryCount} {2 - queryCount === 1 ? 'query' : 'queries'} remaining. Connect wallet for unlimited access!</span>
-            </div>
-          </Card>
-        </div>}
+      {queryCount > 0 && queryCount < 2}
 
       {/* Quick Actions Guide */}
-      {messages.length === 1 && (
-        <div className="flex-shrink-0 animate-fade-in">
+      {messages.length === 1 && <div className="flex-shrink-0 animate-fade-in">
           <div className="py-2 px-4">
             <div className="flex items-center justify-center gap-2 text-muted-foreground">
               <span className="text-sm font-medium">Select any Option and begin</span>
               <ChevronDown className="w-4 h-4 animate-bounce" />
             </div>
           </div>
-        </div>
-      )}
+        </div>}
 
       {/* Input */}
       <div className="border-t border-border glass flex-shrink-0">
