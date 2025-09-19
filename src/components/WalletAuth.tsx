@@ -27,7 +27,7 @@ export const WalletAuth = () => {
         <Card className="glass p-8 max-w-md w-full text-center">
           <div className="mb-6">
             <img src="/lovable-uploads/b8ec2af1-41ea-4718-ad31-c8f47484c004.png" alt="Web3 Research Agent" className="w-20 h-20 mx-auto mb-4 object-contain" />
-            <h1 className="text-2xl font-bold mb-2">Mantlet Research</h1>
+            <h1 className="text-2xl font-bold mb-2">Mantlet AI</h1>
             <p className="text-muted-foreground">
               Connect your Web3 wallet or signup using Mail ID
             </p>
@@ -62,12 +62,7 @@ export const WalletAuth = () => {
                   {user?.wallet?.address || 'Connected'}
                 </p>
               </div>
-              <Button 
-                onClick={logout} 
-                variant="outline" 
-                size="sm"
-                className="w-full border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
-              >
+              <Button onClick={logout} variant="outline" size="sm" className="w-full border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground">
                 <LogOut className="w-4 h-4 mr-2" />
                 Disconnect
               </Button>
