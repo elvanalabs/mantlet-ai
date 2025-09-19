@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { TrendingUp, TrendingDown, BarChart3, Globe, Coins, Users, Info, AlertTriangle, Clock, ExternalLink, FileText, Shield } from 'lucide-react';
+import { TrendingUp, TrendingDown, BarChart3, Globe, Coins, Users, Info, AlertTriangle, Clock, ExternalLink, FileText, Shield, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { MoralisService, TokenHolder } from '@/services/MoralisService';
+import { supabase } from '@/integrations/supabase/client';
 
 interface DepegEvent {
   date: string;
@@ -110,6 +111,15 @@ const AdoptionMetrics: React.FC<AdoptionMetricsProps> = ({ adoptionData }) => {
     largestHolderPercentage: 0,
     riskLevel: 'Decentralized',
     riskColor: 'green',
+    loading: false
+  });
+
+  const [aiSummary, setAiSummary] = useState<{
+    content: string[];
+    loading: boolean;
+    error?: string;
+  }>({
+    content: [],
     loading: false
   });
 
@@ -236,6 +246,78 @@ const AdoptionMetrics: React.FC<AdoptionMetricsProps> = ({ adoptionData }) => {
       .replace(/ledger/g, '');
     
     return chainLogos[normalizedChainName] || null;
+  };
+
+  const generateAISummary = async () => {
+    setAiSummary({ content: [], loading: true, error: undefined });
+
+    try {
+      // Gather all available data for the stablecoin
+      const dataPoints = [
+        `Stablecoin: ${adoptionData.stablecoin}`,
+        `Total Circulating Supply: ${adoptionData.totalCirculatingSupply}`,
+        `Market Share: ${adoptionData.marketSharePercent}%`,
+        `24H Transaction Volume: ${adoptionData.transactionVolume24h}`,
+        `30-Day Growth/Decline: ${adoptionData.growthDecline30d.direction === 'up' ? '+' : '-'}${adoptionData.growthDecline30d.percentage}%`,
+        `Depeg Events (30D): ${adoptionData.depegEvents.count}`,
+        `Chain Distribution: ${adoptionData.chainDistribution.map(chain => `${chain.chain} (${chain.percentage}%)`).join(', ')}`,
+      ];
+
+      // Add concentration data if available
+      if (!concentrationData.loading && !concentrationData.error) {
+        dataPoints.push(
+          `Top 10 Holders: ${concentrationData.top10Percentage}%`,
+          `Largest Holder: ${concentrationData.largestHolderPercentage}%`,
+          `Risk Level: ${concentrationData.riskLevel}`
+        );
+      }
+
+      const prompt = `Based on the following comprehensive metrics for ${adoptionData.stablecoin}, generate a concise 3-point summary analyzing its adoption and performance:
+
+${dataPoints.join('\n')}
+
+Please provide exactly 3 key insights in bullet points, covering:
+1. Market position and adoption level
+2. Stability and risk assessment
+3. Growth trends and outlook
+
+Format each point as a single, clear sentence.`;
+
+      const { data, error } = await supabase.functions.invoke('claude-chat', {
+        body: {
+          message: prompt,
+          model: 'claude-sonnet-4-20250514'
+        }
+      });
+
+      if (error || !data?.success) {
+        throw new Error('Failed to generate AI summary');
+      }
+
+      // Parse the response into bullet points
+      const response = data.response;
+      const points = response
+        .split('\n')
+        .filter(line => line.trim() && (line.includes('•') || line.includes('-') || line.includes('*') || line.match(/^\d+\./)))
+        .map(line => line.replace(/^[•\-*\d\.]\s*/, '').trim())
+        .filter(point => point.length > 0)
+        .slice(0, 3); // Ensure exactly 3 points
+
+      if (points.length < 3) {
+        // Fallback: split by sentences if bullet parsing failed
+        const sentences = response.split(/[.!?]+/).filter(s => s.trim()).slice(0, 3);
+        setAiSummary({ content: sentences, loading: false });
+      } else {
+        setAiSummary({ content: points, loading: false });
+      }
+    } catch (error) {
+      console.error('Error generating AI summary:', error);
+      setAiSummary({ 
+        content: [], 
+        loading: false, 
+        error: 'Failed to generate summary. Please try again.' 
+      });
+    }
   };
 
   return (
@@ -460,6 +542,71 @@ const AdoptionMetrics: React.FC<AdoptionMetricsProps> = ({ adoptionData }) => {
               </CardContent>
             </Card>
           )}
+
+          {/* Generate Summary */}
+          <Card className="glass border border-border/50 hover:border-primary/20 transition-colors md:col-span-2">
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">
+                    Generate Summary
+                  </CardTitle>
+                  <Badge 
+                    variant="outline" 
+                    className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 text-xs font-semibold"
+                  >
+                    AI
+                  </Badge>
+                </div>
+                <Sparkles className="w-4 h-4 text-primary" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  Get an AI-powered summary of all adoption metrics and insights for {adoptionData.stablecoin}
+                </p>
+                
+                <Button
+                  onClick={generateAISummary}
+                  disabled={aiSummary.loading}
+                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white border-0"
+                >
+                  {aiSummary.loading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Generating Summary...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4 mr-2" />
+                      Generate AI Summary
+                    </>
+                  )}
+                </Button>
+
+                {aiSummary.error && (
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+                    <p className="text-sm text-red-600">{aiSummary.error}</p>
+                  </div>
+                )}
+
+                {aiSummary.content.length > 0 && (
+                  <div className="p-4 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-md">
+                    <h4 className="font-semibold text-sm mb-3 text-purple-800">AI Summary for {adoptionData.stablecoin}</h4>
+                    <ul className="space-y-2">
+                      {aiSummary.content.map((point, index) => (
+                        <li key={index} className="flex items-start gap-2 text-sm text-gray-700">
+                          <span className="text-purple-600 font-bold mt-0.5">•</span>
+                          <span>{point}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Concentration Risk */}
           {tokenAddresses[adoptionData.stablecoin] && (
