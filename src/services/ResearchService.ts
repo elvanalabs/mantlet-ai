@@ -1,5 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { STABLECOIN_REFERENCE_DATA, getStablecoinBySymbol } from '@/data/stablecoinReference';
+import { getStablecoinExplanation, isBasicStablecoinQuery } from '@/data/stablecoinExplanations';
+import { StablecoinSourceService } from './StablecoinSourceService';
 
 export interface ResearchResponse {
   contextData: string;
@@ -67,6 +69,21 @@ export class ResearchService {
           sources: [],
           newsResults
         };
+      }
+
+      // Check for basic stablecoin explanation queries
+      if (isBasicStablecoinQuery(query)) {
+        const enhancedData = await StablecoinSourceService.getEnhancedStablecoinData(query);
+        if (enhancedData) {
+          return {
+            contextData: enhancedData.explanation,
+            sources: enhancedData.sources || [],
+            newsResults: [],
+            chartData: undefined,
+            comparisonData: null,
+            adoptionData: null
+          };
+        }
       }
       
       // Check if this is an adoption tracker query
