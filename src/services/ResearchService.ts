@@ -73,16 +73,21 @@ export class ResearchService {
 
       // Check for basic stablecoin explanation queries
       if (isBasicStablecoinQuery(query)) {
-        const enhancedData = await StablecoinSourceService.getEnhancedStablecoinData(query);
-        if (enhancedData) {
-          return {
-            contextData: enhancedData.explanation,
-            sources: enhancedData.sources || [],
-            newsResults: [],
-            chartData: undefined,
-            comparisonData: null,
-            adoptionData: null
-          };
+        try {
+          const enhancedData = await StablecoinSourceService.getEnhancedStablecoinData(query);
+          if (enhancedData) {
+            return {
+              contextData: enhancedData.explanation,
+              sources: enhancedData.sources || [],
+              newsResults: [],
+              chartData: undefined,
+              comparisonData: null,
+              adoptionData: null
+            };
+          }
+        } catch (error) {
+          console.error('Error fetching enhanced stablecoin data:', error);
+          // Continue to normal flow if enhanced data fails
         }
       }
       
@@ -94,13 +99,22 @@ export class ResearchService {
         const stablecoinSymbols = this.extractStablecoinSymbols(query);
         
         if (stablecoinSymbols.length > 0) {
-          const adoptionData = await this.getAdoptionData(stablecoinSymbols[0]);
-          
-          return {
-            contextData: `Adoption metrics for ${stablecoinSymbols[0]}`,
-            sources: [],
-            adoptionData
-          };
+          try {
+            const adoptionData = await this.getAdoptionData(stablecoinSymbols[0]);
+            
+            return {
+              contextData: `Adoption metrics for ${stablecoinSymbols[0]}`,
+              sources: [],
+              adoptionData
+            };
+          } catch (error) {
+            console.error('Error fetching adoption data:', error);
+            return {
+              contextData: `Unable to fetch adoption metrics for ${stablecoinSymbols[0]} at this time. Please try again later.`,
+              sources: [],
+              adoptionData: null
+            };
+          }
         }
       }
       
@@ -127,13 +141,22 @@ export class ResearchService {
       
       if (isComparison && stablecoinSymbols.length >= 2) {
         console.log('Comparison query detected for:', stablecoinSymbols);
-        const comparisonData = this.generateComparisonData(stablecoinSymbols.slice(0, 2));
-        
-        return {
-          contextData: `Comparison between ${stablecoinSymbols[0]} and ${stablecoinSymbols[1]}`,
-          sources: [],
-          comparisonData
-        };
+        try {
+          const comparisonData = this.generateComparisonData(stablecoinSymbols.slice(0, 2));
+          
+          return {
+            contextData: `Comparison between ${stablecoinSymbols[0]} and ${stablecoinSymbols[1]}`,
+            sources: [],
+            comparisonData
+          };
+        } catch (error) {
+          console.error('Error generating comparison data:', error);
+          return {
+            contextData: `Unable to compare ${stablecoinSymbols[0]} and ${stablecoinSymbols[1]} at this time. Please try again later.`,
+            sources: [],
+            comparisonData: null
+          };
+        }
       }
       
       // For other queries, proceed with normal flow
@@ -168,7 +191,15 @@ export class ResearchService {
       };
     } catch (error) {
       console.error('Error processing query:', error);
-      throw new Error('Failed to process research query');
+      // Return a more user-friendly error response instead of throwing
+      return {
+        contextData: 'We encountered an issue processing your request. Please try again with a different query or check your internet connection.',
+        sources: [],
+        chartData: undefined,
+        newsResults: undefined,
+        comparisonData: undefined,
+        adoptionData: undefined
+      };
     }
   }
 

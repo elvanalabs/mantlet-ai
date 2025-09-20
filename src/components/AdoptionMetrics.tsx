@@ -204,7 +204,7 @@ const AdoptionMetrics: React.FC<AdoptionMetricsProps> = ({ adoptionData }) => {
         setConcentrationData(prev => ({ 
           ...prev, 
           loading: false, 
-          error: 'Failed to load concentration data' 
+          error: 'Unable to load concentration data. Data may be temporarily unavailable.' 
         }));
       }
     };
@@ -315,7 +315,7 @@ Format each point as a single, clear sentence.`;
       setAiSummary({ 
         content: [], 
         loading: false, 
-        error: 'Failed to generate summary. Please try again.' 
+        error: 'Failed to generate summary. Please check your internet connection and try again.' 
       });
     }
   };

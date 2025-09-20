@@ -19,6 +19,7 @@ export class StablecoinSourceService {
     const explanation = getStablecoinExplanation(stablecoin);
     
     if (!explanation || !explanation.sources || explanation.sources.length === 0) {
+      console.log(`No sources found for stablecoin: ${stablecoin}`);
       return null;
     }
 
@@ -35,7 +36,15 @@ export class StablecoinSourceService {
       
     } catch (error) {
       console.error(`Error fetching from official sources for ${stablecoin}:`, error);
-      return null;
+      // Return empty data instead of null to provide fallback
+      return {
+        circulatingSupply: 'N/A',
+        marketShare: 'N/A',
+        backing: 'Information temporarily unavailable',
+        issuer: 'Unknown',
+        regulatory: 'Unknown',
+        lastUpdate: new Date().toISOString()
+      };
     }
   }
 
