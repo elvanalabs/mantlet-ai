@@ -533,6 +533,13 @@ export class ResearchService {
         let referenceInfo = '';
         
         if (referenceData) {
+          // Use the proper explanation structure from stablecoinExplanations
+          const explanationData = require('../data/stablecoinExplanations').getStablecoinExplanation(stablecoinName);
+          
+          if (explanationData) {
+            return explanationData;
+          }
+          
           referenceInfo = `
 Reference Data for ${referenceData.name} (${referenceData.symbol}):
 - Category: ${referenceData.category}
