@@ -125,9 +125,11 @@ export class ResearchService {
       const stablecoinSymbols = this.extractStablecoinSymbols(query);
       
       if (isExplainQuery && stablecoinSymbols.length > 0) {
-        console.log('Explain stablecoin query detected for:', stablecoinSymbols[0]);
+        console.log('🔍 Explain stablecoin query detected for:', stablecoinSymbols[0]);
         const contextData = await this.generateResponse(query, '');
+        console.log('📝 Generated context data:', contextData.substring(0, 100) + '...');
         const chartData = await this.getChartData(stablecoinSymbols[0]);
+        console.log('📊 Chart data retrieved:', chartData ? 'SUCCESS' : 'FAILED', chartData);
         
         return {
           contextData,

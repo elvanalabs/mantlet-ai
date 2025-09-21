@@ -17,6 +17,7 @@ interface StablecoinChartProps {
 }
 
 const StablecoinChart: React.FC<StablecoinChartProps> = ({ chartData }) => {
+  console.log('📈 StablecoinChart received data:', chartData);
   const { symbol, data } = chartData;
   
   // Calculate price trend
