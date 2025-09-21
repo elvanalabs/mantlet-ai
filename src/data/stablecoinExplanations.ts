@@ -30,7 +30,8 @@ export const STABLECOIN_EXPLANATIONS: { [key: string]: StablecoinExplanation } =
   'USDT': {
     symbol: 'USDT',
     name: 'Tether',
-    explanation: `**Tether (USDT)** is the world's largest stablecoin by market capitalization and trading volume, designed to maintain a 1:1 peg with the US Dollar.
+    explanation: `**Overview:**
+Tether (USDT) is the world's largest stablecoin by market capitalization and trading volume, designed to maintain a 1:1 peg with the US Dollar. Launched in 2014, USDT has become the most widely used stablecoin across major exchanges and DeFi protocols globally.
 
 **Backing Mechanism:**
 • **100% Reserve Backing**: All USDT tokens backed by Tether's reserves including USD, treasury bills, and commercial paper
@@ -40,14 +41,16 @@ export const STABLECOIN_EXPLANATIONS: { [key: string]: StablecoinExplanation } =
 • **Reserve Composition**: Mix of cash deposits, short-term US Treasury securities, and commercial paper holdings
 • **Independent Attestations**: Regular third-party verification of reserve holdings and circulation metrics
 
-**Regulatory Status:**
-Tether has faced regulatory scrutiny but maintains operations globally. The company publishes quarterly attestations of reserves.
+**Use Cases:**
+• Trading pairs on major exchanges worldwide
+• Cross-border payments and remittances
+• DeFi lending and borrowing protocols
+• Corporate treasury management
+• Arbitrage and trading strategies
+• Store of value during crypto market volatility
 
-**Advantages:**
-✓ Highest liquidity and acceptance
-✓ Available on most exchanges
-✓ Multi-chain compatibility
-✓ Established track record since 2014`,
+**Associated Institutions:**
+Issuer: Tether Limited | Auditor: Big Four accounting firm (in transition 2024-2025) | Partners: Bitfinex, Cantor Fitzgerald | Major Exchanges: Binance, Coinbase, Kraken, Huobi, OKX`,
     associatedInstitutions: {
       issuer: 'Tether Limited',
       auditor: 'Big Four accounting firm (in transition 2024-2025)',
@@ -81,7 +84,8 @@ Tether has faced regulatory scrutiny but maintains operations globally. The comp
   'USDC': {
     symbol: 'USDC',
     name: 'USD Coin',
-    explanation: `**USD Coin (USDC)** is a fully regulated, US dollar-backed stablecoin issued by Circle, known for its regulatory compliance.
+    explanation: `**Overview:**
+USD Coin (USDC) is a fully regulated, US dollar-backed stablecoin issued by Circle, known for its regulatory compliance and institutional adoption. USDC operates under strict regulatory oversight with monthly reserve attestations and established financial institution backing.
 
 **Backing Mechanism:**
 • **Circle Reserve Fund**: 100% backed through SEC-registered government money market fund managed by BlackRock
@@ -91,22 +95,16 @@ Tether has faced regulatory scrutiny but maintains operations globally. The comp
 • **Monthly Attestations**: Independent verification by Grant Thornton LLP of all reserve holdings and circulation
 • **Real-Time Transparency**: Daily updates on reserves composition, issuance, and redemption data publicly available
 
-**Regulatory Compliance:**
-USDC operates under strict regulatory oversight with full reserve backing and regular audits.
-
-**Advantages:**
-✓ Full regulatory compliance
-✓ Monthly reserve attestations
-✓ Strong institutional adoption
-✓ Native cross-chain support
-✓ Backed by established financial institutions
-
 **Use Cases:**
 • DeFi protocols and yield farming
 • Institutional treasury management
-• Cross-border payments
-• Trading and arbitrage
-• Corporate crypto adoption`,
+• Cross-border payments and remittances
+• Trading and arbitrage strategies
+• Corporate crypto adoption
+• Payment rails for fintech companies
+
+**Associated Institutions:**
+Issuer: Circle Internet Financial | Custodian: BlackRock (Circle Reserve Fund) | Auditor: Grant Thornton LLP | Partners: Coinbase, BlackRock, Goldman Sachs | Major Exchanges: Coinbase, Binance, Kraken, FTX, Gemini`,
     associatedInstitutions: {
       issuer: 'Circle Internet Financial',
       custodian: 'BlackRock (Circle Reserve Fund)',
@@ -142,13 +140,8 @@ USDC operates under strict regulatory oversight with full reserve backing and re
   'DAI': {
     symbol: 'DAI',
     name: 'Dai',
-    explanation: `**Dai (DAI)** is a decentralized stablecoin created by MakerDAO, backed by over-collateralized cryptocurrency assets rather than traditional fiat reserves.
-
-**Key Features:**
-• **Decentralized**: No single entity controls DAI issuance
-• **Crypto-backed**: Collateralized by ETH, WBTC, USDC, and other approved assets
-• **Algorithmic**: Price stability maintained through automated liquidations and incentives
-• **Governance**: Controlled by MKR token holders through on-chain voting
+    explanation: `**Overview:**
+Dai (DAI) is a decentralized stablecoin created by MakerDAO, backed by over-collateralized cryptocurrency assets rather than traditional fiat reserves. DAI operates through a truly decentralized architecture with no single entity controlling issuance, making it censorship-resistant and transparent.
 
 **Backing Mechanism:**
 • **Over-Collateralization**: Backed by 150%+ crypto collateral including ETH, WBTC, USDC deposited in Maker Vaults
@@ -158,18 +151,16 @@ USDC operates under strict regulatory oversight with full reserve backing and re
 • **Debt Ceiling Management**: Protocol-controlled limits on DAI generation from each collateral type for risk management
 • **Emergency Shutdown**: Global settlement mechanism ensures all DAI holders can redeem proportional collateral value
 
-**Advantages:**
-✓ Truly decentralized architecture
-✓ Censorship resistant
-✓ Transparent on-chain operations
-✓ No counterparty risk from traditional banking
-✓ Established DeFi integration
-
 **Use Cases:**
-• DeFi lending and borrowing
-• Yield farming strategies
-• Hedge against crypto volatility
-• Decentralized trading pairs`,
+• DeFi lending and borrowing protocols
+• Yield farming and liquidity mining
+• Hedge against crypto market volatility
+• Decentralized trading pairs and AMMs
+• Collateral for other DeFi protocols
+• Store of value in decentralized ecosystem
+
+**Associated Institutions:**
+Issuer: MakerDAO (Decentralized) | Partners: Compound, Aave, Uniswap, Curve, Yearn Finance | Major Exchanges: Coinbase, Binance, Kraken, Uniswap, SushiSwap | Governance: MKR Token Holders`,
     associatedInstitutions: {
       issuer: 'MakerDAO (Decentralized)',
       partners: ['Compound', 'Aave', 'Uniswap', 'Curve', 'Yearn Finance'],
@@ -202,27 +193,27 @@ USDC operates under strict regulatory oversight with full reserve backing and re
   'USDE': {
     symbol: 'USDE',
     name: 'Ethena USDe',
-    explanation: `**Ethena USDe (USDe)** is a synthetic dollar protocol that maintains its peg through delta-neutral positions using ETH derivatives and staking rewards.
+    explanation: `**Overview:**
+Ethena USDe (USDe) is a synthetic dollar protocol that maintains its peg through delta-neutral positions using ETH derivatives and staking rewards. Unlike traditional stablecoins, USDe generates native yield while maintaining stability through innovative derivatives strategies.
 
-**Key Features:**
-• **Synthetic**: Not backed by USD reserves but by ETH derivatives
-• **Delta-neutral**: Uses perpetual futures to hedge ETH price exposure
-• **Yield-generating**: Combines ETH staking rewards with funding rate arbitrage
-• **Scalable**: Can grow beyond traditional banking limitations
-
-**How It Works:**
-USDe is backed by ETH and stETH, with short positions in ETH perpetual futures to maintain delta neutrality. This creates a synthetic USD exposure while generating yield.
-
-**Advantages:**
-✓ Generates native yield for holders
-✓ Scalable beyond bank deposit limitations
-✓ No traditional banking counterparty risk
-✓ Innovative approach to stablecoin design
+**Backing Mechanism:**
+• **Synthetic USD Exposure**: Not backed by USD reserves but by ETH derivatives creating synthetic dollar exposure
+• **Delta-Neutral Strategy**: Uses perpetual futures to hedge ETH price exposure while maintaining stability
+• **ETH Staking Rewards**: Combines ETH staking rewards with funding rate arbitrage for yield generation
+• **Collateral Composition**: Backed by ETH and stETH with corresponding short positions in ETH perpetual futures
+• **Scalable Design**: Can grow beyond traditional banking limitations without reserve constraints
+• **Risk Management**: Multiple exchange partnerships for custody and risk distribution
 
 **Use Cases:**
-• Yield-bearing stablecoin alternative
-• DeFi protocols seeking yield
-• Sophisticated trading strategies`,
+• Yield-bearing stablecoin alternative for DeFi
+• Sophisticated trading and arbitrage strategies
+• Liquidity provision in yield-generating protocols
+• Treasury management for yield-seeking institutions
+• Collateral for DeFi lending platforms
+• Cross-chain yield farming strategies
+
+**Associated Institutions:**
+Issuer: Ethena Labs | Custodians: Binance, OKX, Bybit, Deribit | Auditor: Chaos Labs | Partners: BlackRock (USDtb), Multiple CEX Partners | Major Exchanges: Binance, OKX, Gate.io, KuCoin`,
     associatedInstitutions: {
       issuer: 'Ethena Labs',
       custodian: 'Multiple exchange partners (Binance, OKX, Bybit, Deribit)',
@@ -326,7 +317,8 @@ In February 2023, Paxos received a Wells notice from the SEC and stopped minting
   'PYUSD': {
     symbol: 'PYUSD',
     name: 'PayPal USD',
-    explanation: `**PayPal USD (PYUSD)** is a stablecoin issued by PayPal, backed by US dollar deposits, US Treasury securities, and cash equivalents.
+    explanation: `**Overview:**
+PayPal USD (PYUSD) is a stablecoin issued by PayPal, backed by US dollar deposits, US Treasury securities, and cash equivalents. PYUSD represents PayPal's entry into the stablecoin market, leveraging their established financial infrastructure and mainstream user base.
 
 **Backing Mechanism:**
 • **Paxos-Issued Stablecoin**: Fully backed USD stablecoin issued by Paxos Trust Company for PayPal ecosystem
@@ -336,20 +328,16 @@ In February 2023, Paxos received a Wells notice from the SEC and stopped minting
 • **Institutional Custody**: Reserves managed through established financial institution custody services
 • **Monthly Attestations**: Regular third-party verification of reserve holdings and token circulation
 
-**PayPal Integration:**
-PYUSD is designed to integrate seamlessly with PayPal's existing financial services, enabling easy conversion between PYUSD and traditional fiat currencies.
-
-**Advantages:**
-✓ Backed by established financial institution
-✓ Easy fiat on/off ramps through PayPal
-✓ Strong regulatory compliance
-✓ Potential for mainstream adoption
-
 **Use Cases:**
-• Digital payments and e-commerce
-• Cross-border remittances
-• Integration with existing PayPal services
-• Gateway between traditional finance and crypto`,
+• Digital payments and e-commerce transactions
+• Cross-border remittances and transfers
+• Integration with existing PayPal services and Venmo
+• Gateway between traditional finance and crypto
+• Merchant payments and online commerce
+• Peer-to-peer transfers within PayPal ecosystem
+
+**Associated Institutions:**
+Issuer: PayPal Holdings Inc. | Custodian: Paxos Trust Company | Auditor: Withum Smith + Brown PC | Partners: Paxos, Venmo, Xoom, Stellar Network | Major Exchanges: Crypto.com, Coinbase, Kraken, Bitstamp`,
     associatedInstitutions: {
       issuer: 'PayPal Holdings Inc.',
       custodian: 'Paxos Trust Company',
