@@ -1020,6 +1020,7 @@ ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
     price: number;
     volume?: number;
   }> {
+    console.log('🎯 generateMockChartData called for symbol:', symbol);
     const data = [];
     let basePrice = 1.0000; // Default for USD stablecoins
     
@@ -1277,6 +1278,9 @@ ${marketData ? `Current Market Data:\n${marketData}` : ''}`;
       });
     }
     
+    console.log('🎯 Base price set to:', basePrice, 'for symbol:', symbol);
+    console.log('🎯 Starting data generation for 30 days...');
+    console.log('🎯 Generated', data.length, 'data points. First:', data[0], 'Last:', data[data.length - 1]);
     return data;
   }
 

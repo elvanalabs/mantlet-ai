@@ -17,7 +17,25 @@ interface StablecoinChartProps {
 }
 
 const StablecoinChart: React.FC<StablecoinChartProps> = ({ chartData }) => {
-  console.log('📈 StablecoinChart received data:', chartData);
+  console.log('📈 StablecoinChart RENDERING with data:', chartData);
+  console.log('📈 Data points:', chartData?.data?.length || 0);
+  
+  if (!chartData || !chartData.data || chartData.data.length === 0) {
+    console.log('❌ No chart data available');
+    return (
+      <Card className="w-full mt-4 min-h-[300px] bg-card border border-border">
+        <CardHeader>
+          <CardTitle>Chart Data Unavailable</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-64 flex items-center justify-center text-muted-foreground">
+            No price data available for this stablecoin.
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+  
   const { symbol, data } = chartData;
   
   // Calculate price trend
@@ -48,7 +66,7 @@ const StablecoinChart: React.FC<StablecoinChartProps> = ({ chartData }) => {
   }));
 
   return (
-    <Card className="w-full mt-4">
+    <Card className="w-full mt-4 min-h-[320px] bg-card border border-border shadow-sm">
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center justify-between text-lg">
           <span>{symbol} Price Chart (30 Days)</span>
@@ -61,7 +79,7 @@ const StablecoinChart: React.FC<StablecoinChartProps> = ({ chartData }) => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="h-64 w-full">
+        <div className="h-64 w-full bg-background/50 rounded-md border">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={formattedData}>
               <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
