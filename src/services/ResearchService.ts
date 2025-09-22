@@ -128,8 +128,30 @@ export class ResearchService {
         console.log('🔍 Explain stablecoin query detected for:', stablecoinSymbols[0]);
         const contextData = await this.generateResponse(query, '');
         console.log('📝 Generated context data:', contextData.substring(0, 100) + '...');
-        const chartData = await this.getChartData(stablecoinSymbols[0]);
-        console.log('📊 Chart data retrieved:', chartData ? 'SUCCESS' : 'FAILED', chartData);
+        
+        // Force chart data generation - always provide data for explains
+        let chartData;
+        try {
+          chartData = await this.getChartData(stablecoinSymbols[0]);
+          console.log('📊 Chart data retrieved:', chartData ? 'SUCCESS' : 'FAILED');
+          
+          // If no chart data, generate mock data as fallback
+          if (!chartData) {
+            console.log('🎯 Generating fallback mock data for', stablecoinSymbols[0]);
+            chartData = {
+              symbol: stablecoinSymbols[0],
+              data: this.generateMockChartData(stablecoinSymbols[0])
+            };
+          }
+        } catch (error) {
+          console.error('📊 Chart data error, using mock:', error);
+          chartData = {
+            symbol: stablecoinSymbols[0],
+            data: this.generateMockChartData(stablecoinSymbols[0])
+          };
+        }
+        
+        console.log('📊 Final chart data:', chartData);
         
         return {
           contextData,

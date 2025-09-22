@@ -132,8 +132,7 @@ export const ResearchInterface = () => {
       // API call for queries
       console.log('🚀 Using API for query:', query);
       const response = await ResearchService.processQuery(query);
-      console.log('📋 API response received:', response);
-      console.log('📊 Chart data in response:', response.chartData ? 'PRESENT' : 'MISSING');
+      console.log('📋 API response - chartData present:', !!response.chartData);
       
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -153,7 +152,7 @@ export const ResearchInterface = () => {
         } : undefined
       };
       
-      console.log('💬 Final assistant message created with chartData:', assistantMessage.chartData ? 'YES' : 'NO');
+      console.log('💬 Message created with chartData:', !!assistantMessage.chartData);
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Research error:', error);
@@ -400,12 +399,9 @@ export const ResearchInterface = () => {
                 {message.adoptionData && <div className="mt-3">
                     <AdoptionMetrics adoptionData={message.adoptionData} />
                   </div>}
-                 {(() => {
-                   console.log('🔍 Checking chartData for message:', message.id, 'chartData:', message.chartData ? 'EXISTS' : 'NULL');
-                   return message.chartData && <div className="mt-3">
+                 {message.chartData && <div className="mt-3">
                      <StablecoinChart chartData={message.chartData} />
-                   </div>;
-                 })()}
+                   </div>}
                  {message.newsResults && <div className="mt-3">
                      <NewsGrid newsResults={message.newsResults} />
                    </div>}
