@@ -156,7 +156,8 @@ export class ResearchService {
         return {
           contextData,
           sources: [],
-          chartData
+          chartData,
+          newsResults: undefined // Explicitly exclude news for explain queries
         };
       }
       

@@ -396,13 +396,13 @@ export const ResearchInterface = () => {
                 });
               })()}
                 </div>
-                {message.adoptionData && <div className="mt-3">
-                    <AdoptionMetrics adoptionData={message.adoptionData} />
-                  </div>}
+                 {message.adoptionData && <div className="mt-3">
+                     <AdoptionMetrics adoptionData={message.adoptionData} />
+                   </div>}
                  {message.chartData && <div className="mt-3">
                      <StablecoinChart chartData={message.chartData} />
                    </div>}
-                 {message.newsResults && <div className="mt-3">
+                 {message.newsResults && !message.chartData && <div className="mt-3">
                      <NewsGrid newsResults={message.newsResults} />
                    </div>}
                  {message.comparisonData && <div className="mt-3">
